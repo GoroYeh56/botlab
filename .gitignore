@@ -1,7 +1,10 @@
 #######################################
 # Project Specific
 #######################################
-
+src/lcmtypes/*.c
+src/lcmtypes/*.hpp
+src/lcmtypes/*.h
+src/lcmtypes/*.py
 
 #######################################
 # LCM
