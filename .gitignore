@@ -5,6 +5,12 @@ src/lcmtypes/*.c
 src/lcmtypes/*.hpp
 src/lcmtypes/*.h
 src/lcmtypes/*.py
+src/lcmtypes/*.o
+lcmtypes/*.c
+lcmtypes/*.hpp
+lcmtypes/*.h
+lcmtypes/*.py
+lcmtypes/*.o
 
 #######################################
 # LCM
