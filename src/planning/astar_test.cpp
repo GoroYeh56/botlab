@@ -76,18 +76,31 @@ int main(int argc, char** argv)
     
     // Handle Options
     getopt_t *gopt = getopt_create();
-    getopt_add_bool(gopt, 'h', "help", 0, "Show this help"); 
-    getopt_add_bool(gopt, '\0', useGuiArg, 0, "Flag to send lcm messages with pose and grid data. Have ./botgui running to display them.");
-    getopt_add_bool(gopt, '\0', animatePathArg, 1, "Flag to animate the path formation in the order that is_valid_cell follows");
-    getopt_add_int(gopt, '\0', numRepeatsArg, "1", "Number of times to repeat the A* .");
-    getopt_add_int(gopt, '\0', pauseTimeArg, "2", "Time [s] to pause the A* test for each tested pair of start and goal in each map");
-    getopt_add_int(gopt, '\0', testSelectArg, "6", "[0-6] Number corresponding of case to test. Leave at 6 to test all cases");
+    getopt_add_bool(gopt, 'h', "help", 0, "Show this help message."); 
+    getopt_add_bool(gopt, '\0', useGuiArg, 0, "Indicates whether ./botgui is being used for visualization."
+                    " Set this to 1 or true to send lcm messages with pose and grid data for visualization."
+                    " './botgui' has to be running in parallel.");
+    getopt_add_bool(gopt, '\0', animatePathArg, 0, "If this flag is set to true when visualizing, "
+                    "the path will be animated with brief pauses at every vertex.");
+    getopt_add_int(gopt, '\0', numRepeatsArg, "1", "Indicates the number of times A* is re-run when evaluating the code's runtime.");
+    getopt_add_int(gopt, '\0', pauseTimeArg, "1", "Indicates the time, in seconds, to pause after every test."
+                    " Used to facilitate visualization.");
+    getopt_add_int(gopt, '\0', testSelectArg, "6", "Can be set to a value in the interval [0-6]."
+                    " When set to 6 (default) all tests are run, otherwise the one corresponding test is run: "
+                    "test_empty_grid, test_filled_grid, test_narrow_constriction_grid, "
+                    "test_wide_constriction_grid, test_convex_grid, test_maze_grid");
 
     // PRINT HELP IF FAILED TO PARSE STRING, OR IF SENT --help ARGUMENT
     if (!getopt_parse(gopt, argc, argv, 1)  || getopt_get_bool(gopt, "help")) {
-        printf("Usage: %s [options]", argv[0]);
+        printf("To execute this code: %s [options] [value]\n", argv[0]);
+        printf("To use a non-boolean flag one has to follow the flag by its value.\n"
+        "The following are valid examples:"
+        "\n\t ./astar_test --num-repeats 2 \n\t ./astar_test --use-gui --pause-time 2 \n");
+
+        printf("\nAvailable options and their values are:\n");
         getopt_do_usage(gopt);
-        printf("\nMake sure you provide the required Gui flag\n");
+
+        // printf("\nMake sure you provide the required Gui flag\n");
         return 1;
     }
 
@@ -210,8 +223,8 @@ bool test_saved_poses(const std::string& mapFile, const std::string& posesFile, 
     std::ifstream poseIn(posesFile);
     if(!poseIn.is_open())
     {
-        std::cerr << "ERROR: No maze poses located in " << posesFile 
-            << " Please run astar_test directly from the bin/ directory.\n";
+        std::cerr << "ERROR: No maze poses located in " << posesFile << std::endl
+            << "\n****Please run astar_test directly from the 'bin/' directory.****\n";
         exit(-1);
     }
     
