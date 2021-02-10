@@ -13,10 +13,11 @@ from mbot_motor_command_t import mbot_motor_command_t
 
 class Mbot(pygame.sprite.Sprite):
     class State:
-        def __init__(self, pose, twist, stamp):
+        def __init__(self, pose, twist, stamp, motion_direction):
             self.stamp = stamp
             self.pose = pose
             self.twist = twist
+            self.motion_direction = motion_direction
 
     def __init__(self, world_map, max_trans_speed, max_angular_speed, real_time_factor):
         super(Mbot, self).__init__()
@@ -34,7 +35,7 @@ class Mbot(pygame.sprite.Sprite):
         num_steps = int(self._trajectory_length / self._trajectory_step)
         start_time = time.perf_counter() - (num_steps * self._trajectory_step)
         self._trajectory = [
-            Mbot.State(geometry.Pose(0, 0, 0), geometry.Twist(0, 0, 0), start_time + (i * self._trajectory_step)) for i
+            Mbot.State(geometry.Pose(0, 0, 0), geometry.Twist(0, 0, 0), start_time + (i * self._trajectory_step), 1) for i
             in range(num_steps)]
         # TODO(???): Properly model the dependence between translation and angular speed, e.g. if at max angular speed
         #            then translation speed must be zero
@@ -180,13 +181,13 @@ class Mbot(pygame.sprite.Sprite):
                                         geometry.Twist(cmd.trans_v * numpy.cos(last_state.pose.theta),
                                                        cmd.trans_v * numpy.sin(last_state.pose.theta),
                                                        cmd.angular_v),
-                                        cmd_time)
+                                        cmd_time, numpy.sign(cmd.trans_v))
                 self._trajectory.append(last_state)
             # Calculate to the end of this step
             dt = (end_time - start_time) * self._real_time_factor
             dpose = self._const_vel_motion(last_state, dt)
             final_pose = self._handle_collision(last_state.pose + dpose, last_state.twist)
-            last_state = Mbot.State(final_pose, last_state.twist, end_time)
+            last_state = Mbot.State(final_pose, last_state.twist, end_time, last_state.motion_direction)
             self._trajectory.append(last_state)
         return last_state.pose
 
@@ -220,8 +221,8 @@ class Mbot(pygame.sprite.Sprite):
             dtheta = 0
         else:
             trans_over_ang = numpy.sqrt(state.twist.vx ** 2 + state.twist.vy ** 2) / state.twist.vtheta
-            dx = trans_over_ang * (numpy.sin(state.twist.vtheta * dt + state.pose.theta) - numpy.sin(state.pose.theta))
-            dy = -trans_over_ang * (numpy.cos(state.twist.vtheta * dt + state.pose.theta) - numpy.cos(state.pose.theta))
+            dx = state.motion_direction * trans_over_ang * (numpy.sin(state.twist.vtheta * dt + state.pose.theta) - numpy.sin(state.pose.theta))
+            dy = -state.motion_direction * trans_over_ang * (numpy.cos(state.twist.vtheta * dt + state.pose.theta) - numpy.cos(state.pose.theta))
 
         return geometry.Pose(dx, dy, dtheta)
 
