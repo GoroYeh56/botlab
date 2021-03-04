@@ -273,7 +273,7 @@ void OccupancyGridSLAM::updateLocalization(void)
 
 void OccupancyGridSLAM::updateMap(void)
 {
-    if(mode_ != localization_only || mode_ != action_only)
+    if(mode_ != localization_only && mode_ != action_only)
     {
         // Process the map
         mapper_.updateMap(currentScan_, currentPose_, map_);
