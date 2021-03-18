@@ -101,9 +101,11 @@ class Gui:
         dpose = pose - self._last_pose
         if self._use_noise and self._mbot.moving:
             trans = numpy.sqrt(dpose.x ** 2 + dpose.y ** 2) + numpy.random.normal(0, self._odom_trans_sigma)
-            dpose.theta += numpy.random.normal(0, self._odom_rot_sigma)
-            dpose.x = trans * numpy.cos(self._odom_pose.theta + dpose.theta)
-            dpose.y = trans * numpy.sin(self._odom_pose.theta + dpose.theta)
+            rot_noise = numpy.random.normal(0, self._odom_rot_sigma)
+            trans_dir = numpy.arctan2(dpose.y, dpose.x) + rot_noise
+            dpose.x = trans * numpy.cos(trans_dir)
+            dpose.y = trans * numpy.sin(trans_dir)
+            dpose.theta += rot_noise
         self._odom_pose += dpose
         msg = odometry_t()
         msg.x = self._odom_pose.x
