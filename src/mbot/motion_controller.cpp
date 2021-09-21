@@ -30,7 +30,7 @@
  *  - Limit (min max) the speeds that your robot is commanded
  *      to avoid commands to slow for your bots or ones too high
  */
-///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////   
 
 class StraightManeuverController : public ManeuverControllerBase
 {
