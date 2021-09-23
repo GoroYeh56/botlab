@@ -65,6 +65,14 @@ public:
     }
 };
 
+const float Kp = 0.3;
+const float Ktheta = 1;
+
+// const float MAX_FWD_VEL = 0.8;
+// const float MAX_TURN_VEL = 2.5;
+const float MAX_FWD_VEL = 0.3;
+const float MAX_TURN_VEL = 1;
+
 
 class MotionController
 { 
@@ -97,7 +105,7 @@ public:
         
         if(!targets_.empty() && !odomTrace_.empty()) 
         {
-            pose_xyt_t target = targets_.back();
+            pose_xyt_t target = targets_.back(); // 
             pose_xyt_t pose = currentPose();
 
             ///////  TODO: Add different states when adding maneuver controls /////// 
@@ -109,7 +117,11 @@ public:
                 } 
                 else
                 {
-                    cmd = turn_controller.get_command(pose, target);
+                    // TODO: calculate cmd by error
+                    float angle_err = target.theta - pose.theta ;
+                    cmd.trans_v = 0;
+                    cmd.angular_v = Ktheta * angle_err;
+                    // cmd = turn_controller.get_command(pose, target);
                 }
             }
             else if(state_ == DRIVE) 
@@ -120,10 +132,18 @@ public:
                     {
                         std::cout << "\rTarget Reached!";
                     }
+                    // else{
+                        // std::cout<< "To TURN state\n";
+                        // state_ = TURN;
+                    // }
                 }
                 else
                 { 
-                    cmd = straight_controller.get_command(pose, target);
+                    float distance_err =  sqrt ( pow( (pose.x - target.x) , 2) + pow((pose.y - target.y),2));
+                    cmd.trans_v = Kp * distance_err ;
+                    cmd.angular_v = 0;
+
+                    // cmd = straight_controller.get_command(pose, target);
                 }
 		    }
             else
@@ -255,6 +275,9 @@ int main(int argc, char** argv)
 
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
+                cmd.trans_v = std::min(MAX_FWD_VEL, cmd.trans_v);
+                cmd.angular_v = std::min(MAX_TURN_VEL, cmd.angular_v);
+                printf("%f, %f\n",cmd.trans_v, cmd.angular_v);
             	lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
     	}
     }
