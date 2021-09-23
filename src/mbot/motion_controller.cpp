@@ -44,10 +44,10 @@ public:
     {
         this->t_prev = this->t_now;
         this->t_now = pose->utime;
-        float xDeviation = target->x - pose->x;
-        float angleDeviation = atanf(pose->x / pose->y);
+        float xDeviation = target.x - pose.x;
+        float angleDeviation = atanf(pose.x / pose.y);
         float Dt = t_now - t_prev;
-        float v = Kp*xDeviation + Ki*Dt*xDeviation + kv*xDeviation/Dt;
+        float v = Kp*xDeviation + Ki*Dt*xDeviation + Kv*xDeviation/Dt;
         float w = Kp*angleDeviation;
         
         return {0, v, w};
