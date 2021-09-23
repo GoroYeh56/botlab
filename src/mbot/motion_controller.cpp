@@ -38,16 +38,31 @@
 class StraightManeuverController : public ManeuverControllerBase
 {
 public:
+    
     StraightManeuverController() = default;   
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
-        return {0, 0.1, 0};
+        this->t_prev = this->t_now;
+        this->t_now = pose->utime;
+        float xDeviation = target->x - pose->x;
+        float angleDeviation = atanf(pose->x / pose->y);
+        float Dt = t_now - t_prev;
+        float v = Kp*xDeviation + Ki*Dt*xDeviation + kv*xDeviation/Dt;
+        float w = Kp*angleDeviation;
+        
+        return {0, v, w};
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
         return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
     }
+private:
+    float Kp = 2.0;
+    float Ki = 0.7;
+    float Kd = 0.03;
+    float t_prev = 0.0;
+    float t_now = 0.0;
 };
 
 class TurnManeuverController : public ManeuverControllerBase
