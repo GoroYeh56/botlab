@@ -48,7 +48,7 @@ public:
         float angleDeviation = target.theta - pose.theta;
         float Dt = t_now - t_prev;
         float v = Kp * xDeviation;
-        float w = Kp * angleDeviation; 
+        float w = Komega * angleDeviation; 
         
         return {0, v, w};
     }
@@ -62,6 +62,7 @@ private:
     float Kp = 2.0;
     float Ki = 0.7;
     float Kd = 0.03;
+    float Komega = 0.1;
     float t_prev = 0.0;
     float t_now = 0.0;
 };
