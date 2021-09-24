@@ -45,7 +45,10 @@ public:
         this->t_prev = this->t_now;
         this->t_now = pose.utime;
         float xDeviation = target.x - pose.x;
-        float angleDeviation = target.theta - pose.theta;
+        float dx = target.x - pose.x;
+        float dy = target.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        float angleDeviation = angle_diff(pose.theta, target_heading);
         float Dt = t_now - t_prev;
         float v = Kp * xDeviation;
         float w = Komega * angleDeviation; 
@@ -83,7 +86,7 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07);
+        return (fabs(angle_diff(pose.theta, target_heading)) < 0.15); //0.07
     }
 private: 
     float Kp = 0.5;
