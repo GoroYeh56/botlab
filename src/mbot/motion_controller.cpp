@@ -62,7 +62,7 @@ public:
     }
 
 private:
-    float Kp = 0.5;
+    float Kp = 1;
     float Ki = 0.7;
     float Kd = 0.2;
     float Komega = 0.05;
