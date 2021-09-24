@@ -277,7 +277,7 @@ int main(int argc, char** argv)
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
                 lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
-                std::cout << "\rv: " << cmd.trans_v << "    w: " << cmd.angular_v;
+                //std::cout << "\rv: " << cmd.trans_v << "    w: " << cmd.angular_v;
     	}
     }
     
