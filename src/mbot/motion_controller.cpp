@@ -271,9 +271,8 @@ int main(int argc, char** argv)
     {
         lcmInstance.handleTimeout(50);  // update at 20Hz minimum
 
-    	if(controller.timesync_initialized()||!controller.timesync_initialized()){
+    	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
-                cmd = { 0, 0.25,0.25 };
                 lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
     	}
     }
