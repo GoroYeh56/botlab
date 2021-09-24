@@ -1,6 +1,6 @@
 #! /usr/bin/python
 import lcm
-from time import sleep
+import time
 import sys
 sys.path.append("lcmtypes")
 
@@ -16,17 +16,34 @@ sq_w = 1.0
 sq_d = 1.0
 
 
-""" Setup LCM and subscribe """
-        self.lc = lcm.LCM()
-        self.lcm_sub = self.lc.subscribe("ODOMETRY", self.odometry_handler)
-        self.waypoints = [[0.0,0.0],[sq_w,0.0],[sq_w,sq_d],[0.0,sq_d],[0.0,0.0]]
-        self.wpt_num = 0
-        self.wpt_thresh = 0.01
+
+lc = lcm.LCM()
+
+point1 = pose_xyt_t()
+point1.x = 0
+point1.y = 0
+point1.theta = 0
+point2 = pose_xyt_t()
+point2.x = 1
+point2.y = 0
+point2.theta = 0
+point3 = pose_xyt_t()
+point3.x = 1
+point3.y = 1
+point3.theta = 0
+point4 = pose_xyt_t()
+point4.x = 0
+point4.y = 1
+point4.theta = 0
+msg = robot_path_t()
+msg.path_length = 5
+msg.path = [point1,point2,point3,point4,point1]
 
 
-def path_cmd_publish():
-        msg = robot_path_t()
-        msg.path_length = 4
-        msg.path = [[0.0,0.0,0.0],[sq_w,0.0,0.0],[sq_w,sq_d,0.0],[0.0,sq_d,0.0],[0.0,0.0,0.0]]
-        self.lc.publish("MBOT_MOTOR_COMMAND",msg.encode())
+timestamp = timestamp_t()
+timestamp.utime = time.time() 
+lc.publish("MBOT_TIMESYNC", timestamp.encode())
+
+
+lc.publish("CONTROLLER_PATH",msg.encode())
 
