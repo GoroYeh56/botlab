@@ -47,8 +47,8 @@ public:
         float xDeviation = target.x - pose.x;
         float angleDeviation = atanf(pose.x / pose.y);
         float Dt = t_now - t_prev;
-        float v = Kp*xDeviation + Ki*Dt*xDeviation + Kd*xDeviation/Dt;
-        float w = Kp*angleDeviation;
+        float v = Kp * xDeviation;
+        float w = Kp * angleDeviation; 
         
         return {0, v, w};
     }
@@ -57,6 +57,7 @@ public:
     {
         return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
     }
+
 private:
     float Kp = 2.0;
     float Ki = 0.7;
