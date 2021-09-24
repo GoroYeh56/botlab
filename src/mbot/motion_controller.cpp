@@ -50,7 +50,7 @@ public:
         float v = Kp*xDeviation + Ki*Dt*xDeviation + Kd*xDeviation/Dt;
         float w = Kp*angleDeviation;
         
-        return {0, v, w};
+        return {0, 0.25, 0.25};
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
