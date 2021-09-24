@@ -59,10 +59,10 @@ public:
     }
 
 private:
-    float Kp = 2.0;
+    float Kp = 0.25;
     float Ki = 0.7;
     float Kd = 0.03;
-    float Komega = 0.1;
+    float Komega = 0.05;
     float t_prev = 0.0;
     float t_now = 0.0;
 };
