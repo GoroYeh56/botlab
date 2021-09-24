@@ -50,7 +50,7 @@ public:
         float v = Kp*xDeviation + Ki*Dt*xDeviation + Kd*xDeviation/Dt;
         float w = Kp*angleDeviation;
         
-        return {0, 0.25, 0.25};
+        return {0, v, w};
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
@@ -266,6 +266,7 @@ int main(int argc, char** argv)
     MotionController controller(&lcmInstance);
 
     signal(SIGINT, exit);
+    std::cout << "\n";
     
     while(true)
     {
@@ -274,6 +275,7 @@ int main(int argc, char** argv)
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
                 lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
+                std::cout << "\rv: " << cmd.trans_v << "    w: " << cmd.angular_v;
     	}
     }
     
