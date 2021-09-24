@@ -273,7 +273,7 @@ int main(int argc, char** argv)
 
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
-            	lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
+                lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, {0, 0.25,0.25});//&cmd);
     	}
     }
     
