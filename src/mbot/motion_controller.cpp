@@ -16,7 +16,7 @@
 #include <cassert>
 #include <signal.h>
 #include "maneuver_controller.h"
-
+using namespace std;
 /////////////////////// TODO: /////////////////////////////
 /**
  * Code below is a little more than a template. You will need
@@ -32,6 +32,14 @@
  */
 ///////////////////////////////////////////////////////////
 
+// #define DEBUG_STATE
+
+
+#define DRIVE_CRITERIA 0.03 // m
+#define TURN_CRITERIA 0.1 // radian 5 degree
+#define TURN2_CRITERIA 0.1 // radian
+
+
 class StraightManeuverController : public ManeuverControllerBase
 {
 public:
@@ -43,11 +51,11 @@ public:
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
+        return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < DRIVE_CRITERIA));
     }
     virtual bool target_reached2(const pose_xyt_t& pose, const float& target_theta)  override
     {
-        return (fabs(angle_diff(pose.theta, target_theta)) < 0.2); // radian (~15 degree)
+        return (fabs(angle_diff(pose.theta, target_theta)) < TURN2_CRITERIA); // radian (~15 degree)
     }
 
 };
@@ -60,17 +68,17 @@ public:
     {
         return {0, 0, 0.5};
     }
-
+    // For 'heading' alignment
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.2); // radian
+        return (fabs(angle_diff(pose.theta, target_heading)) < TURN_CRITERIA); // radian
     }
     virtual bool target_reached2(const pose_xyt_t& pose, const float& target_theta)  override
     {
-        return (fabs(angle_diff(pose.theta, target_theta)) < 0.2); // radian (~15 degree)
+        return (fabs(angle_diff(pose.theta, target_theta)) < TURN2_CRITERIA); // radian (~15 degree)
     }
 
 
@@ -82,8 +90,8 @@ const float Kdrive_w = 0.5;
 
 // const float MAX_FWD_VEL = 0.8;
 // const float MAX_TURN_VEL = 2.5;
-const float MAX_FWD_VEL = 0.8;
-const float MAX_TURN_VEL = 1.5;
+const float MAX_FWD_VEL = 0.5;
+const float MAX_TURN_VEL = 1.3;
 
 
 class MotionController
@@ -120,6 +128,12 @@ public:
             pose_xyt_t target = targets_.back(); // 
             pose_xyt_t pose = currentPose();
 
+            // Print State, current (x,y,theta) and current goal
+            #ifdef DEBUG_STATE
+                std::cout<<"state: "<<state_<<"(x,y,t): "<<pose.x<<","<<pose.y<<","<<pose.theta<<", goal: "<<target.x<<", "<<target.y<<", "<<target.theta<<std::endl;
+            #endif
+            
+
             ///////  TODO: Add different states when adding maneuver controls /////// 
             if(state_ == TURN)
             { 
@@ -135,7 +149,7 @@ public:
                     float dy = target.y - pose.y;
                     float target_heading = atan2(dy, dx);
                     float angle_err = angle_diff(target_heading, pose.theta);
-                    printf("\rTURN: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target_heading, angle_err);
+                    // printf("\rTURN: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target_heading, angle_err);
                     cmd.trans_v = 0;
                     cmd.angular_v = Ktheta * angle_err;
                     // cmd.angular_v = Ktheta * angle_err;
@@ -152,14 +166,14 @@ public:
                     // }
                     state_ = TURN2;
 
-                        printf("\rReached target (x,y) %.2f, %.2f, now to TURN2\n",target.x, target.y);
+                    printf("\rReached target (x,y) %.2f, %.2f, now to TURN2\n",target.x, target.y);
                 }
                 else
                 { 
                     float distance_err = sqrt( pow((target.x - pose.x),2) + pow((target.y-pose.y),2) );
                     float x_err = fabs(pose.x - target.x);
                     float y_err = fabs(pose.y - target.y);
-                    printf("\rDRIVE: cur x %.3f, goal x %.3f x_err %.4f y_err %4f\n",pose.x, target.x, x_err, y_err);
+                    // printf("\rDRIVE: cur x %.3f, goal x %.3f x_err %.4f y_err %4f\n",pose.x, target.x, x_err, y_err);
                     cmd.trans_v = Kp * distance_err ;
 
                     float dx = target.x - pose.x;
@@ -179,13 +193,13 @@ public:
                     {
                         std::cout << "\rEnd Path !!!\n";
                     }
-                    printf("\rTarget Reached!!!!!!!!! Reached target theta %.2f, now to TURN \n",target.theta);
+                    // printf("\rTarget Reached!!!!!!!!! Reached target theta %.2f, now to TURN \n",target.theta);
 		            state_ = TURN;
                 } 
                 else
                 {   
                     float angle_err = angle_diff(target.theta, pose.theta);
-                    printf("\rTURN2: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target.theta, angle_err);
+                    // printf("\rTURN2: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target.theta, angle_err);
                     cmd.trans_v = 0;
                     cmd.angular_v = Ktheta * angle_err;
                 }
@@ -212,16 +226,17 @@ public:
     void handlePath(const lcm::ReceiveBuffer* buf, const std::string& channel, const robot_path_t* path)
     {
         targets_ = path->path;
-        std::reverse(targets_.begin(), targets_.end()); // store first at back to allow for easy pop_back()
-
     	std::cout << "received new path at time: " << path->utime << "\n"; 
     	for(auto pose : targets_)
         {
     		std::cout << "(" << pose.x << "," << pose.y << "," << pose.theta << "); ";
     	}
         std::cout << std::endl;
+        std::reverse(targets_.begin(), targets_.end()); // store first at back to allow for easy pop_back()
 
-        assignNextTarget();
+
+        // assignNextTarget();
+        state_ = TURN; 
 
         //confirm that the path was received
         message_received_t confirm {now(), path->utime, channel};
@@ -270,7 +285,10 @@ private:
     
     bool assignNextTarget(void)
     {
-        if(!targets_.empty()) { targets_.pop_back(); }
+        if(!targets_.empty()) { 
+            cout<<"Target: "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
+            targets_.pop_back(); 
+        }
         state_ = TURN; 
         return !targets_.empty();
     }

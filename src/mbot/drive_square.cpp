@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include <cmath>
 
-#define SCALAR 0.3
-
+#define SCALAR 1
 int main(int argc, char** argv)
 {std::cout << "here" <<std::endl;
     int numTimes = 4;
@@ -37,7 +36,7 @@ int main(int argc, char** argv)
     
     nextPose.x = 1.0f*SCALAR;
     nextPose.y = 1.0f*SCALAR;
-    nextPose.theta = 0;
+    nextPose.theta = M_PI;
     for(int n = 0; n < numTimes; ++n)
     {
         path.path[4*n + 1] = nextPose;
@@ -45,7 +44,7 @@ int main(int argc, char** argv)
     
     nextPose.x = 0.0f*SCALAR;
     nextPose.y = 1.0f*SCALAR;
-    nextPose.theta = -M_PI;
+    nextPose.theta = -M_PI/2;
     for(int n = 0; n < numTimes; ++n)
     {
         path.path[4*n + 2] = nextPose;
@@ -53,20 +52,18 @@ int main(int argc, char** argv)
     
     nextPose.x = 0.0f*SCALAR;
     nextPose.y = 0.0f*SCALAR;
-    nextPose.theta = -M_PI_2;
+    nextPose.theta = 0;
     for(int n = 0; n < numTimes; ++n)
     {
         path.path[4*n + 3] = nextPose;
     }
     
     // Return to original heading after completing all circuits
-//    nextPose.theta = 0.0f;
-//    path.path.push_back(nextPose);
     
-    nextPose.x = 0.0f*SCALAR;
-    nextPose.y = 0.0f*SCALAR;
-    nextPose.theta = 0; 
-    path.path.insert(path.path.end(), nextPose);
+    // nextPose.x = 0.0f*SCALAR;
+    // nextPose.y = 0.0f*SCALAR;
+    // nextPose.theta = 0; 
+    // path.path.insert(path.path.end(), nextPose);
     
     path.path_length = path.path.size();
     
