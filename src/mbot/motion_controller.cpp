@@ -46,7 +46,7 @@ public:
         this->t_now = pose.utime;
         this->Dt = (t_now - t_prev);
        
-        if (this->Dt > 0.01) {
+        if (this->Dt > 0.01 && this->Dt < 1) {
             this->prevDev = this->xDeviation;
             this->xDeviation = target.x - pose.x;
             float dx = target.x - pose.x;
