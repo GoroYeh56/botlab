@@ -40,10 +40,10 @@ class StraightManeuverController : public ManeuverControllerBase
 public:
     
     StraightManeuverController() = default;   
-    virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
+    virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target, uint64_t now) override
     {
         this->t_prev = this->t_now;
-        this->t_now = pose.utime;
+        this->t_now = now;
         this->Dt = (t_now - t_prev);
         std::cout << "\nDt: " << this->Dt;
         if (this->Dt > 0.01 && this->Dt < 1) {
@@ -166,7 +166,7 @@ public:
                 }
                 else
                 { 
-                    cmd = straight_controller.get_command(pose, target);
+                    cmd = straight_controller.get_command(pose, target, this->now());
                 }
 		    }
             else
@@ -273,7 +273,6 @@ private:
         pose.y = (odomPose.x * std::sin(odomToGlobalFrame_.theta)) + (odomPose.y * std::cos(odomToGlobalFrame_.theta))
             + odomToGlobalFrame_.y;
         pose.theta = angle_sum(odomPose.theta, odomToGlobalFrame_.theta);
-        pose.utime = this->now();
         return pose;
     }
 
