@@ -49,23 +49,27 @@ public:
         if (this->t_now > this->t_next) {
             this->prevDev = this->xDeviation;
             this->xDeviation = target.x - pose.x;
-            float dx = target.x - pose.x;
-            float dy = target.y - pose.y;
+            
+            if (this->xDeviation > 0.2) {
+                v = 0.25;
+            }
+            else {
 
+                v = Kp * xDeviation + Ki * (this->Dt) * xDeviation + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
+                //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
+                //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
+
+            }
             float target_heading = atan2(dy, dx);
             float angleDeviation = angle_diff(pose.theta, target_heading);
             float w = Komega * angleDeviation;
-           
-            v = Kp * xDeviation + Ki * (this->Dt) * xDeviation + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
-            //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
-            //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
             
             this->Dt = (t_now - t_prev);
             this->t_prev = this->t_now;
             this->t_next = this->t_now + 1000;
-        
         }
-       
+        if (v > 0.5) v = 0.5;
+        if (w > 0.5) w = 0.5;
         
         return {0, v, w};
     }
@@ -91,15 +95,21 @@ private:
 
 };
 
+
 class TurnManeuverController : public ManeuverControllerBase
 {
 public:
     TurnManeuverController() = default;   
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
+        
         float angleDeviation = target.theta - pose.theta;
-        float w = Kp * angleDeviation;
-        return {0, 0, w};
+        if (angleDeviation > 0.2) {
+            return { 0, 0, 1.5 };
+        }
+        else {
+            return { 0, 0, Kp * angleDeviation };
+        }
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
