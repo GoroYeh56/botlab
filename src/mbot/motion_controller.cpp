@@ -133,7 +133,7 @@ public:
                 if(turn_controller.target_reached(pose, target))
                 {
 		            state_ = DRIVE;
-                    std::cout << "\nAngle target reached."
+                    std::cout << "\nAngle target reached.";
                 } 
                 else
                 {
