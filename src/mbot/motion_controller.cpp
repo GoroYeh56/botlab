@@ -53,7 +53,7 @@ public:
         float Dt = (t_now - t_prev)/1000000;
         float v = Kp * xDeviation + Ki*Dt* xDeviation + Kd*(this->xDeviation - this->prevDev)/Dt;
         float w = Komega * angleDeviation; 
-        std::cout << "\rv: " << v << "   w: " << w << "  Dt: " << Dt;
+        std::cout << "\rv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
         std::cout << "         P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
         return {0, v, w};
     }
