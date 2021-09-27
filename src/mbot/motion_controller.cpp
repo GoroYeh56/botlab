@@ -43,11 +43,10 @@ public:
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
         
-        this->t_prev = this->t_now;
+        
         this->t_now = utime_now();
-        this->Dt = (t_now - t_prev);
-        std::cout << "\nDt: " << this->Dt;
-        if (this->Dt > 0.01 && this->Dt < 1) {
+        
+        if (this->t_now > this->t_next) {
             this->prevDev = this->xDeviation;
             this->xDeviation = target.x - pose.x;
             float dx = target.x - pose.x;
@@ -60,6 +59,11 @@ public:
             v = Kp * xDeviation + Ki * this->Dt * xDeviation + Kd * (this->xDeviation - this->prevDev) / this->Dt;
             std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
             std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
+            
+            this->Dt = (t_now - t_prev);
+            this->t_prev = this->t_now;
+            this->t_next = this->t_now + 0.001;
+        
         }
        
         
@@ -76,13 +80,14 @@ private:
     float Ki = 0.5;
     float Kd = 0.5;
     float Komega = 0.25;
-    float t_prev = 0.0;
-    float t_now = 0.0;
+    uint64_t t_prev = 0.0;
+    uint64_t t_now = 0.0;
     float xDeviation = 0.0;
     float prevDev = 0.0;
     float Dt = 0.0;
     float v = 0.0;
     float w = 0.0;
+    uint64_t t_next = 0.0;
 
 };
 
