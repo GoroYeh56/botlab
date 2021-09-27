@@ -268,7 +268,8 @@ private:
     {
         if(!targets_.empty()) { targets_.pop_back(); }
         state_ = TURN;
-        std::cout << "\nTURNING";
+
+        std::cout << "\nadded target: " << "(" << targets_.back().x << "," << targets_.back().y << "," << targets_.back().theta << ")\n\n";
         return !targets_.empty();
     }
     
