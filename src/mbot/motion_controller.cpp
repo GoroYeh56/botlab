@@ -44,17 +44,20 @@ public:
     {
         this->t_prev = this->t_now;
         this->t_now = pose.utime;
-        this->prevDev = this->xDeviation;
-        this->xDeviation = target.x - pose.x;
-        float dx = target.x - pose.x;
-        float dy = target.y - pose.y;
-        float target_heading = atan2(dy, dx);
-        float angleDeviation = angle_diff(pose.theta, target_heading);
-        if(t_now > t_prev + 0.001) this->Dt = (t_now - t_prev);
-        float v = Kp * xDeviation + Ki*this->Dt* xDeviation + Kd*(this->xDeviation - this->prevDev)/this->Dt;
-        float w = Komega * angleDeviation; 
-        std::cout << "\rv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
-        std::cout << "         P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
+       
+        if (t_now > t_prev + 0.001) {
+            this->prevDev = this->xDeviation;
+            this->xDeviation = target.x - pose.x;
+            float dx = target.x - pose.x;
+            float dy = target.y - pose.y;
+            float target_heading = atan2(dy, dx);
+            float angleDeviation = angle_diff(pose.theta, target_heading);
+            this->Dt = (t_now - t_prev); 
+        }
+        float v = Kp * xDeviation + Ki * this->Dt * xDeviation + Kd * (this->xDeviation - this->prevDev) / this->Dt;
+        float w = Komega * angleDeviation;
+        std::cout << "\r\rv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
+        std::cout << "  P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
         return {0, v, w};
     }
 
