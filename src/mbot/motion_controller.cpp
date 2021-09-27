@@ -231,7 +231,7 @@ private:
     {
         if(!targets_.empty()) { targets_.pop_back(); }
         state_ = TURN;
-        std::cout << "\nPosition target reached."
+        std::cout << "\nPosition target reached.";
         return !targets_.empty();
     }
     
