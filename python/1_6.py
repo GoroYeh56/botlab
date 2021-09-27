@@ -15,12 +15,31 @@ from lcmtypes import timestamp_t
 
 
 lc = lcm.LCM("udpm://239.255.76.67:7667?ttl=1")
+Targets = []
+pose = pose_xyt_t()
+pose.x = 0.3
+pose.y = 0
+pose.theta = 1.5
+Targets.append(pose)
 
 pose = pose_xyt_t()
-pose.x = 1
-pose.y = 2
+pose.x = 0.3
+pose.y = 0.3
 pose.theta = 1.5
-Targets = [pose]
+Targets.append(pose)
+
+pose = pose_xyt_t()
+pose.x = 0
+pose.y = 0.3
+pose.theta = 1.5
+Targets.append(pose)
+
+pose = pose_xyt_t()
+pose.x = 0
+pose.y = 0
+pose.theta = 1.5
+Targets.append(pose)
+
 path = robot_path_t()
 path.path = Targets
 lc.publish("CONTROLLER_PATH",path.encode())
@@ -52,5 +71,5 @@ stop_command.angular_v = 0.0
 # lc.publish("MBOT_MOTOR_COMMAND",drive_command.encode())
 # sleep(2.0)
 # lc.publish("MBOT_MOTOR_COMMAND",turn_command.encode())
-sleep(2.0)
-lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
+# sleep(2.0)
+# lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())

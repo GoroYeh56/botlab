@@ -45,6 +45,11 @@ public:
     {
         return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
     }
+    virtual bool target_reached2(const pose_xyt_t& pose, const float& target_theta)  override
+    {
+        return (fabs(angle_diff(pose.theta, target_theta)) < 0.2); // radian (~15 degree)
+    }
+
 };
 
 class TurnManeuverController : public ManeuverControllerBase
@@ -61,17 +66,24 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07);
+        return (fabs(angle_diff(pose.theta, target_heading)) < 0.2); // radian
     }
+    virtual bool target_reached2(const pose_xyt_t& pose, const float& target_theta)  override
+    {
+        return (fabs(angle_diff(pose.theta, target_theta)) < 0.2); // radian (~15 degree)
+    }
+
+
 };
 
-const float Kp = 0.3;
-const float Ktheta = 1;
+const float Kp = 1;
+const float Ktheta = 0.5;
+const float Kdrive_w = 0.5;
 
 // const float MAX_FWD_VEL = 0.8;
 // const float MAX_TURN_VEL = 2.5;
-const float MAX_FWD_VEL = 0.3;
-const float MAX_TURN_VEL = 1;
+const float MAX_FWD_VEL = 0.8;
+const float MAX_TURN_VEL = 1.5;
 
 
 class MotionController
@@ -112,15 +124,21 @@ public:
             if(state_ == TURN)
             { 
                 if(turn_controller.target_reached(pose, target))
-                {
+                {   
+                    printf("\rReached target theta %.2f, now to DRIVE\n",target.theta);
 		            state_ = DRIVE;
                 } 
                 else
-                {
+                {   
                     // TODO: calculate cmd by error
-                    float angle_err = target.theta - pose.theta ;
+                    float dx = target.x - pose.x;
+                    float dy = target.y - pose.y;
+                    float target_heading = atan2(dy, dx);
+                    float angle_err = angle_diff(target_heading, pose.theta);
+                    printf("\rTURN: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target_heading, angle_err);
                     cmd.trans_v = 0;
                     cmd.angular_v = Ktheta * angle_err;
+                    // cmd.angular_v = Ktheta * angle_err;
                     // cmd = turn_controller.get_command(pose, target);
                 }
             }
@@ -128,24 +146,53 @@ public:
             {
                 if(straight_controller.target_reached(pose, target))
                 {
-                    if(!assignNextTarget())
-                    {
-                        std::cout << "\rTarget Reached!";
-                    }
-                    // else{
-                        // std::cout<< "To TURN state\n";
-                        // state_ = TURN;
+                    // if(!assignNextTarget())
+                    // {
+                    //     std::cout << "\rTarget Reached!\n";
                     // }
+                    state_ = TURN2;
+
+                        printf("\rReached target (x,y) %.2f, %.2f, now to TURN2\n",target.x, target.y);
                 }
                 else
                 { 
-                    float distance_err =  sqrt ( pow( (pose.x - target.x) , 2) + pow((pose.y - target.y),2));
+                    float distance_err = sqrt( pow((target.x - pose.x),2) + pow((target.y-pose.y),2) );
+                    float x_err = fabs(pose.x - target.x);
+                    float y_err = fabs(pose.y - target.y);
+                    printf("\rDRIVE: cur x %.3f, goal x %.3f x_err %.4f y_err %4f\n",pose.x, target.x, x_err, y_err);
                     cmd.trans_v = Kp * distance_err ;
-                    cmd.angular_v = 0;
+
+                    float dx = target.x - pose.x;
+                    float dy = target.y - pose.y;
+                    float target_heading = atan2(dy, dx);
+                    float angle_err = angle_diff(target_heading, pose.theta);
+                    cmd.angular_v = Kdrive_w * angle_err;
 
                     // cmd = straight_controller.get_command(pose, target);
                 }
 		    }
+            else if(state_ == TURN2)  // pose.theta => target.theta
+            {
+                if(turn_controller2.target_reached2(pose, target.theta))
+                {   
+                    if(!assignNextTarget())
+                    {
+                        std::cout << "\rEnd Path !!!\n";
+                    }
+                    printf("\rTarget Reached!!!!!!!!! Reached target theta %.2f, now to TURN \n",target.theta);
+		            state_ = TURN;
+                } 
+                else
+                {   
+                    float angle_err = angle_diff(target.theta, pose.theta);
+                    printf("\rTURN2: Goal: cur %.3f, goal %.3f Angle Error: %.4f\n",pose.theta, target.theta, angle_err);
+                    cmd.trans_v = 0;
+                    cmd.angular_v = Ktheta * angle_err;
+                }
+		    }
+
+
+
             else
             {
                 std::cerr << "ERROR: MotionController: Entered unknown state: " << state_ << '\n';
@@ -197,7 +244,8 @@ private:
     enum State
     {
         TURN,
-        DRIVE
+        DRIVE,
+        TURN2
     };
     
     pose_xyt_t odomToGlobalFrame_;      // transform to convert odometry into the global/map coordinates for navigating in a map
@@ -211,8 +259,9 @@ private:
 
     lcm::LCM * lcmInstance;
  
-    TurnManeuverController turn_controller;
+    TurnManeuverController turn_controller;  // First heading controller
     StraightManeuverController straight_controller;
+    TurnManeuverController turn_controller2; // Final Orientation controller
 
     int64_t now()
     {
@@ -275,9 +324,9 @@ int main(int argc, char** argv)
 
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
-                cmd.trans_v = std::min(MAX_FWD_VEL, cmd.trans_v);
+                cmd.trans_v = std::max( std::min(MAX_FWD_VEL, cmd.trans_v), float(0));
                 cmd.angular_v = std::min(MAX_TURN_VEL, cmd.angular_v);
-                printf("%f, %f\n",cmd.trans_v, cmd.angular_v);
+                // printf("%f, %f\n",cmd.trans_v, cmd.angular_v);
             	lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
     	}
     }
