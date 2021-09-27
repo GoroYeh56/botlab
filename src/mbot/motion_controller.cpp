@@ -45,7 +45,7 @@ public:
         this->t_prev = this->t_now;
         this->t_now = pose.utime;
         this->Dt = (t_now - t_prev);
-       
+        std::cout << "\nDt: " << this->Dt;
         if (this->Dt > 0.01 && this->Dt < 1) {
             this->prevDev = this->xDeviation;
             this->xDeviation = target.x - pose.x;
