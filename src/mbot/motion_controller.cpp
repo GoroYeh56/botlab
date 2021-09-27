@@ -166,7 +166,7 @@ public:
                 if(turn_controller.target_reached(pose, target))
                 {
 		            state_ = DRIVE;
-                    std::cout << "\nAngle target reached.";
+                    std::cout << "\nDRIVING";
                 } 
                 else
                 {
@@ -264,7 +264,7 @@ private:
     {
         if(!targets_.empty()) { targets_.pop_back(); }
         state_ = TURN;
-        std::cout << "\nPosition target reached.";
+        std::cout << "\nTURNING";
         return !targets_.empty();
     }
     
