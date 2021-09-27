@@ -55,7 +55,7 @@ public:
             }
             else {
 
-                v = Kp * xDeviation + Ki * (this->Dt) * xDeviation + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
+                v = Kp * xDeviation // Ki * (this->Dt) * xDeviation + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
                 //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
                 //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
 
@@ -82,7 +82,7 @@ public:
     }
 
 private:
-    float Kp = 0.25;
+    float Kp = 0.75;
     float Ki = 0.0000005;
     float Kd = 40000;
     float Komega = 0.5;
