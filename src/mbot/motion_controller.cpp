@@ -76,9 +76,9 @@ public:
     }
 
 private:
-    float Kp = 0.5;
-    float Ki = 0.000005;
-    float Kd = 50000;
+    float Kp = 0.25;
+    float Ki = 0.0000005;
+    float Kd = 40000;
     float Komega = 0.25;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
