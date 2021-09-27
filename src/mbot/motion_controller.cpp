@@ -51,7 +51,7 @@ public:
             this->xDeviation = target.x - pose.x;
             
             if (this->xDeviation > 0.2) {
-                v = 0.25;
+                v = 0.5;
             }
             else {
 
