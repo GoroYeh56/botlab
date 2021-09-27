@@ -44,15 +44,16 @@ public:
     {
         this->t_prev = this->t_now;
         this->t_now = pose.utime;
-        float xDeviation = target.x - pose.x;
+        this->prevDev = this->xDeviation;
+        this->xDeviation = target.x - pose.x;
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
         float angleDeviation = angle_diff(pose.theta, target_heading);
         float Dt = (t_now - t_prev)/1000000;
-        float v = Kp * xDeviation;
+        float v = Kp * xDeviation + Ki*Dt* xDeviation + Kd*(this->xDeviation - this->prevDev)/Dt;
         float w = Komega * angleDeviation; 
-        
+        std::cout << "\rv: " << v << "   w: " << w;
         return {0, v, w};
     }
 
@@ -68,6 +69,8 @@ private:
     float Komega = 0.25;
     float t_prev = 0.0;
     float t_now = 0.0;
+    float xDeviation = 0.0;
+    float prevDev = 0.0;
 };
 
 class TurnManeuverController : public ManeuverControllerBase
