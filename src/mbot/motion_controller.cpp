@@ -171,6 +171,7 @@ public:
                 else
                 {
                     cmd = turn_controller.get_command(pose, target);
+                    std::cout << "\rv: " << cmd.trans_v << "  w: " << cmd.angular_v;
                 }
             }
             else if(state_ == DRIVE) 
