@@ -64,8 +64,8 @@ public:
 private:
     float Kp = 1;
     float Ki = 0.5;
-    float Kd = 0.05;
-    float Komega = 0.5;
+    float Kd = 0.5;
+    float Komega = 0.25;
     float t_prev = 0.0;
     float t_now = 0.0;
 };
