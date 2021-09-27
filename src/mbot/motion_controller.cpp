@@ -44,20 +44,22 @@ public:
     {
         this->t_prev = this->t_now;
         this->t_now = pose.utime;
+        this->Dt = (t_now - t_prev);
        
-        if (t_now > t_prev + 0.001) {
+        if (if this->Dt > 0.01) {
             this->prevDev = this->xDeviation;
             this->xDeviation = target.x - pose.x;
             float dx = target.x - pose.x;
             float dy = target.y - pose.y;
             float target_heading = atan2(dy, dx);
             float angleDeviation = angle_diff(pose.theta, target_heading);
-            this->Dt = (t_now - t_prev); 
+            v = Kp * xDeviation + Ki * this->Dt * xDeviation + Kd * (this->xDeviation - this->prevDev) / this->Dt;
+            
         }
-        float v = Kp * xDeviation + Ki * this->Dt * xDeviation + Kd * (this->xDeviation - this->prevDev) / this->Dt;
+        
         float w = Komega * angleDeviation;
-        std::cout << "\r\rv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
-        std::cout << "  P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
+        std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
+        std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
         return {0, v, w};
     }
 
@@ -75,7 +77,10 @@ private:
     float t_now = 0.0;
     float xDeviation = 0.0;
     float prevDev = 0.0;
-    float Dt = 0.001;
+    float Dt = 0.0;
+    float v = 0.0;
+    float w = 0;.0
+
 };
 
 class TurnManeuverController : public ManeuverControllerBase
