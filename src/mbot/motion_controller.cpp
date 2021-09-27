@@ -57,8 +57,8 @@ public:
             float w = Komega * angleDeviation;
            
             v = Kp * xDeviation + Ki * (this->Dt) * xDeviation + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
-            std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
-            std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
+            //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
+            //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
             
             this->Dt = (t_now - t_prev);
             this->t_prev = this->t_now;
@@ -76,9 +76,9 @@ public:
     }
 
 private:
-    float Kp = 1;
-    float Ki = 0.00005;
-    float Kd = 500000;
+    float Kp = 0.5;
+    float Ki = 0.000005;
+    float Kd = 50000;
     float Komega = 0.25;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
