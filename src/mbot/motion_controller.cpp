@@ -163,19 +163,22 @@ public:
             ///////  TODO: Add different states when adding maneuver controls /////// 
             if(state_ == TURN)
             { 
+                std::cout << "\rTURNING";
+                
                 if(turn_controller.target_reached(pose, target))
                 {
 		            state_ = DRIVE;
-                    std::cout << "\nDRIVING";
+                    
                 } 
                 else
                 {
                     cmd = turn_controller.get_command(pose, target);
-                    std::cout << "\rv: " << cmd.trans_v << "  w: " << cmd.angular_v;
+                    
                 }
             }
             else if(state_ == DRIVE) 
             {
+                std::cout << "\rDRIVING";
                 if(straight_controller.target_reached(pose, target))
                 {
                     if(!assignNextTarget())
