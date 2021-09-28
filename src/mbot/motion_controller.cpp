@@ -34,7 +34,6 @@
 
 
 
-
 class StraightManeuverController : public ManeuverControllerBase
 {
 public:
