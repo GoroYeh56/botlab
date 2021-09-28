@@ -85,7 +85,7 @@ private:
     float Kp = 1.5;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 1;
+    float Komega = 5;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float xDeviation = 0.0;
@@ -122,7 +122,7 @@ public:
         return (fabs(angle_diff(pose.theta, target_heading)) < 0.15); //0.07
     }
 private: 
-    float Kp = 3;
+    float Kp = 15;
 };
 
 
