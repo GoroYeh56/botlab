@@ -88,7 +88,7 @@ private:
     float Kp = 1.5;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 3;
+    float Komega = 0.5;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
