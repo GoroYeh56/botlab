@@ -49,7 +49,7 @@ public:
         if (this->t_now > this->t_next) {
 
             this->prevDev = this->dev;
-            this->dev = sqrt(pow(target.x,2) + pow(target.y,2)) - sqrt(pow(pose.x, 2) + pow(pose.y, 2));
+            this->dev = sqrt(pow(target.x - pose.x, 2) + pow(target.y - pose.y, 2));
             
             if (this->dev > 0.2) {
                 v = 0.3;
