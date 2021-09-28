@@ -106,7 +106,7 @@ public:
     {
         
         float angleDeviation = target.theta - pose.theta;
-        if (angleDeviation > 0.1) {
+        if (angleDeviation > 0.07) {
             return { 0, 0, 3 };
         }
         else {
