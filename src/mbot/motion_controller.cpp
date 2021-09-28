@@ -52,7 +52,7 @@ public:
             this->dev = sqrt(pow(target.x,2) + pow(target.y,2)) - sqrt(pow(pose.x, 2) + pow(pose.y, 2));
             
             if (this->dev > 0.2) {
-                v = 0.5;
+                v = 0.3;
             }
             else {
 
