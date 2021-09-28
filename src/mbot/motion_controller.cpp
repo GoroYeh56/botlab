@@ -107,10 +107,15 @@ public:
     TurnManeuverController() = default;   
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
-        
-        float angleDeviation = target.theta - pose.theta;
-        
-        return { 0, 0, 2.5 };
+        float dx = target.x - pose.x;
+        float dy = target.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        float wError = angle_diff(target_heading, pose.theta);
+        float w = 2.5;
+        if (wError < 0) {
+            w = -2.5;
+        }
+        return { 0, 0, w };
        
     }
 
@@ -119,7 +124,7 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07); 
+        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07) 
     }
 private: 
     float Kp = 30;
