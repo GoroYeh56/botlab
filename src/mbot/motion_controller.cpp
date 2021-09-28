@@ -43,7 +43,6 @@ public:
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
         
-        
         this->t_now = utime_now();
         
         if (this->t_now > this->t_next) {
@@ -65,7 +64,7 @@ public:
             float dy = target.y - pose.y;
             float target_heading = atan2(dy, dx);
             float angleDeviation = angle_diff(pose.theta, target_heading);
-            float w = Komega * angleDeviation;
+            float w = 0; // Komega* angleDeviation;
             std::cout << "\n\rv: " << v << "  w: " << w << "\n";
             this->Dt = (t_now - t_prev);
             this->t_prev = this->t_now;
