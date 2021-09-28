@@ -266,12 +266,14 @@ private:
     
     bool assignNextTarget(void)
     {
-        if(!targets_.empty()) { targets_.pop_back(); }
+        if(!targets_.empty()) { 
+            targets_.pop_back(); 
+            std::cout << "\nCurrent target: " << "(" << targets_.back().x << "," << targets_.back().y << "," << targets_.back().theta << ")\n";
+        }
         state_ = TURN;
-
-        std::cout << "\nadded target: " << "(" << targets_.back().x << "," << targets_.back().y << "," << targets_.back().theta << ")\n\n";
         return !targets_.empty();
     }
+
     
     void computeOdometryOffset(const pose_xyt_t& globalPose)
     {
