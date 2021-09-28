@@ -17,6 +17,8 @@
 #include <signal.h>
 #include "maneuver_controller.h"
 
+#define PI 3.1415
+
 /////////////////////// TODO: /////////////////////////////
 /**
  * Code below is a little more than a template. You will need
@@ -51,7 +53,7 @@ public:
             
             if (this->dev > 0.2) {
                 
-                v = 0.3;
+                v = 0.2;
             }
             else {
 
@@ -111,9 +113,9 @@ public:
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
         float wError = angle_diff(target_heading, pose.theta);
-        float w = 2.5;
+        float w = PI/4;
         if (wError < 0) {
-            w = -2.5;
+            w = -PI/4;
         }
         return { 0, 0, w };
        
@@ -138,9 +140,9 @@ public:
     {
         
         float wError = angle_diff(target.theta, pose.theta);
-        float w = 2.5;
+        float w = PI/4;
         if (wError < 0) {
-            w = -2.5;
+            w = -PI/4;
         }
         return { 0, 0, w };
 
