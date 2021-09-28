@@ -113,6 +113,7 @@ public:
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
         float wError = angle_diff(target_heading, pose.theta);
+
         float w = 2.5;// PI / 4;
         if (wError < 0) {
             w = -2.5;//-PI/4;
@@ -194,6 +195,9 @@ public:
             ///////  TODO: Add different states when adding maneuver controls /////// 
             if(state_ == TURN)
             { 
+                state_ = ORIENT;
+                break;
+
                 std::cout << "\rTURNING";
                 
                 if(turn_controller.target_reached(pose, target))
