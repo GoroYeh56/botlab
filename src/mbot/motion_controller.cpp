@@ -51,7 +51,6 @@ public:
             this->prevDev = this->dev;
             this->dev = sqrt(pow(target.x,2) + pow(target.y,2)) - sqrt(pow(pose.x, 2) + pow(pose.y, 2));
             
-            
             if (this->dev > 0.2) {
                 v = 0.5;
             }
@@ -73,7 +72,9 @@ public:
             this->t_next = this->t_now + 1000;
         }
         if (v > 0.5) v = 0.5;
-        if (w > 0.5) w = 0.5;
+        if (w > 6) w = 6;
+        if (v < 0.07) v = 0.07;
+        if (w < 0.5) w = 0.5
         
         return {0, v, w};
     }
