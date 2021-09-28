@@ -64,7 +64,7 @@ point9.theta = 0
 msg = robot_path_t()
 msg.path_length = 10
 msg.path = [point0,point1,point2,point3,point4,point5,point6,point7,point8,point9]
-msg.utime = time.now()
+#msg.utime = time.now()
 
 lc.publish("CONTROLLER_PATH",msg.encode())
 
