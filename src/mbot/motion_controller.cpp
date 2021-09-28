@@ -82,10 +82,10 @@ public:
     }
 
 private:
-    float Kp = 0.75;
+    float Kp = 1.5;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 0.5;
+    float Komega = 1;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float xDeviation = 0.0;
