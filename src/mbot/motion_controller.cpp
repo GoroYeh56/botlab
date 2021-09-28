@@ -124,7 +124,7 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07) 
+        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07);
     }
 private: 
     float Kp = 30;
