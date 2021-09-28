@@ -63,8 +63,8 @@ public:
             float dy = target.y - pose.y;
             float target_heading = atan2(dy, dx);
             float angleDeviation = angle_diff(pose.theta, target_heading);
-            float w = 0 Komega* angleDeviation;
-            std::cout << "\n\rv: " << v << "  w: " << w << "\n";
+            float w = Komega* angleDeviation;
+            //std::cout << "\n\rv: " << v << "  w: " << w << "\n";
             this->Dt = (t_now - t_prev);
             this->t_prev = this->t_now;
             this->t_next = this->t_now + 1000;
