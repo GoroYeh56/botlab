@@ -86,7 +86,7 @@ private:
     float Kp = 2;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 0.25;
+    float Komega = 0;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
@@ -120,6 +120,26 @@ public:
         return (fabs(angle_diff(pose.theta, target_heading)) < 0.07); 
     }
 private: 
+    float Kp = 30;
+};
+
+class OrientManeuverController : public ManeuverControllerBase
+{
+public:
+    OrientManeuverController() = default;
+    virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
+    {
+        
+        return { 0, 0, 1.5 };
+
+    }
+
+    virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
+    {
+        
+        return (fabs(angle_diff(pose.theta, target.theta)) < 0.07);
+    }
+private:
     float Kp = 30;
 };
 
@@ -165,8 +185,8 @@ public:
                 
                 if(turn_controller.target_reached(pose, target))
                 {
-		            state_ = DRIVE;
-                    std::cout << "\n";
+                    state_ = DRIVE
+		            
                 } 
                 else
                 {
@@ -179,16 +199,27 @@ public:
                 std::cout << "\rDRIVING";
                 if(straight_controller.target_reached(pose, target))
                 {
-                    if(!assignNextTarget())
-                    {
-                        std::cout << "\nTarget Reached!\n";
-                    }
+                    state_ = ORIENT;
                 }
                 else
                 { 
                     cmd = straight_controller.get_command(pose, target);
                 }
 		    }
+            else if (state_ == ORIENT) {
+                std::cout << "\rORIENT";
+                if (orient_controller.target_reached(pose, target))
+                {
+                    if (!assignNextTarget())
+                    {
+                        std::cout << "\nTarget Reached!\n";
+                    }
+                }
+                else
+                {
+                    cmd = orient_controller.get_command(pose, target);
+                }
+            }
             else
             {
                 std::cerr << "ERROR: MotionController: Entered unknown state: " << state_ << '\n';
@@ -240,7 +271,8 @@ private:
     enum State
     {
         TURN,
-        DRIVE
+        DRIVE,
+        ORIENT
     };
     
     pose_xyt_t odomToGlobalFrame_;      // transform to convert odometry into the global/map coordinates for navigating in a map
@@ -256,6 +288,7 @@ private:
  
     TurnManeuverController turn_controller;
     StraightManeuverController straight_controller;
+    OrientManeuverController orient_controller;
 
     int64_t now()
     {
