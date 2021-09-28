@@ -85,10 +85,10 @@ public:
     }
 
 private:
-    float Kp = 1.5;
+    float Kp = 2;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 0.5;
+    float Komega = 0.25;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
@@ -274,7 +274,6 @@ private:
         return !targets_.empty();
     }
 
-    
     void computeOdometryOffset(const pose_xyt_t& globalPose)
     {
         pose_xyt_t odomAtTime = odomTrace_.poseAt(globalPose.utime);
