@@ -148,7 +148,7 @@ public:
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        return (fabs(angle_diff(pose.theta, target.theta)) < 0.07);
+        return (fabs(angle_diff(pose.theta, target.theta)) < 0.03);
     }
 private:
     float Kp = 30;
