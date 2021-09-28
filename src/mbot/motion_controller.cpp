@@ -83,7 +83,7 @@ public:
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        return ((fabs(pose.x - target.x) < 0.15) && (fabs(pose.y - target.y)  < 0.15));
+        return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
     }
 
 private:
