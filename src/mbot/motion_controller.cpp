@@ -74,7 +74,7 @@ public:
         if (v > 0.5) v = 0.5;
         if (w > 6) w = 6;
         if (v < 0.07) v = 0.07;
-        if (w < 0.5) w = 0.5
+        if (w < 0.5) w = 0.5;
         
         return {0, v, w};
     }
