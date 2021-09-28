@@ -194,10 +194,7 @@ public:
 
             ///////  TODO: Add different states when adding maneuver controls /////// 
             if(state_ == TURN)
-            { 
-                state_ = ORIENT;
-                break;
-
+            {
                 std::cout << "\rTURNING";
                 
                 if(turn_controller.target_reached(pose, target))
@@ -216,7 +213,10 @@ public:
                 std::cout << "\rDRIVING";
                 if(straight_controller.target_reached(pose, target))
                 {
-                    state_ = ORIENT;
+                    if (!assignNextTarget())
+                    {
+                        std::cout << "\nTarget Reached!\n";
+                    }
                     std::cout << "\n";
                 }
                 else
@@ -224,20 +224,6 @@ public:
                     cmd = straight_controller.get_command(pose, target);
                 }
 		    }
-            else if (state_ == ORIENT) {
-                std::cout << "\rORIENTING";
-                if (orient_controller.target_reached(pose, target))
-                {
-                    if (!assignNextTarget())
-                    {
-                        std::cout << "\nTarget Reached!\n";
-                    }
-                }
-                else
-                {
-                    cmd = orient_controller.get_command(pose, target);
-                }
-            }
             else
             {
                 std::cerr << "ERROR: MotionController: Entered unknown state: " << state_ << '\n';
