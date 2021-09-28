@@ -47,15 +47,17 @@ public:
         this->t_now = utime_now();
         
         if (this->t_now > this->t_next) {
+
             this->prevDev = this->xDeviation;
-            this->xDeviation = target.x - pose.x;
+            this->dev = sqrt(math.pow(target.x,2) + math.pow(target.y,2)) - sqrt(math.pow(pose.x, 2) + math.pow(pose.y, 2));
             
-            if (this->xDeviation > 0.2) {
+            
+            if (this->dev > 0.2) {
                 v = 0.5;
             }
             else {
 
-                v = Kp * xDeviation + Ki * (this->Dt) * xDeviation; // +Kd * (this->xDeviation - this->prevDev) / (this->Dt);
+                v = Kp * (xDeviation + yDeviation) + Ki * (this->Dt) * (xDeviation+yDeviation); // +Kd * (this->xDeviation - this->prevDev) / (this->Dt);
                 //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
                 //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
 
@@ -88,7 +90,7 @@ private:
     float Komega = 10;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
-    float xDeviation = 0.0;
+    float dev = 0.0;
     float prevDev = 0.0;
     float Dt = 0.0;
     float v = 0.0;
