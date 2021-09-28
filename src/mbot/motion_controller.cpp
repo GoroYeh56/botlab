@@ -185,7 +185,7 @@ public:
                 
                 if(turn_controller.target_reached(pose, target))
                 {
-                    state_ = DRIVE
+                    state_ = DRIVE;
 		            
                 } 
                 else
