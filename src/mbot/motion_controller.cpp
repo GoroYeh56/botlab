@@ -133,18 +133,20 @@ public:
     {
         
         float wError = angle_diff(target.theta, pose.theta);
-        float w = this->Kp * wError;
+        float w = 2.5;
+        if (wError < 0) {
+            w = -2.5;
+        }
         return { 0, 0, w };
 
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        
         return (fabs(angle_diff(pose.theta, target.theta)) < 0.07);
     }
 private:
-    float Kp = 3;
+    float Kp = 30;
 };
 
 
