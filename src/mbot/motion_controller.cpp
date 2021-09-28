@@ -130,8 +130,8 @@ public:
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
         
-        float wError = angle_diff(target->theta, pose->theta);
-        float w = kP * wError;
+        float wError = angle_diff(target.theta, pose.theta);
+        float w = this->Kp * wError;
         return { 0, 0, w };
 
     }
