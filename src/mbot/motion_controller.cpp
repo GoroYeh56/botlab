@@ -183,7 +183,7 @@ public:
                 {
                     if(!assignNextTarget())
                     {
-                        std::cout << "\rTarget Reached!";
+                        std::cout << "\nTarget Reached!\n";
                     }
                 }
                 else
