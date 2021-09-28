@@ -186,7 +186,7 @@ public:
                 if(turn_controller.target_reached(pose, target))
                 {
                     state_ = DRIVE;
-		            
+                    std::cout << "\n";
                 } 
                 else
                 {
@@ -200,6 +200,7 @@ public:
                 if(straight_controller.target_reached(pose, target))
                 {
                     state_ = ORIENT;
+                    std::cout << "\n";
                 }
                 else
                 { 
@@ -207,7 +208,7 @@ public:
                 }
 		    }
             else if (state_ == ORIENT) {
-                std::cout << "\rORIENT";
+                std::cout << "\rORIENTING";
                 if (orient_controller.target_reached(pose, target))
                 {
                     if (!assignNextTarget())
