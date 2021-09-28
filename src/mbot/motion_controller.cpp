@@ -142,7 +142,7 @@ public:
         return (fabs(angle_diff(pose.theta, target.theta)) < 0.07);
     }
 private:
-    float Kp = 30;
+    float Kp = 3;
 };
 
 
