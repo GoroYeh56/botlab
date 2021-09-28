@@ -50,6 +50,7 @@ public:
             this->dev = sqrt(pow(target.x - pose.x, 2) + pow(target.y - pose.y, 2));
             
             if (this->dev > 0.2) {
+                
                 v = 0.3;
             }
             else {
@@ -63,7 +64,8 @@ public:
             float dy = target.y - pose.y;
             float target_heading = atan2(dy, dx);
             float angleDeviation = angle_diff(pose.theta, target_heading);
-            float w = Komega* angleDeviation;
+        
+            float w = Komega * angleDeviation;
             //std::cout << "\n\rv: " << v << "  w: " << w << "\n";
             this->Dt = (t_now - t_prev);
             this->t_prev = this->t_now;
@@ -72,7 +74,7 @@ public:
         if (v > 0.5) v = 0.5;
         if (w > 6) w = 6;
         if (v < 0.07) v = 0.07;
-        //if (w < 0.5) w = 0.5;
+       
         
         return {0, v, w};
     }
@@ -86,7 +88,7 @@ private:
     float Kp = 2;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 0;
+    float Komega = 3;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
