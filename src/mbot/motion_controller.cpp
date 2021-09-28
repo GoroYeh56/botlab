@@ -85,7 +85,7 @@ private:
     float Kp = 1.5;
     float Ki = 0.0000005;
     float Kd = 40000;
-    float Komega = 5;
+    float Komega = 10;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float xDeviation = 0.0;
@@ -106,7 +106,7 @@ public:
     {
         
         float angleDeviation = target.theta - pose.theta;
-        if (angleDeviation > 0.2) {
+        if (angleDeviation > 0.1) {
             return { 0, 0, 3 };
         }
         else {
@@ -119,10 +119,10 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        return (fabs(angle_diff(pose.theta, target_heading)) < 0.15); //0.07
+        return (fabs(angle_diff(pose.theta, target_heading)) < 0.07); 
     }
 private: 
-    float Kp = 15;
+    float Kp = 30;
 };
 
 
