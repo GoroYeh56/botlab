@@ -32,12 +32,28 @@ using namespace std;
  */
 ///////////////////////////////////////////////////////////
 
-// #define DEBUG_STATE
+#define DEBUG_STATE
 
 
-#define DRIVE_CRITERIA 0.03 // m
-#define TURN_CRITERIA 0.1 // radian 5 degree
-#define TURN2_CRITERIA 0.1 // radian
+
+
+#define DRIVE_CRITERIA 0.026 // m (2cm)
+#define TURN_CRITERIA 0.04 //  radian 5 degree
+#define TURN2_CRITERIA 0.04 // radian
+// const float Kp = 1;
+// const float Ktheta = 0.5;
+// const float Kdrive_w = 0.5;
+float Kp = 1.5;
+float Ktheta = 0.5;
+float Kdrive_w = 1;
+
+
+// const float MAX_FWD_VEL = 0.8;
+// const float MAX_TURN_VEL = 2.5;
+
+// Default value
+float MAX_FWD_VEL = 0.2;
+float MAX_TURN_VEL = M_PI/4;
 
 
 class StraightManeuverController : public ManeuverControllerBase
@@ -84,15 +100,6 @@ public:
 
 };
 
-const float Kp = 1;
-const float Ktheta = 0.5;
-const float Kdrive_w = 0.5;
-
-// const float MAX_FWD_VEL = 0.8;
-// const float MAX_TURN_VEL = 2.5;
-const float MAX_FWD_VEL = 0.5;
-const float MAX_TURN_VEL = 1.3;
-
 
 class MotionController
 { 
@@ -130,7 +137,8 @@ public:
 
             // Print State, current (x,y,theta) and current goal
             #ifdef DEBUG_STATE
-                std::cout<<"state: "<<state_<<"(x,y,t): "<<pose.x<<","<<pose.y<<","<<pose.theta<<", goal: "<<target.x<<", "<<target.y<<", "<<target.theta<<std::endl;
+                // std::cout<<"state: "<<state_<<"(x,y,t): "<<pose.x<<","<<pose.y<<","<<pose.theta<<", goal: "<<target.x<<", "<<target.y<<", "<<target.theta<<std::endl;
+                 std::cout<<"state: "<<state_<<"(x,y): "<<pose.x<<","<<pose.y<<", goal: "<<target.x<<", "<<target.y<<std::endl;
             #endif
             
 
@@ -139,7 +147,7 @@ public:
             { 
                 if(turn_controller.target_reached(pose, target))
                 {   
-                    printf("\rReached target theta %.2f, now to DRIVE\n",target.theta);
+                    printf("\rTURN: Reached target theta %.2f\n",target.theta);
 		            state_ = DRIVE;
                 } 
                 else
@@ -160,19 +168,20 @@ public:
             {
                 if(straight_controller.target_reached(pose, target))
                 {
-                    // if(!assignNextTarget())
-                    // {
-                    //     std::cout << "\rTarget Reached!\n";
-                    // }
-                    state_ = TURN2;
-
-                    printf("\rReached target (x,y) %.2f, %.2f, now to TURN2\n",target.x, target.y);
+                    cmd.trans_v = 0;
+                    cmd.angular_v = 0;
+                    printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
+                    if(!assignNextTarget())
+                    {
+                        std::cout << "\rTarget Reached!\n";
+                    }
+                    // state_ = TURN2;
                 }
                 else
                 { 
                     float distance_err = sqrt( pow((target.x - pose.x),2) + pow((target.y-pose.y),2) );
-                    float x_err = fabs(pose.x - target.x);
-                    float y_err = fabs(pose.y - target.y);
+                    // float x_err = fabs(pose.x - target.x);
+                    // float y_err = fabs(pose.y - target.y);
                     // printf("\rDRIVE: cur x %.3f, goal x %.3f x_err %.4f y_err %4f\n",pose.x, target.x, x_err, y_err);
                     cmd.trans_v = Kp * distance_err ;
 
@@ -262,7 +271,7 @@ private:
         DRIVE,
         TURN2
     };
-    
+    int index = 1; // target
     pose_xyt_t odomToGlobalFrame_;      // transform to convert odometry into the global/map coordinates for navigating in a map
     PoseTrace  odomTrace_;              // trace of odometry for maintaining the offset estimate
     std::vector<pose_xyt_t> targets_;
@@ -284,9 +293,9 @@ private:
     }
     
     bool assignNextTarget(void)
-    {
+    {  
         if(!targets_.empty()) { 
-            cout<<"Target: "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
+            cout<<"Target:"<<index++<<", "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
             targets_.pop_back(); 
         }
         state_ = TURN; 
@@ -336,6 +345,20 @@ int main(int argc, char** argv)
 
     signal(SIGINT, exit);
     
+    // if(argc < 2){
+    //     printf("Wrong input format. ./motion_controller <speed_mode> (0: Fast, 1: Slow)\n");
+    //     return 0;
+    // }    
+    int speed_mode;
+    cout<<"Enter speed mode: 0 => Slow, 1 => Fast: \n";
+    cin>>speed_mode;
+    string mode = (speed_mode==0)? "Slow" : "Fast";
+    Ktheta = (speed_mode==0)?0.5 : 2.2;
+
+    cout<<"Speed mode: "<< mode<<endl;
+    MAX_FWD_VEL = (speed_mode==0)? 0.2 : 0.8;
+    MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;
+
     while(true)
     {
         lcmInstance.handleTimeout(50);  // update at 20Hz minimum
