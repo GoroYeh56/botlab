@@ -106,12 +106,9 @@ public:
     {
         
         float angleDeviation = target.theta - pose.theta;
-        if (angleDeviation > 0.07) {
-            return { 0, 0, 3 };
-        }
-        else {
-            return { 0, 0, Kp * angleDeviation };
-        }
+        
+        return { 0, 0, 2.5 };
+       
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
