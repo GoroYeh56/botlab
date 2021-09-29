@@ -46,34 +46,26 @@ public:
         
         this->t_now = utime_now();
         
-        if (this->t_now > this->t_next) {
-
-            this->prevDev = this->dev;
-            this->dev = sqrt(pow(target.x - pose.x, 2) + pow(target.y - pose.y, 2));
-            
-            if (this->dev > 0.2) {
-                
-                v = 0.2;
-            }
-            else {
-
-                v = Kp * (this->dev) + Ki * (this->Dt) * (this->dev); // +Kd * (this->xDeviation - this->prevDev) / (this->Dt);
-                //std::cout << "\nv: " << v << "   w: " << w << "  Dt: " << Dt << "  t_now: " << t_now << "  t_prev: " << t_prev;
-                //std::cout << "\n      P: " << Kp * xDeviation << "  I: " << Ki * Dt * xDeviation << "  D: " << Kd * (this->xDeviation - this->prevDev) / Dt;
-
-            }
-            float dx = target.x - pose.x;
-            float dy = target.y - pose.y;
-            float target_heading = atan2(dy, dx);
-            float angleDeviation = angle_diff(pose.theta, target_heading);
         
-            float w = Komega * angleDeviation;
-            //std::cout << "\n\rv: " << v << "  w: " << w << "\n";
-            this->Dt = (t_now - t_prev);
-            this->t_prev = this->t_now;
-            this->t_next = this->t_now + 1000;
-        }
-        if (v > 0.5) v = 0.5;
+
+        this->prevDev = this->dev;
+        this->dev = sqrt(pow(target.x - pose.x, 2) + pow(target.y - pose.y, 2));
+          
+
+        v = Kp * (this->dev); //+Ki*(this->Dt)*this->dev + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
+                
+        float dx = target.x - pose.x;
+        float dy = target.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        float angleDeviation = angle_diff(pose.theta, target_heading);
+        
+        float w = Komega * angleDeviation;
+        
+        this->Dt = (t_now - t_prev);
+        this->t_prev = this->t_now;
+        this->t_next = this->t_now + 1000;
+        
+        if (v > 1) v = 1;
         if (w > 6) w = 6;
         if (v < 0.07) v = 0.07;
        
@@ -83,14 +75,14 @@ public:
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < 0.1));
+        return ((fabs(pose.x - target.x) < 0.05) && (fabs(pose.y - target.y)  < 0.05));
     }
 
 private:
-    float Kp = 1;
-    float Ki = 0.0000002;
-    float Kd = 40000;
-    float Komega = 3;
+    float Kp = 1.5;
+    //float Ki = 0.0000002;
+    //float Kd = 40000;
+    float Komega = 1;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
@@ -114,10 +106,10 @@ public:
         float target_heading = atan2(dy, dx);
         float wError = angle_diff(target_heading, pose.theta);
 
-        float w = 2.5;// PI / 4;
-        if (wError < 0) {
+        float w = kP*wError;// PI / 4;
+        /*if (wError < 0) {
             w = -2.5;//-PI/4;
-        }
+        }*/
         return { 0, 0, w };
        
     }
@@ -130,7 +122,7 @@ public:
         return (fabs(angle_diff(pose.theta, target_heading)) < 0.03);
     }
 private: 
-    float Kp = 30;
+    float Kp = 0.5;
 };
 
 class OrientManeuverController : public ManeuverControllerBase
