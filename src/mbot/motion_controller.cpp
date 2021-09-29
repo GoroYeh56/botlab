@@ -106,7 +106,7 @@ public:
         float target_heading = atan2(dy, dx);
         float wError = angle_diff(target_heading, pose.theta);
 
-        float w = kP*wError;// PI / 4;
+        float w = Kp*wError;// PI / 4;
         /*if (wError < 0) {
             w = -2.5;//-PI/4;
         }*/
