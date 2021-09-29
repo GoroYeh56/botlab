@@ -108,6 +108,7 @@ public:
         /*if (wError < 0) {
             w = -2.5;//-PI/4;
         }*/
+        if (w < 1 && w > 0.02) w = 1;
         return { 0, 0, w };
        
     }
