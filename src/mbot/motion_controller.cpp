@@ -57,7 +57,7 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        float angleDeviation = angle_diff(pose.theta, target_heading);
+        float angleDeviation = -angle_diff(pose.theta, target_heading);
         
         float w = Komega * angleDeviation;
         
@@ -66,7 +66,9 @@ public:
         this->t_next = this->t_now + 1000;
         
         if (v > 1.5) v = 1.5;
-        if (w > 6) w = 6;       
+        if (v < -1.5) v = -1.5;
+        if (w > 6) w = 6;   
+        if (w < -6) w = -6;
         
         return {0, v, w};
     }
