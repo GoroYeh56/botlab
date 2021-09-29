@@ -21,7 +21,7 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
     }
 
     MovingLaserScan movingscan(scan, previousPose_, pose);
-    for (auto& ray : movingScan) {
+    for (auto& ray : movingscan) {
         scoreEndpoint(ray, map);
         scoreRay(ray, map);
     }
