@@ -39,7 +39,7 @@ void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
         rayCell.y = static_cast<int>((ray.range * std::sin(ray.theta) * map.cellsPerMeter()) + rayStart.y);
 
         if (map.isCellInGrid(rayCell.x, rayCell.y)) {
-            increaseCellOdds(rayCell.x, RayCell, y, map);
+            increaseCellOdds(rayCell.x, rayCell.y, map);
         }
     }
 }
