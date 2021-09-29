@@ -82,7 +82,7 @@ private:
     float Kp = 1.5;
     //float Ki = 0.0000002;
     //float Kd = 40000;
-    float Komega = 0.75;
+    float Komega = 0.7;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
@@ -122,7 +122,7 @@ public:
         return (fabs(angle_diff(pose.theta, target_heading)) < 0.03);
     }
 private: 
-    float Kp = 0.5;
+    float Kp = 0.75;
 };
 
 class OrientManeuverController : public ManeuverControllerBase
