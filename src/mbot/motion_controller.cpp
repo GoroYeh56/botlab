@@ -57,7 +57,7 @@ public:
         float dx = target.x - pose.x;
         float dy = target.y - pose.y;
         float target_heading = atan2(dy, dx);
-        float angleDeviation = -angle_diff(pose.theta, target_heading);
+        float angleDeviation = angle_diff(pose.theta, target_heading);
         
         float w = Komega * angleDeviation;
         
@@ -82,7 +82,7 @@ private:
     float Kp = 1.5;
     //float Ki = 0.0000002;
     //float Kd = 40000;
-    float Komega = 0.5;
+    float Komega = 1;
     uint64_t t_prev = 0.0;
     uint64_t t_now = 0.0;
     float dev = 0.0;
