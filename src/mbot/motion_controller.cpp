@@ -49,7 +49,7 @@ public:
         
 
         this->prevDev = this->dev;
-        this->dev = sqrt(pow(target.x - pose.x, 2) + pow(target.y - pose.y, 2));
+        this->dev = sqrt(pow((target.x - pose.x), 2) + pow((target.y - pose.y), 2));
           
 
         v = Kp * (this->dev); //+Ki*(this->Dt)*this->dev + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
@@ -65,10 +65,8 @@ public:
         this->t_prev = this->t_now;
         this->t_next = this->t_now + 1000;
         
-        if (v > 1) v = 1;
-        if (w > 6) w = 6;
-        if (v < 0.07) v = 0.07;
-       
+        if (v > 1.5) v = 1.5;
+        if (w > 6) w = 6;       
         
         return {0, v, w};
     }
