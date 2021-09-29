@@ -120,7 +120,7 @@ public:
         return (fabs(angle_diff(pose.theta, target_heading)) < 0.03);
     }
 private: 
-    float Kp = 1;
+    float Kp = 1.5;
 };
 
 class OrientManeuverController : public ManeuverControllerBase
