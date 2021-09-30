@@ -278,7 +278,7 @@ void OccupancyGridSLAM::updateMap(void)
     if(mode_ != localization_only && mode_ != action_only)
     {
         // Process the map
-        std::cout << "\nUpdating Map for pose: (" << currentPose.x << "," << currentPose.y << "," << currentPose.theta << ")";
+        std::cout << "\nUpdating Map for pose: (" << currentPose_.x << "," << currentPose_.y << "," << currentPose_.theta << ")";
         mapper_.updateMap(currentScan_, currentPose_, map_);
         haveMap_ = true;
     }
