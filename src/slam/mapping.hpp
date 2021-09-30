@@ -7,6 +7,20 @@
 class OccupancyGrid;
 class lidar_t;
 
+
+struct adjusted_ray_t;
+/*
+    moving_laser_scan.hpp
+    struct adjusted_ray_t
+    {
+        Point<float> origin;        ///< Position of the robot when the ray was measured
+        float        range;         ///< Range of the measurement
+        float        theta;         ///< Angle of the measurement in global frame, not robot frame
+    };
+
+*/
+
+
 /**
 * Mapping implements the occupancy grid mapping algorithm. 
 */
@@ -39,6 +53,17 @@ private:
     const int8_t kMissOdds_;
     
     //////////////////// TODO: Add any private members needed for your occupancy grid mapping algorithm ///////////////
+    pose_xyt_t previousPose_;
+    bool initialized_;
+
+    // score the endpoint and add the log odds
+    void scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map);
+    // score the whole ray
+    void scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map);
+
+    void decreaseCellOdds(int x, int y, OccupancyGrid& map); // write output in map
+    void increaseCellOdds(int x, int y, OccupancyGrid& map);
+
 };
 
 #endif // SLAM_MAPPING_HPP
