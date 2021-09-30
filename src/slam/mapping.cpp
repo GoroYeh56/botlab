@@ -31,6 +31,7 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
 }
 
 void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
+    std::cout << "\nScoringEndpoint: (" << ray.origin.x << "," << ray.origin.y << ")";
     if (ray.range < kMaxLaserDistance_) {
         Point <float> rayStart = global_position_to_grid_cell(ray.origin, map);
         Point<int> rayCell;
