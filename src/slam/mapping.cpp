@@ -20,8 +20,8 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
         previousPose_ = pose;
     }
 
-    MovingLaserScan movingscan(scan, previousPose_, pose);
-    for (auto& ray : movingscan) {
+    MovingLaserScan movingScan(scan, previousPose_, pose);
+    for (auto& ray : movingScan) {
         scoreEndpoint(ray, map);
         scoreRay(ray, map);
     }
@@ -31,7 +31,7 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
 }
 
 void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
-    if (ray.range <= kMaxLaserDistance_) {
+    if (ray.range < kMaxLaserDistance_) {
         Point <float> rayStart = global_position_to_grid_cell(ray.origin, map);
         Point<int> rayCell;
 
