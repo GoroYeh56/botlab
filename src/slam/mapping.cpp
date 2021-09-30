@@ -44,6 +44,7 @@ void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
     }
 }
 void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
+   /* 
     int xend = ray.range * std::cos(ray.theta);
     int yend = ray.range * std::sin(ray.theta);
 
@@ -52,16 +53,11 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
 
     int sx = ray.origin.x < xend ? 1 : -1;
     int sy = ray.origin.y < yend ? 1 : -1;
+    */
 
 }
 void Mapping::decreaseCellOdds(int x, int y, OccupancyGrid& map) {
-    if (std::numeric_limits<CellOdds>::max() - map(x,y) <= kMissOdds_) {
-        map(x, y) -= kMissOdds_;
-    }
-   
-    else {
-        map(x, y) = std::numeric_limits<CellOdds>::min();
-    }
+    
 }
 void Mapping::increaseCellOdds(int x, int y, OccupancyGrid& map) {
     
