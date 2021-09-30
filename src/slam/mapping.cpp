@@ -12,14 +12,13 @@ Mapping::Mapping(float maxLaserDistance, int8_t hitOdds, int8_t missOdds)
 {
 }
 
-
 void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGrid& map)
 {
     //////////////// TODO: Implement your occupancy grid algorithm here ///////////////////////
     if (!initialized_) {
         previousPose_ = pose;
     }
-
+    std::cout << "\nUpdating Map for pose: (" << pose.x << "," << pose.y << "," << pose.theta << ")";
     MovingLaserScan movingScan(scan, previousPose_, pose);
     for (auto& ray : movingScan) {
         scoreEndpoint(ray, map);
@@ -31,7 +30,7 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
 }
 
 void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
-    std::cout << "\nScoringEndpoint: (" << ray.origin.x << "," << ray.origin.y << ")";
+    
     if (ray.range < kMaxLaserDistance_) {
         Point <float> rayStart = global_position_to_grid_cell(ray.origin, map);
         Point<int> rayCell;
