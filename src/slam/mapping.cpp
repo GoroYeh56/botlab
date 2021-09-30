@@ -52,6 +52,9 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
     int x1 = static_cast<int>((ray.range * std::cos(ray.theta) * map.cellsPerMeter()) + rayStart.x);
     int y1 = static_cast<int>((ray.range * std::sin(ray.theta) * map.cellsPerMeter()) + rayStart.y);
 
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+
     int sx = x0 < x1 ? 1 : -1;
     int sy = y0 < y1 ? 1 : -1;
 
