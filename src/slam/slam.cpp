@@ -190,12 +190,14 @@ bool OccupancyGridSLAM::isReadyToUpdate(void)
 
 void OccupancyGridSLAM::runSLAMIteration(void)
 {
+    std::cout << "\nrunning Slam iteration";
     copyDataForSLAMUpdate();
     initializePosesIfNeeded();
     
     // Sanity check the laser data to see if rplidar_driver has lost sync
     if(currentScan_.num_ranges > 100)//250)
     {
+       
         updateLocalization();
         updateMap();
     }
@@ -276,6 +278,7 @@ void OccupancyGridSLAM::updateMap(void)
     if(mode_ != localization_only && mode_ != action_only)
     {
         // Process the map
+        std::cout << "\nUpdating Map for pose: (" << currentPose.x << "," << currentPose.y << "," << currentPose.theta << ")";
         mapper_.updateMap(currentScan_, currentPose_, map_);
         haveMap_ = true;
     }
