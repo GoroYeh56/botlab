@@ -45,7 +45,38 @@ void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
 }
 void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
   
+    Point <float> rayStart = global_position_to_grid_cell(ray.origin, map);
+    int x0 = static_cast<int>rayStart.x;
+    int y0 = static_cast<int>rayStart.y;
+
+    int x1 = static_cast<int>((ray.range * std::cos(ray.theta) * map.cellsPerMeter()) + rayStart.x);
+    int y1 = static_cast<int>((ray.range * std::sin(ray.theta) * map.cellsPerMeter()) + rayStart.y);
+
+    int sx = x0 < x1 ? 1 : -1;
+    int sy = y0 < y1 ? 1 : -1;
+
+    int err = dx - dy;
+
+    int x = x0;
+    int y = y0;
+
+    while (x != x1 || y != y1) {
+        if (map.isCellInGrid(x, y)) {
+            decreaseCellOdds(x, y, map);
+        }
+
+        e2 = 2 * err;
+        if (e2 >= -dy) {
+            err -= dy;
+            x += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y += sy;
+        }
+    }
 }
+
 void Mapping::decreaseCellOdds(int x, int y, OccupancyGrid& map) {
     if (map(x, y) - kMissOdds_ > std::numeric_limits<CellOdds>::min()) {
         map(x, y) -= kMissOdds_;
