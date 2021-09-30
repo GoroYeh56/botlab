@@ -44,6 +44,7 @@ private:
     pose_xyt_t previousPose_;
     bool initialized_;
 
+
     void scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map);
     void scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map);
     void decreaseCellOdds(int x, int y, OccupancyGrid& map);
