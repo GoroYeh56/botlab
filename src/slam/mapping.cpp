@@ -43,6 +43,7 @@ void Mapping::scoreEndpoint(const adjusted_ray_t& ray, OccupancyGrid& map) {
         }
     }
 }
+
 void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
   
     Point <float> rayStart = global_position_to_grid_cell(ray.origin, map);
@@ -79,6 +80,7 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
         }
     }
 }
+
 
 void Mapping::decreaseCellOdds(int x, int y, OccupancyGrid& map) {
     if (map(x, y) - kMissOdds_ > std::numeric_limits<CellOdds>::min()) {
