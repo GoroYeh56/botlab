@@ -22,7 +22,7 @@ void ParticleFilter::initializeFilterAtPose(const pose_xyt_t& pose)
         p.pose.x = posteriorPose_.x;
         p.pose.y = posteriorPose_.y;
         p.pose.theta = wrap_to_pi(posteriorPose_.theta);
-        p.poes.utime = pose.utime;
+        p.pose.utime = pose.utime;
         p.parent_pose = p.pose;
         p.weight = sampleWeight;
     }
