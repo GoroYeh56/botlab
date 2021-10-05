@@ -90,7 +90,22 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
     //////////// TODO: Implement your algorithm for resampling from the posterior distribution ///////////////////
     
-    std::vector<particle_t> prior;
+    std::vector<particle_t> prior = posterior_;
+     // don't just sample random ones in real code?
+    double sampleWeight = 1.0 / kNumParticles_;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::normal_distribution<> dist(0.0, 0.01);
+
+    for (auto& p : prior) {
+        p.pose.x = posteriorPose_.x + dist(generator);
+        p.pose.y = posteriorPose_.y + dist(generator);
+        p.pose.theta = posteriorPose_.theta + dist(generator);
+        p.pose.utime = posteriorPose_.utime;
+        p.parent_pose = posteriorPose_;
+        p.weight = sampleWeight;
+    }
+
     return prior;
 }
 
@@ -113,6 +128,19 @@ std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::ve
     /////////// TODO: Implement your algorithm for computing the normalized posterior distribution using the 
     ///////////       particles in the proposal distribution
     std::vector<particle_t> posterior;
+    double sumWeights = 0.0;
+
+    for (auto& p : proposal) {
+        particle_t weighted = p;
+        weighted.weight = sensorModel_.likelihood(weighted, laser, map);
+        sumWeights += weighted.weight;
+        posterior.push_back(weighted);
+    }
+
+    for (auto& p : proposal) {
+        p.weight /= sumWeights;
+    }
+
     return posterior;
 }
 
@@ -121,5 +149,21 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
 {
     //////// TODO: Implement your method for computing the final pose estimate based on the posterior distribution
     pose_xyt_t pose;
+
+    double xMean = 0.0;
+    double yMean = 0.0;
+    double cosThetaMean = 0.0;
+    double sinThetaMean = 0.0;
+    for (auto& p : posterior) {
+        xMean += p.weight * p.pose.x;
+        yMean += p.weight * p.pose.y;
+        cosThetaMean += p.weight * std::cos(p.pose.theta);
+        sinThetaMean += p.weight * std::sin(p.pose.theta);
+    }
+
+    pose.x = xMean;
+    pose.y = yMean;
+    pose.theta = std::atan2(sinTehtaMean, cosThetaMean);
+
     return pose;
 }
