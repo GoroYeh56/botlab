@@ -10,11 +10,11 @@ ActionModel::ActionModel(void) : k1_(0.01f),k2_(0.01f),initialized_(false)
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;
-    numberGenerator = std::mt19937(rd());
+    numberGenerator_ = std::mt19937(rd());
 }
 
 
-bool ActionModel::updateAction(const pose_xyt_t& odometry)a
+bool ActionModel::updateAction(const pose_xyt_t& odometry)
 {
     ////////////// TODO: Implement code here to compute a new distribution of the motion of the robot ////////////////
     if (!initialized_) {
@@ -56,9 +56,9 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     // Make sure you create a new valid particle_t. Don't forget to set the new time and new parent_pose.
     particle_t newSample = sample;
 
-    float sampleRot1 = std::normal_distribution<>(rot1_, rot1Std_)(numberGenerator_);
-    float sampleTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerator_);
-    float sampleRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
+    float sampledRot1 = std::normal_distribution<>(rot1_, rot1Std_)(numberGenerator_);
+    float sampledTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerator_);
+    float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
 
     newSample.pose.x += sampledTrans * cos(sample.pose.theta * smapledRot1);
     newSample.pose.y += sampledTrans * sin(sample.pose.theta * smapledRot1);
@@ -69,9 +69,9 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     return newSample;
 }
 
-
+/*
 float ActionModel::prob_normal_distribution(float x, float variance) {
-    return (1 / std::sqrtf(2 * std::_Pi * variance)) * std::expf(-0.5 * std::pow(x, 2) / variance);
+    return (1 / std::sqrt(2 * std::_Pi * variance)) * std::expf(-0.5 * std::pow(x, 2) / variance);
 }
 
 float ActionModel::sample_normal_distribution(float variance) {
@@ -86,3 +86,4 @@ float ActionModel::sample_uniform_distribution(float high, float low) {
     low + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (low - high)));
 }
 
+*/

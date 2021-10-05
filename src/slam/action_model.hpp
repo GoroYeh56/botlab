@@ -58,12 +58,12 @@ private:
     ////////// TODO: Add private member variables needed for you implementation ///////////////////
     const float k1_;
     const float k2_;
-    bool initialized_;
+    //bool initialized_;
 
     pose_xyt_t previousOdometry_;
     double rot1_;
     double trans_;
-    double rot2;
+    double rot2_;
     bool moved_;
     bool initialized_;
     int64_t utime_;
@@ -74,10 +74,11 @@ private:
 
     std::mt19937 numberGenerator_;
 
+    /*
     float prob_normal_distribution(float x, float variance);
     float sample_normal_distribution(float variance);
     float sample_uniform_distribution(float high, float low);
-
+    */
 
 };
 
