@@ -18,7 +18,7 @@ bool ActionModel::updateAction(const pose_xyt_t& odometry)
 {
     ////////////// TODO: Implement code here to compute a new distribution of the motion of the robot ////////////////
     if (!initialized_) {
-        prevoiusodometery_ = odometry;
+        prevoiusOdometery_ = odometry;
         initialized_ = true;
     }
 
@@ -36,7 +36,7 @@ bool ActionModel::updateAction(const pose_xyt_t& odometry)
 
     rot2_ = angle_diff(deltaTheta, rot1_);
 
-    moved_ = (deltaX != 0.0) || (deltaY != 0.0) || deltaTheta != 0.0);
+    moved_ = (deltaX != 0.0) || (deltaY != 0.0) || (deltaTheta != 0.0);
     if (moved_) {
         rot1Std_ = std::sqrt(k1_ * std::abs(rot1_)); // could add translation here maybe?
         transStd_ = std::sqrt(k2_ * std::abs(trans_));
