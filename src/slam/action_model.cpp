@@ -39,8 +39,8 @@ bool ActionModel::updateAction(const pose_xyt_t& odometry)
     moved_ = (deltaX != 0.0) || (deltaY != 0.0) || deltaTheta != 0.0);
     if (moved_) {
         rot1Std_ = std::sqrt(k1_ * std::abs(rot1_)); // could add translation here maybe?
-        transStd = std::sqrt(k2_ * std::abs(trans_));
-        rot2Std = std::sqrt(k1_ * std::abs(rot2_));
+        transStd_ = std::sqrt(k2_ * std::abs(trans_));
+        rot2Std_ = std::sqrt(k1_ * std::abs(rot2_));
     }
     trans_ *= direction;
     previousOdometry_ = odometry;
@@ -60,7 +60,7 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     float sampledTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerator_);
     float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
 
-    newSample.pose.x += sampledTrans * cos(sample.pose.theta * smapledRot1);
+    newSample.pose.x += sampledTrans * cos(sample.pose.theta * sampledRot1);
     newSample.pose.y += sampledTrans * sin(sample.pose.theta * smapledRot1);
     newSample.pose.theta = wrap_to_pi(sample.pose.theta * sampledRot1 * sampledRot2);
     newSample.pose.utime = utime_;
