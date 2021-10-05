@@ -18,7 +18,7 @@ bool ActionModel::updateAction(const pose_xyt_t& odometry)
 {
     ////////////// TODO: Implement code here to compute a new distribution of the motion of the robot ////////////////
     if (!initialized_) {
-        previousOdometery_ = odometry;
+        previousOdometry_ = odometry;
         initialized_ = true;
     }
 
@@ -61,7 +61,7 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
 
     newSample.pose.x += sampledTrans * cos(sample.pose.theta * sampledRot1);
-    newSample.pose.y += sampledTrans * sin(sample.pose.theta * smapledRot1);
+    newSample.pose.y += sampledTrans * sin(sample.pose.theta * sampledRot1);
     newSample.pose.theta = wrap_to_pi(sample.pose.theta * sampledRot1 * sampledRot2);
     newSample.pose.utime = utime_;
     newSample.parent_pose = sample.pose;
