@@ -90,11 +90,13 @@ double MMA_rand(double high, double low) {
 }
 
 double RandomFloat(float a, float b) {
-    float random = ((float) rand()) / (float)RAND_MAX;
-    float diff = b - a;
-    float r = random * diff;
+    double random = ((double) rand()) / (double)RAND_MAX;
+    double diff = b - a;
+    double r = random * diff;
     return a + r;
 }
+
+
 
 std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
