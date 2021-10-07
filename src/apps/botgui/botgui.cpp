@@ -584,7 +584,7 @@ void BotGui::createGuiLayout(GtkWidget* window, GtkWidget* vxCanvas)
     
     showLaserCheck_ = gtk_check_button_new_with_label("Show Laser");
     gtk_box_pack_start(GTK_BOX(optionsBox_), showLaserCheck_, FALSE, TRUE, 0);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(showLaserCheck_), TRUE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(showLaserCheck_), FALSE);
     
     showParticlesCheck_ = gtk_check_button_new_with_label("Show Particles");
     gtk_box_pack_start(GTK_BOX(optionsBox_), showParticlesCheck_, FALSE, TRUE, 0);
