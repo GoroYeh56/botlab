@@ -101,13 +101,13 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
     std::normal_distribution<> dist(0.0, 0.04);
 
     double r = MMA_rand(0, sampleWeight);
-    double c = prior.at(0).weight;
+    double c = posterior_.at(0).weight;
     int i = 1;
     for (int m = 1; m <= kNumParticles_; m++) {
         double U = r + (m - 1) * (sampleWeight);
         while (U > c) {
             i++;
-            c = c + prior.at(i).weight;
+            c = c + posterior_.at(i).weight;
         }
         if (i < posterior_.size()) {
             prior.push_back(posterior_.at(i));
