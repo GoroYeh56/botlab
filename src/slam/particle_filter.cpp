@@ -95,7 +95,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
     double sampleWeight = 1.0 / kNumParticles_;
     std::random_device rd;
     std::mt19937 generator(rd());
-    std::normal_distribution<> dist(0.0, 0.01);
+    std::normal_distribution<> dist(0.0, 0.04);
 
     for (auto& p : prior) {
         p.pose.x = posteriorPose_.x + dist(generator);
