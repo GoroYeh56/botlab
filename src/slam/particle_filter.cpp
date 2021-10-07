@@ -113,7 +113,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
     double c = posterior_.at(0).weight;
     int i = 0;
     for (int m = 1; m < kNumParticles_; m++) {
-        double U = r + (m - 1) * (sampleWeight);
+        double U = r + ((double)m - 1) * (sampleWeight);
         while (U > c) {
             i++;
             if (i < posterior_.size()) {
