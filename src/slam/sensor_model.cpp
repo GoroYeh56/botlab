@@ -15,7 +15,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
 {
     ///////////// TODO: Implement your sensor model for calculating the likelihood of a particle given a laser scan //////////
     MovingLaserScan movingScan(scan, sample.parent_pose, sample.pose);
-    double scanStore;
+    double scanScore;
     //could check max and min range from manufacturing website
     for (auto& ray : movingScan) {
         Point<double> endpoint(ray.origin.x + ray.range * std::cos(ray.theta), 
