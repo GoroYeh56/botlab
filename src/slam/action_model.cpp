@@ -69,9 +69,11 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     return newSample;
 }
 
+
+
 /*
 float ActionModel::prob_normal_distribution(float x, float variance) {
-    return (1 / std::sqrt(2 * std::_Pi * variance)) * std::expf(-0.5 * std::pow(x, 2) / variance);
+    return (1 / std::sqrt(2 * std::_Pi * variance)) * std::exp(-0.5 * x*x / variance);
 }
 
 float ActionModel::sample_normal_distribution(float variance) {

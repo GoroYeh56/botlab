@@ -39,6 +39,9 @@ public:
 private:
     
     ///////// TODO: Add any private members for your SensorModel ///////////////////
+
+
+
 };
 
 #endif // SLAM_SENSOR_MODEL_HPP
