@@ -89,21 +89,28 @@ double MMA_rand(double high, double low) {
     return low + static_cast <double> (std::rand()) / (static_cast <double> (RAND_MAX / (low - high)));
 }
 
+double RandomFloat(float a, float b) {
+    float random = ((float rand())) / (float)RAND_MAX;
+    float diff = b - a;
+    float r = random * diff;
+    return a + r;
+}
+
 std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
     //////////// TODO: Implement your algorithm for resampling from the posterior distribution ///////////////////
 
-    std::vector<particle_t> prior;
+    std::vector<particle_t> prior = posterior_;
     // don't just sample random ones in real code?
     const double sampleWeight = 1.0 / kNumParticles_;
     std::random_device rd;
     std::mt19937 generator(rd());
     std::normal_distribution<> dist(0.0, 0.04);
 
-    double r = MMA_rand(0, sampleWeight);
+    double r = RandomFloat(0, sampleWeight);
     double c = posterior_.at(0).weight;
-    int i = 1;
-    for (int m = 1; m <= kNumParticles_; m++) {
+    int i = 0;
+    for (int m = 0; m < kNumParticles_; m++) {
         double U = r + (m - 1) * (sampleWeight);
         while (U > c) {
             i++;
@@ -112,7 +119,8 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             }
         }
         if (i < posterior_.size()) {
-            prior.push_back(posterior_.at(i));
+            prior.at(m) = posterior_.at(i);
+            
         }
         
     }
