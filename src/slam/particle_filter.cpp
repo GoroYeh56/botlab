@@ -109,8 +109,8 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 
     double r = RandomFloat(0.0, sampleWeight);
     double c = posterior_.at(0).weight;
-    int i = 0;
-    for (int m = 0; m < kNumParticles_; m++) {
+    int i = 1;
+    for (int m = 1; m < kNumParticles_; m++) {
         double U = r + (m - 1) * (sampleWeight);
         while (U > c) {
             i++;
