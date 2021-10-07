@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-ActionModel::ActionModel(void) : k1_(0.003f),k2_(0.03f),initialized_(false)
+ActionModel::ActionModel(void) : k1_(0.006f),k2_(0.3f),initialized_(false)
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;
