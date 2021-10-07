@@ -109,7 +109,10 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             i++;
             c = c + prior.at(i).weight;
         }
-        prior.push_back(posterior_.at(i));
+        if (i < posterior_.size()) {
+            prior.push_back(posterior_.at(i));
+        }
+        
     }
 
         /*
