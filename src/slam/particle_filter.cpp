@@ -89,24 +89,44 @@ particles_t ParticleFilter::particles(void) const
 std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
     //////////// TODO: Implement your algorithm for resampling from the posterior distribution ///////////////////
-    
-    std::vector<particle_t> prior = posterior_;
-     // don't just sample random ones in real code?
-    double sampleWeight = 1.0 / kNumParticles_;
+
+    std::vector<particle_t> prior;
+    // don't just sample random ones in real code?
+    const double sampleWeight = 1.0 / kNumParticles_;
     std::random_device rd;
     std::mt19937 generator(rd());
     std::normal_distribution<> dist(0.0, 0.04);
 
-    for (auto& p : prior) {
-        p.pose.x = posteriorPose_.x + dist(generator);
-        p.pose.y = posteriorPose_.y + dist(generator);
-        p.pose.theta = posteriorPose_.theta + dist(generator);
-        p.pose.utime = posteriorPose_.utime;
-        p.parent_pose = posteriorPose_;
-        p.weight = sampleWeight;
+    double r = MMA_rand(0, sampleWeight);
+    double c = prior.at(0).weight;
+    int i = 1;
+    for (int m = 1; m <= kNumParticles_; m++) {
+        double U = r + (m - 1) * (sampleWeight);
+        while (U > c) {
+            i++;
+            c = c + prior.at(i).weight;
+        }
+        prior.push_back(posterior_.at(i));
     }
 
+        /*
+        for (auto& p : prior) {
+            p.pose.x = posteriorPose_.x + dist(generator);
+            p.pose.y = posteriorPose_.y + dist(generator);
+            p.pose.theta = posteriorPose_.theta + dist(generator);
+            p.pose.utime = posteriorPose_.utime;
+            p.parent_pose = posteriorPose_;
+            p.weight = sampleWeight;
+        }
+        */
+
     return prior;
+        
+}
+
+
+double MMA_rand(double high, double low) {
+    low + static_cast <double> (std::rand()) / (static_cast <double> (RAND_MAX / (low - high)));
 }
 
 
