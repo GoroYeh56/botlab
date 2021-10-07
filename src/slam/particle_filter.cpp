@@ -85,6 +85,9 @@ particles_t ParticleFilter::particles(void) const
     return particles;
 }
 
+double MMA_rand(double high, double low) {
+    return low + static_cast <double> (std::rand()) / (static_cast <double> (RAND_MAX / (low - high)));
+}
 
 std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
@@ -125,9 +128,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 }
 
 
-double MMA_rand(double high, double low) {
-    low + static_cast <double> (std::rand()) / (static_cast <double> (RAND_MAX / (low - high)));
-}
+
 
 
 std::vector<particle_t> ParticleFilter::computeProposalDistribution(const std::vector<particle_t>& prior)
