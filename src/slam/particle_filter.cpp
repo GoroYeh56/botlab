@@ -121,7 +121,7 @@ std::vector<particle_t> ParticleFilter::computeProposalDistribution(const std::v
 }
 
 
-std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::vector<particle_t>& proposal,
+std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(std::vector<particle_t>& proposal,
                                                                    const lidar_t& laser,
                                                                    const OccupancyGrid&   map)
 {
@@ -138,7 +138,7 @@ std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::ve
     }
 
     for (auto& p : proposal) {
-        p.weight /= sumWeights;
+        test.weight /= sumWeights;
     }
 
     return posterior;
