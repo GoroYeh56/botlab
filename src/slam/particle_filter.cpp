@@ -17,10 +17,12 @@ void ParticleFilter::initializeFilterAtPose(const pose_xyt_t& pose)
     ///////////// TODO: Implement your method for initializing the particles in the particle filter /////////////////
     double sampleWeight = 1.0 / kNumParticles_;
     posteriorPose_ = pose;
-
+    std::random_device rd;
+    std::mt19937 numberGenerator = std::mt19937(rd());
+    
     for (auto& p : posterior_) {
-        p.pose.x = posteriorPose_.x;
-        p.pose.y = posteriorPose_.y;
+        p.pose.x = posteriorPose_.x + std::normal_distribution<>(0, 0.1)(numberGenerator_);
+        p.pose.y = posteriorPose_.y + std::normal_distribution<>(0, 0.1)(numberGenerator_);
         p.pose.theta = wrap_to_pi(posteriorPose_.theta);
         p.pose.utime = pose.utime;
         p.parent_pose = p.pose;
