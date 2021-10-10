@@ -108,9 +108,9 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
     std::vector<particle_t> prior; // = posterior_;
     // don't just sample random ones in real code?
     const double sampleWeight = 1.0 / kNumParticles_;
-    //std::random_device rd;
-    //std::mt19937 generator(rd());
-    //std::normal_distribution<> dist(0.0, 0.04);
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::normal_distribution<> dist(0.0, 0.04);
 
     double r = RandomFloat(0.0, sampleWeight);
     double c = posterior_.at(0).weight;
