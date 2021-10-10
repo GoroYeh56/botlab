@@ -105,7 +105,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
 {
     //////////// TODO: Implement your algorithm for resampling from the posterior distribution ///////////////////
 
-    std::vector<particle_t> prior; // = posterior_;
+    std::vector<particle_t> = posterior_;
     // don't just sample random ones in real code?
     const double sampleWeight = 1.0 / kNumParticles_;
     std::random_device rd;
@@ -124,10 +124,13 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             }
         }
         if (i < posterior_.size()) {
+            /*
             particle_t p;
             p = posterior_.at(i);
             p.parent_pose = posteriorPose_;
-            prior.push_back(p); // prior.at(m) = posterior;
+            */
+            prior.at(m) = posterior;
+            prior.at(m).parent_pose = posteriorPose_;
             
         }
         
