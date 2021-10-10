@@ -19,7 +19,7 @@ void ParticleFilter::initializeFilterAtPose(const pose_xyt_t& pose)
     posteriorPose_ = pose;
     std::random_device rd;
     std::mt19937 numberGenerator = std::mt19937(rd());
-    std::normal_distribution<> dist(0.0, 0.02);
+    std::normal_distribution<> dist(0.0, 0.007);
     
     for (auto& p : posterior_) {
         p.pose.x = posteriorPose_.x + dist(numberGenerator);
