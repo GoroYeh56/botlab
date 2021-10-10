@@ -124,11 +124,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             }
         }
         if (i < posterior_.size()) {
-            /*
-            particle_t p;
-            p = posterior_.at(i);
-            p.parent_pose = posteriorPose_;
-            */
+            
             prior.at(m) = posterior_.at(i);
             prior.at(m).parent_pose = posteriorPose_;
             
