@@ -6,13 +6,29 @@
 #include <iostream>
 
 
-ActionModel::ActionModel(void) : k1_(0.01f),k2_(0.3f),initialized_(false)
+ActionModel::ActionModel(void) : k1_(0.3f),k2_(0.01f),initialized_(false)
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;
     numberGenerator_ = std::mt19937(rd());
 }
 
+bool ActionModel::updateActionOdometry(const pose_xyt_t& odometry) {
+    float y_bar_prime = odometry.y;
+    float y_bar = previousOdometry_.y;
+    float x_bar_prime = odometry.x;
+    float x_bar = previousOdometry_.x;
+    float theta_bar_prime = odometry.theta;
+    float theta_bar = previousOdometry_.theta;
+    float deltaX_bar = x_bar_prime - x_bar;
+    float deltaY_bar = y_bar_prime - y_bar;
+
+    float del_rot1 = std::atan2(deltaY_bar, deltaX_bar ) - theta_bar;
+    float del_trans = std::sqrt(deltaX_bar * deltaX_bar + deltaY_bar * deltaY_bar);
+    float del_rot2 = theta_bar_prime - theta_bar - del_rot1;
+
+    float 
+}
 
 bool ActionModel::updateAction(const pose_xyt_t& odometry)
 {

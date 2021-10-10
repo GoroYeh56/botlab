@@ -43,7 +43,7 @@ public:
     * \return   The pose transform distribution representing the uncertainty of the robot's motion.
     */
     bool updateAction(const pose_xyt_t& odometry);
-    
+    bool updateActionOdometry(const pose_xyt_t& odometry);
     /**
     * applyAction applies the motion to the provided sample and returns a new sample that
     * can be part of the proposal distribution for the particle filter.
