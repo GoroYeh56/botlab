@@ -129,12 +129,12 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             p.parent_pose = posteriorPose_;
             prior.push_back(p); // prior.at(m) = posterior;
             
-            
         }
         
     }
 
-        
+
+    /*
     for (auto& a : posterior_) {
         particle_t p;
         p.pose.x = posteriorPose_.x + dist(generator);
@@ -144,7 +144,8 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
         p.parent_pose = posteriorPose_;
         p.weight = sampleWeight;
         prior.push_back(p);
-    }
+    
+    */
         
 
     return prior;
