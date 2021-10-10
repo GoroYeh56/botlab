@@ -30,7 +30,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
         if (map.logOdds(rayEnd.x, rayEnd.y) > 0.0) {
             scanScore += 1.0;
         }
-        /*
+        
         else {
             float pastOdds =  map.logOdds(past.x, past.y);
             float beforeOdds = map.logOdds(before.x, before.y);
@@ -40,7 +40,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
             if (beforeOdds > 0.0) {
                 scanScore += 0.1;
             }
-        }*/
+        }
         
     }
 
