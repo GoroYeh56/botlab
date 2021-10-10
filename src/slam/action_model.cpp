@@ -27,7 +27,7 @@ bool ActionModel::updateActionOdometry(const pose_xyt_t& odometry) {
     float del_trans = std::sqrt(deltaX_bar * deltaX_bar + deltaY_bar * deltaY_bar);
     float del_rot2 = theta_bar_prime - theta_bar - del_rot1;
 
-    float 
+    
 }
 
 bool ActionModel::updateAction(const pose_xyt_t& odometry)
