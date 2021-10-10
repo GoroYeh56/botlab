@@ -18,6 +18,11 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
     double scanScore = 0.0;
     //could check max and min range from manufacturing website
     for (auto& ray : movingScan) {
+        
+        scanScore += map.scoreRay(ray);
+        
+        
+        /*
         Point<double> endpoint(ray.origin.x + ray.range * std::cos(ray.theta), ray.origin.y + ray.range * std::sin(ray.theta));
         Point<double> rayEnd = global_position_to_grid_position(endpoint, map);
         
@@ -25,10 +30,10 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
         Point<double> past = global_position_to_grid_position(pastEndpoint, map);
         Point<double> beforeEndpoint(ray.origin.x + (ray.range - 0.05) * std::cos(ray.theta), ray.origin.y + (ray.range - 0.05) * std::sin(ray.theta));
         Point<double> before = global_position_to_grid_position(beforeEndpoint, map);
-      
+        
         if (map.logOdds(rayEnd.x, rayEnd.y) > 0.0) {
             scanScore += 1.0;
-        }
+        }*/
         /*
         else {
             
