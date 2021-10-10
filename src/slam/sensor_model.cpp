@@ -21,15 +21,18 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
         Point<double> endpoint(ray.origin.x + ray.range * std::cos(ray.theta), ray.origin.y + ray.range * std::sin(ray.theta));
         Point<double> rayEnd = global_position_to_grid_position(endpoint, map);
         
+        Point<double> pastEendpoint(ray.origin.x + (ray.range + 0.05) * std::cos(ray.theta), ray.origin.y + (ray.range + 0.05) * std::sin(ray.theta));
+        Point<double> past = global_position_to_grid_position(pastEndpoint, map);
+        Point<double> beforeEndpoint(ray.origin.x + (ray.range - 0.05) * std::cos(ray.theta), ray.origin.y + (ray.range - 0.05) * std::sin(ray.theta));
+        Point<double> before = global_position_to_grid_position(beforeEndpoint, map);
       
         if (map.logOdds(rayEnd.x, rayEnd.y) > 0.0) {
             scanScore += 1.0;
         }
-        /*
         else {
-            scanScore += 0.005 * map.logOdds(rayEnd.x + 1.0, rayEnd.y + 1.0);
-            scanScore += 0.005 * map.logOdds(rayEnd.x - 1.0, rayEnd.y - 1.0);
-        }*/
+            scanScore += 0.08 * map.logOdds(past.x, past.y);
+            scanScore += 0.08 * map.logOdds(before.x, before.y);
+        }
     }
 
     return scanScore;
