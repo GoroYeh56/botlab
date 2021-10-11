@@ -201,25 +201,13 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     double yMean = 0.0;
     double cosThetaMean = 0.0;
     double sinThetaMean = 0.0;
-    particle_t bestParticle = posterior.at(0);
-    for (auto& p : posterior) {
-        if (p.weight > bestParticle.weight) {
-            bestParticle = p;
-        }
-    }
-    /*
+    
     for (auto& p : posterior) {
         xMean += p.weight * p.pose.x;
         yMean += p.weight * p.pose.y;
         cosThetaMean += p.weight * std::cos(p.pose.theta);
         sinThetaMean += p.weight * std::sin(p.pose.theta);
     }
-    */
-
-    xMean = bestParticle.pose.x;
-    yMean = bestParticle.pose.y;
-    cosThetaMean = std::cos(bestParticle.pose.theta);
-    sinThetaMean = std::sin(bestParticle.pose.theta);
 
     pose.x = xMean;
     pose.y = yMean;
