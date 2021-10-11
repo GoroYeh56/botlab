@@ -195,8 +195,6 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     //////// TODO: Implement your method for computing the final pose estimate based on the posterior distribution
     pose_xyt_t pose;
 
-
-    
     double xMean = 0.0;
     double yMean = 0.0;
     double cosThetaMean = 0.0;
