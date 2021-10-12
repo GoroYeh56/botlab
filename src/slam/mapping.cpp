@@ -63,9 +63,10 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
 
     int x = x0;
     int y = y0;
+    float obstacle_threshold = 80.0;
 
     while (x != x1 || y != y1) {
-        if (map.isCellInGrid(x, y)) {
+        if (map.isCellInGrid(x, y) && map(x,y) <= obstacle_threshold) {
             decreaseCellOdds(x, y, map);
         }
 
@@ -79,6 +80,7 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
             y += sy;
         }
     }
+
 }
 
 

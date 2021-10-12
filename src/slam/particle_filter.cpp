@@ -220,10 +220,10 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
         
        // if (i >= max) break;
         //particle_t p = posterior_sorted.at(i);
-        xMean += frac * p.pose.x;
-        yMean += frac * p.pose.y;
-        cosThetaMean += frac * std::cos(p.pose.theta);
-        sinThetaMean += frac * std::sin(p.pose.theta);
+        xMean += p.weight * p.pose.x;
+        yMean += p.weight * p.pose.y;
+        cosThetaMean += p.weight * std::cos(p.pose.theta);
+        sinThetaMean += p.weight * std::sin(p.pose.theta);
         //i++;
     }
 
