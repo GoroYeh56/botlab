@@ -202,7 +202,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     double yMean = 0.0;
     double cosThetaMean = 0.0;
     double sinThetaMean = 0.0;
-    particle_t maxParticle = std::max_element(posterior.begin(), posterior.end(),
+    auto maxParticle = std::max_element(posterior.begin(), posterior.end(),
         [](const particle_t& lhs, const particle_t& rhs)
         {
             return lhs.weight < rhs.weight;
