@@ -191,11 +191,7 @@ std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::ve
     return posterior;
 }
 
-auto maxParticle = std::max_element(posterior.begin(), posterior.end(),
-    [](const particle_t& lhs, const particle_t& rhs)
-    {
-        return lhs.weight < rhs.weight;
-    });
+
 
 pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& posterior)
 {
@@ -206,7 +202,11 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     double yMean = 0.0;
     double cosThetaMean = 0.0;
     double sinThetaMean = 0.0;
-    particle_t maxParticle = maxParticle(posterior.begin(), posterior.end());
+    particle_t auto maxParticle = std::max_element(posterior.begin(), posterior.end(),
+        [](const particle_t& lhs, const particle_t& rhs)
+        {
+            return lhs.weight < rhs.weight;
+        });
     
     for (auto& p : posterior) {
         if (p.weight >= maxParticle.weight - 0.2) {
