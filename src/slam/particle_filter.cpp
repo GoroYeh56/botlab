@@ -115,7 +115,8 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
     double r = RandomFloat(0.0, sampleWeight);
     double c = posterior_.at(0).weight;
     int i = 0;
-    for (int m = 1; m < kNumParticles_; m++) {
+    int m = 1;
+    for (m = 1; m < kNumParticles_; m++) {
         double U = r + ((double)m - 1) * (sampleWeight);
         while (U > c) {
             i++;
@@ -129,6 +130,7 @@ std::vector<particle_t> ParticleFilter::resamplePosteriorDistribution(void)
             prior.at(m).parent_pose = posteriorPose_;
             
         }
+        
         
     }
 
@@ -189,6 +191,11 @@ std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::ve
     return posterior;
 }
 
+auto maxParticle = std::max_element(posterior.begin(), posterior.end(),
+    [](const particle_t& lhs, const particle_t& rhs)
+    {
+        return lhs.weight < rhs.weight;
+    });
 
 pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& posterior)
 {
@@ -199,12 +206,16 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     double yMean = 0.0;
     double cosThetaMean = 0.0;
     double sinThetaMean = 0.0;
+    particle_t maxParticle = maxParticle(posterior.begin(), posterior.end());
     
     for (auto& p : posterior) {
-        xMean += p.weight * p.pose.x;
-        yMean += p.weight * p.pose.y;
-        cosThetaMean += p.weight * std::cos(p.pose.theta);
-        sinThetaMean += p.weight * std::sin(p.pose.theta);
+        if (p.weight >= maxParticle.weight - 0.2) {
+            xMean += p.weight * p.pose.x;
+            yMean += p.weight * p.pose.y;
+            cosThetaMean += p.weight * std::cos(p.pose.theta);
+            sinThetaMean += p.weight * std::sin(p.pose.theta);
+        }
+        
     }
 
     pose.x = xMean;
