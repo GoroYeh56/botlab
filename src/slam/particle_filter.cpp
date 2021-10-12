@@ -223,7 +223,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
         yMean += p.weight * p.pose.y;
         cosThetaMean += p.weight * std::cos(p.pose.theta);
         sinThetaMean += p.weight * std::sin(p.pose.theta);
-        if (i > 10) break;
+        if (i > 25) break;
     }
 
     pose.x = xMean;
