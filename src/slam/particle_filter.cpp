@@ -216,8 +216,9 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
         {
             return lhs.weight > rhs.weight;
         });
-    for (auto& p : posterior_sorted) {
-        
+    
+    for (int i = 0; i < 10; i++) {
+        particle_t p = posterior_sorted.at(i);
         xMean += p.weight * p.pose.x;
         yMean += p.weight * p.pose.y;
         cosThetaMean += p.weight * std::cos(p.pose.theta);
