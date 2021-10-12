@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 
-ActionModel::ActionModel(void) : k1_(0.2f),k2_(0.012f),initialized_(false)
+ActionModel::ActionModel(void) : k1_(0.05f),k2_(0.05f),initialized_(false) // 0.2 0.01
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;
@@ -26,8 +26,8 @@ bool ActionModel::updateActionOdometry(const pose_xyt_t& odometry) {
     float del_trans = std::sqrt(deltaX_bar * deltaX_bar + deltaY_bar * deltaY_bar);
     float del_rot2 = theta_bar_prime - theta_bar - del_rot1;
 
-    
 }
+
 
 bool ActionModel::updateAction(const pose_xyt_t& odometry)
 {
