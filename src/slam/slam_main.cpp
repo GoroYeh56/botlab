@@ -44,6 +44,13 @@ int main(int argc, char** argv)
     
     lcm::LCM lcmConnection(MULTICAST_URL);
 
+    if(argc <=1){
+        std::cout<<"Wrong input format. ./slam [mapname]"<<std::endl;
+        return 0;
+    }
+    std::string MapName = argv[1];
+
+
     OccupancyGridSLAM slam(numParticles, 
                            hitOdds, 
                            missOdds, 
@@ -51,7 +58,8 @@ int main(int argc, char** argv)
                            useOptitrack, 
                            mappingOnly,
                            actionOnly,
-                           localizationMap);
+                           localizationMap,
+                           MapName);
     
     std::thread slamThread([&slam]() {
         slam.runSLAM();

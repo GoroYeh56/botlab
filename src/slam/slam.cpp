@@ -13,7 +13,8 @@ OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
                                      bool waitForOptitrack,
                                      bool mappingOnlyMode,
                                      bool actionOnlyMode,
-                                     const std::string localizationOnlyMap)
+                                     const std::string localizationOnlyMap,
+                                     std::string MapName)
 : mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
 , haveInitializedPoses_(false)
 , waitingForOptitrack_(waitForOptitrack)
@@ -24,6 +25,7 @@ OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
 , mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
 , lcm_(lcmComm)
 , mapUpdateCount_(0)
+, mapname(MapName)
 {
     // Confirm that the mode is valid -- mapping-only and localization-only are not specified
     assert(!(mappingOnlyMode && localizationOnlyMap.length() > 0));
@@ -198,7 +200,7 @@ void OccupancyGridSLAM::runSLAMIteration(void)
     if(currentScan_.num_ranges > 100)//250)
     {
         updateLocalization();
-        std::cout<<"runSLAMIteration"<<std::endl;
+        // std::cout<<"runSLAMIteration"<<std::endl;
         updateMap();
     }
     else 
@@ -288,7 +290,7 @@ void OccupancyGridSLAM::updateMap(void)
     {
         auto mapMessage = map_.toLCM();
         lcm_.publish(SLAM_MAP_CHANNEL, &mapMessage);
-        //map_.saveToFile("current.map");
+        map_.saveToFile(this->mapname);
 
     }
     ++mapUpdateCount_;

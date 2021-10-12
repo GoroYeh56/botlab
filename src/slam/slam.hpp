@@ -13,7 +13,7 @@
 #include <deque>
 #include <mutex>
 
-#define MAPPING_UPDATE_PERIOD 3
+#define MAPPING_UPDATE_PERIOD 5
 
 /**
 * OccupancyGridSLAM runs on a thread and handles mapping.
@@ -46,7 +46,8 @@ public:
                       bool waitForOptitrack,
                       bool mappingOnlyMode = false,
                       bool actionOnlyMode = false,
-                      const std::string localizationOnlyMap = std::string(""));
+                      const std::string localizationOnlyMap = std::string(""),
+                      std::string MapName = std::string(""));
     
     /**
     * runSLAM enters an infinite loop where SLAM will keep running as long as data is arriving.
@@ -97,6 +98,8 @@ private:
     OccupancyGrid map_;
     Mapping mapper_;
     
+    std::string mapname;
+
     lcm::LCM& lcm_;
     int mapUpdateCount_;  // count so we only send the map occasionally, as it takes lots of bandwidth
     

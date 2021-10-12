@@ -26,10 +26,10 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
         float fraction = 0.06;     // parameter to be tuned
         float hitIncrement = 3.0;
         
-        Point<double> beforepoint(ray.origin.x+ (ray.range+gridDimension) * std::cos(ray.theta),
-                                ray.origin.y + (ray.range+gridDimension)*std::sin(ray.theta));
-        Point<double> afterpoint(ray.origin.x+ (ray.range-gridDimension) * std::cos(ray.theta),
+        Point<double> beforepoint(ray.origin.x+ (ray.range-gridDimension) * std::cos(ray.theta),
                                 ray.origin.y + (ray.range-gridDimension)*std::sin(ray.theta));
+        Point<double> afterpoint(ray.origin.x+ (ray.range+gridDimension) * std::cos(ray.theta),
+                                ray.origin.y + (ray.range+gridDimension)*std::sin(ray.theta));
 
         auto rayEnd = global_position_to_grid_cell(endpoint, map);
         auto afterEnd = global_position_to_grid_cell(afterpoint, map);
@@ -41,6 +41,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
             scanScore += hitIncrement;
         }
         // Increase the before and after grid along that ray if its logOdds >0.0
+        /*
         else{
             double beforeOdds = map.logOdds(beforeEnd.x, beforeEnd.y);
             double afterOdds = map.logOdds(afterEnd.x, afterEnd.y);
@@ -51,6 +52,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
                 scanScore += fraction * afterOdds;
             }           
         }
+        */
 
     }
     return scanScore;

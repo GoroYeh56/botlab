@@ -27,8 +27,8 @@ void Mapping::updateMap(const lidar_t& scan, const pose_xyt_t& pose, OccupancyGr
 
     // go through each ray
     for(auto ray : movingscan){
-        scoreEndpoint(ray, map);
-        scoreRay(ray, map);
+        scoreEndpoint(ray, map);  // increase Odds
+        scoreRay(ray, map);       // decrease odds along the ray
     }
 
     previousPose_ = pose;
@@ -79,8 +79,10 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
     int x = x0;
     int y = y0;
 
+    float obstacle_threshold = 80.0;
+
     while (x != x1 || y != y1) {
-        if (map.isCellInGrid(x, y)) {
+        if (map.isCellInGrid(x, y) && map(x,y) <= obstacle_threshold/*if this grid is NOT obstacle (less than a threshol)*/) {
             decreaseCellOdds(x, y, map); // since free space: decrease odd. (increase: means occupied(gridvalue=1))
         }
         // dx - dy
@@ -106,8 +108,8 @@ void Mapping::scoreRay(const adjusted_ray_t& ray, OccupancyGrid& map) {
 
 
 void Mapping::decreaseCellOdds(int x, int y, OccupancyGrid& map){
-    if( map(x,y) - std::numeric_limits<CellOdds>::min() > this->kHitOdds_ ){
-         map(x,y) -= this->kHitOdds_;
+    if( map(x,y) - std::numeric_limits<CellOdds>::min() > this->kMissOdds_ ){
+         map(x,y) -= this->kMissOdds_;
     }
     else{
         // hit the max value of map
