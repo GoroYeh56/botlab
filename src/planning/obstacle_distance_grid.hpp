@@ -3,6 +3,19 @@
 
 #include <common/point.hpp>
 #include <vector>
+#include <queue>
+typedef Point<int> cell_t;
+struct DistanceNode {
+    cell_t cell;
+    float distance;
+
+    bool operator<(const DistanceNode& rhs) const {
+        return rhs.distance < distance;
+    }
+
+    Distancenode(cell_t cell, int distance):
+        cell(cell), distance(distance){}
+};
 
 class OccupancyGrid;
 
@@ -38,7 +51,10 @@ public:
     float cellsPerMeter(void) const { return cellsPerMeter_; }
     
     Point<float> originInGlobalFrame(void) const { return globalOrigin_; }
-    
+
+    void initializeDistances(const OccupancyGride& map);
+    void enqueue_obstacle_cells(ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
+    void expand_node(const DistanceNode& nextNode, ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
     /**
     * setDistances sets the obstacle distances stored in the grid based on the provided occupancy grid map of the
     * environment.
