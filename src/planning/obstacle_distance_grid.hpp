@@ -52,7 +52,7 @@ public:
     
     Point<float> originInGlobalFrame(void) const { return globalOrigin_; }
 
-    void initializeDistances(const OccupancyGride& map);
+    void initializeDistances(const OccupancyGrid& map);
     void enqueue_obstacle_cells(ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
     void expand_node(const DistanceNode& nextNode, ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
     /**

@@ -10,7 +10,7 @@ ObstacleDistanceGrid::ObstacleDistanceGrid(void)
 {
 }
 
-void ObstacleDistanceGrid::initializeDistances(const OccupancyGride& map) {
+void ObstacleDistanceGrid::initializeDistances(const OccupancyGrid& map) {
     int width = map.widthInCells();
     int height = map.heightInCells();
     for (int y = 0; y < height; y++) {
@@ -78,7 +78,7 @@ void ObstacleDistanceGrid::enqueue_obstacle_cells(ObstacleDistanceGrid& grid, st
                 expand_node(Distancenode(cell, 0), grid, searchQueue);
             }
         }
-    
+    }
 }
 
 void ObstacleDistanceGrid::expand_node(const DistanceNode& nextNode, ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue) {
