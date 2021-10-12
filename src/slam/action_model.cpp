@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 
-ActionModel::ActionModel(void) : k1_(0.1f), k2_(0.01f),initialized_(false) // 0.2 0.01
+ActionModel::ActionModel(void) : k1_(0.08f), k2_(0.01f),initialized_(false) // 0.2 0.01
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;

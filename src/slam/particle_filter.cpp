@@ -202,12 +202,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     double yMean = 0.0;
     double cosThetaMean = 0.0;
     double sinThetaMean = 0.0;
-    /*auto maxParticle = std::max_element(posterior.begin(), posterior.end(),
-        [](const particle_t& lhs, const particle_t& rhs)
-        {
-            return lhs.weight < rhs.weight;
-        });
-        */
+  
     //make a local copy of the particles
     std::vector<particle_t> posterior_sorted = posterior;
     //Sort the posterior (weighted) distribution
@@ -216,6 +211,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
         {
             return lhs.weight > rhs.weight;
         });
+
     int i = 0;
     for (auto& p : posterior_sorted) {
         //particle_t p = posterior_sorted.at(i);
@@ -223,6 +219,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
         yMean += p.weight * p.pose.y;
         cosThetaMean += p.weight * std::cos(p.pose.theta);
         sinThetaMean += p.weight * std::sin(p.pose.theta);
+        i++;
         if (i > 20) break;
     }
 
