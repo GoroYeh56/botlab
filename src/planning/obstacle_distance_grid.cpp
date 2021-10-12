@@ -75,7 +75,7 @@ void ObstacleDistanceGrid::enqueue_obstacle_cells(ObstacleDistanceGrid& grid, st
     for (cell.y = 0; cell.y < height; cell.y++) {
         for (cell.x = 0; cell.x < width; cell.x++) {
             if (distance(cell.x, cell.y) == 0) {
-                expand_node(Distancenode(cell, 0), grid, searchQueue);
+                expand_node(DistanceNode(cell, 0), grid, searchQueue);
             }
         }
     }
