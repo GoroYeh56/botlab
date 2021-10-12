@@ -35,7 +35,7 @@ double SensorModel::likelihood(const particle_t& sample, const lidar_t& scan, co
                 scanScore += 0.05*pastOdds;
             }
             if (beforeOdds > 0.0) {
-                scanScore += 0.05*beforeOdds;
+                scanScore += 0.0*beforeOdds; //0.05
             }
         }
         
