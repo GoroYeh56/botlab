@@ -13,8 +13,10 @@ struct DistanceNode {
         return rhs.distance < distance;
     }
 
-    Distancenode(cell_t cell, int distance):
-        cell(cell), distance(distance){}
+    DistanceNode(cell_t cell, int distance)
+    :cell(cell)
+    , distance(distance)
+    {}
 };
 
 class OccupancyGrid;
