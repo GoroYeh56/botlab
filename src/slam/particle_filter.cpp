@@ -214,7 +214,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
 
     int i = 0;
     int max = 20;
-    float frac = 1 / max;
+    float frac = 1 / (float)max;
     for (auto& p : posterior_sorted) {
         
         if (i >= max) break;
