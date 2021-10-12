@@ -216,13 +216,14 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     int max = 20;
     float frac = 1 / max;
     for (auto& p : posterior_sorted) {
+        
+        if (i >= max) break;
         //particle_t p = posterior_sorted.at(i);
         xMean += frac * p.pose.x;
         yMean += frac * p.pose.y;
         cosThetaMean += frac * std::cos(p.pose.theta);
         sinThetaMean += frac * std::sin(p.pose.theta);
         i++;
-        if (i >= max) break;
     }
 
     pose.x = xMean;
