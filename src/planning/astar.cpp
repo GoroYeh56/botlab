@@ -64,10 +64,10 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     //add checking for params later!
     while (currentNode != from) {
         cost += ObstacleDistanceGrid(currentNode->cell.x, currentNode->cell.y);
-
         currentNode = currentNode->parent;
     }
 
+    return cost;
 }
 
 std::vector<Node*> expand_node(Node* node, ObstacleDistanceGrid& distances, const SearchParams& params) {
