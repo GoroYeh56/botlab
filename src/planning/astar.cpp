@@ -12,11 +12,15 @@ robot_path_t search_for_path(pose_xyt_t start,
     PriorityQueue openList;
     PriorityQueue closedList;
     openList.push(start);
+    Node* goalNode;
+    goalNode->cell.x = goal.x;
+    goalNode->cell.y = goal.y;
+
     while (!openList.empty()) {
         Node* q = openList.pop();
         std::vector<Node*> kiddos = expand_node(q, distances, params);
         for (int i = 0; i < kiddos.size(); i++) {
-            if (kiddos.at(i) == goal) {
+            if (kiddos.at(i) == goalNode) {
                 robot_path_t path;
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
@@ -24,9 +28,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                 return path;
             }
             else {
-                kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i));
-                kiddos.at(i)->h_cost = h_cost(kiddos.at(i), goal);
-                if (!openList.is_member(kiddos.at(i)) && !closedList.is_member(kiddos.at(i) ){
+                kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
+                kiddos.at(i)->h_cost = h_cost(kiddos.at(i), goalNode);
+                if (!openList.is_member(kiddos.at(i)) && !closedList.is_member(kiddos.at(i) )){
                     openList.push(kiddos.at(i));
                 }
             }
@@ -62,7 +66,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
 
 }
 
-std::vector<Node*> expand_node(Node* node, ObstacleDistancegrid& distances, const SearchParams& params) {
+std::vector<Node*> expand_node(Node* node, ObstacleDistanceGrid& distances, const SearchParams& params) {
     std::vector<Node*> kiddos;
     Node* currentKiddo = node;
     // This was super clever I can't believe I never thought of doing this before in this way

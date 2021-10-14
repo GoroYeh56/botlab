@@ -4,6 +4,8 @@
 #include <lcmtypes/robot_path_t.hpp>
 #include <lcmtypes/pose_xyt_t.hpp>
 #include <queue>
+#include <point.hpp>
+
 
 typedef Point<int> cell_t;
 
@@ -104,7 +106,7 @@ struct SearchParams
 
 double h_cost(Node* from, Node* goal);
 double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const SearchParams& params);
-std::vector<Node*> expand_node(Node* node, ObstacleDistancegrid& distances, const SearchParams& params);
+std::vector<Node*> expand_node(Node* node, ObstacleDistanceGrid& distances, const SearchParams& params);
 std::vector<Node*> extract_node_path(Node* node);
 std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const ObstacleDistanceGrid& distances);
 
