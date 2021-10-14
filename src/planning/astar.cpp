@@ -11,10 +11,14 @@ robot_path_t search_for_path(pose_xyt_t start,
     
     PriorityQueue openList;
     PriorityQueue closedList;
-    openList.push(start);
     Node* goalNode;
     goalNode->cell.x = goal.x;
     goalNode->cell.y = goal.y;
+    Node* startNode;
+    startNode->cell.x = startx;
+    startNode->cell.y = start.y;
+    openList.push(startNode);
+    
 
     while (!openList.empty()) {
         Node* q = openList.pop();

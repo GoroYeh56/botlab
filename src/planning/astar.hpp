@@ -27,7 +27,7 @@ struct Node {
 };
 
 struct CompareNode {
-    bool() (Node* n1, Node* n2){
+    bool operator() (Node* n1, Node* n2){
         if (n1->f_cost() == n2->f_cost()) {
             return (n1->h_cost) > (n2->h_cost);
         }
