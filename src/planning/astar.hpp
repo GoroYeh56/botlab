@@ -4,7 +4,7 @@
 #include <lcmtypes/robot_path_t.hpp>
 #include <lcmtypes/pose_xyt_t.hpp>
 #include <queue>
-#include <point.hpp>
+#include <common/point.hpp>
 
 
 typedef Point<int> cell_t;
