@@ -15,7 +15,7 @@ robot_path_t search_for_path(pose_xyt_t start,
     goalNode->cell.x = goal.x;
     goalNode->cell.y = goal.y;
     Node* startNode;
-    startNode->cell.x = startx;
+    startNode->cell.x = start.x;
     startNode->cell.y = start.y;
     openList.push(startNode);
     
@@ -63,8 +63,8 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     Node* currentNode = to;
     //add checking for params later!
     while (currentNode != from) {
-        cost += ObstacleDistanceGrid(currentNode->cell.x, curentNode->cell.y);
-        
+        cost += ObstacleDistanceGrid(currentNode->cell.x, currentNode->cell.y);
+
         currentNode = currentNode->parent;
     }
 
@@ -103,8 +103,8 @@ std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const Obs
     std::vector<pose_xyt_t> posePath;
     pose_xyt_t currentPose;
     for (int i = 0; i < nodePath.size(); i++) {
-        currentPose.x = nodePath.at(i)->x;
-        currentPose.y = nodePath.at(i)->y;
+        currentPose.x = nodePath.at(i)->cell.x;
+        currentPose.y = nodePath.at(i)->cell.y;
         posePath.push_back(currentPose);
         // deal with currentPose.theta later not really used rn 
     }
