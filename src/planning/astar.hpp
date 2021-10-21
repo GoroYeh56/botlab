@@ -56,7 +56,7 @@ struct PriorityQueue {
 
     Node* get_member(Node* n) {
         for (auto node : elements) {
-            if (n == node) {
+            if (*n == *node) {
                 return n;
             }
         }

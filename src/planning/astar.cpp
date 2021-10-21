@@ -44,7 +44,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                 bool skip = false;
                 if ((openList.is_member(kiddos.at(i)))) {
                     std::cout << "\n4.5\n";
-                    if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
+                    std::cout << "kiddos.at(i)->f_cost: " << kiddos.at(i)->f_cost();
+                    std::cout << "\n4.6\n";
+                    if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) { // problem child
                         skip = true;
                         std::cout << "\n6\n";
                         
@@ -62,7 +64,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 }
             }
         }
-        std::cout << "\n9\n"; //
+        std::cout << "\n9\n";
         closedList.push(q);
     }
 
