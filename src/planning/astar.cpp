@@ -18,7 +18,7 @@ robot_path_t search_for_path(pose_xyt_t start,
     auto gridStart = global_position_to_grid_position({ start.x, start.y }, distances);
     Node startNode(gridStart.x, gridStart.y);
     startNode.parent = NULL;
-    openList.push(startNode);
+    openList.push(&startNode);
 
     std::cout << "\n-1\n";
     while (!openList.empty()) {
@@ -33,7 +33,7 @@ robot_path_t search_for_path(pose_xyt_t start,
 
         for (int i = 0; i < kiddos.size(); i++) {
             std::cout << "\nkiddos.at(i): " << kiddos.at(i);
-            std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos->at(i).cell.y;
+            std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos.at(i)->cell.y;
             
             if ((kiddos.at(i)->cell.x == goalNode.cell.x) && (kiddos.at(i)->cell.y == goalNode.cell.y)) {
                 robot_path_t path;
@@ -48,7 +48,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 std::cout << "\n kiddos.at(i)->g_cost: " << kiddos.at(i)->g_cost;
                 std::cout << "\n q->g_cost: " << q->g_cost;
                 std::cout << "\n g_cost(): " << g_cost(q, kiddos.at(i), distances, params);
-                kiddos.at(i)->g_cost = q.g_cost + g_cost(&q, kiddos.at(i), distances, params);
+                kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
                 std::cout << "\n3\n";
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
                 std::cout << "\n4\n";
@@ -119,7 +119,7 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
 
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
-        Node* currentKiddo (node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
+        Node* currentKiddo = new Node(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
         currentKiddo.parent = node;
         
         if (distances.isCellInGrid(currentKiddo.cell.x,currentKiddo.cell.y)) {
