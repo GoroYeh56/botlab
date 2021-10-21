@@ -43,6 +43,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 std::cout << "\n4\n";
                 bool skip = false;
                 if ((openList.is_member(kiddos.at(i)))) {
+                    std::cout << "\n4.5\n";
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                         skip = true;
                         std::cout << "\n6\n";
