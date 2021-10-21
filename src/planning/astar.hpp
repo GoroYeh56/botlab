@@ -39,40 +39,40 @@ struct CompareNode {
 };
 
 struct PriorityQueue {
-    std::priority_queue<Node*, std::vector<Node*>, CompareNode> Q;
-    std::vector<Node*> elements;
+    std::priority_queue<Node, std::vector<Node>, CompareNode> Q;
+    std::vector<Node> elements;
 
     bool empty() {
         return Q.empty();
     }
 
-    bool is_member(Node* n) {
+    bool is_member(Node n) {
         for (auto node : elements) {
-            if (*n == *node) {
+            if (n == node) {
                 return true;
             }
         }
         return false;
     }
 
-    Node* get_member(Node* n) {
+    Node get_member(Node n) {
         for (auto node : elements) {
-            if (*n == *node) {
+            if (n == node) {
                 return n;
             }
         }
         return NULL; // nullptr or NULL?
     }
 
-    void push(Node* n) {
+    void push(Node n) {
         elements.push_back(n);
        // std::cout << "\npushing\n";//
         Q.push(n);
     }
 
-    Node* pop() {
+    Node pop() {
         int idx = -1;
-        Node* n = Q.top();
+        Node n = Q.top();
         Q.pop();
         for (int i = 0; i < elements.size(); ++i) {
             if (elements[i] == n) {
@@ -108,9 +108,9 @@ struct SearchParams
 
 double h_cost(Node* from, Node* goal);
 double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const SearchParams& params);
-std::vector<Node*> expand_node(Node* node,const ObstacleDistanceGrid& distances, const SearchParams& params);
-std::vector<Node*> extract_node_path(Node* node);
-std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const ObstacleDistanceGrid& distances);
+std::vector<Node> expand_node(Node* node,const ObstacleDistanceGrid& distances, const SearchParams& params);
+std::vector<Node> extract_node_path(Node* node);
+std::vector<pose_xyt_t> extract_pose_path(std::vector<Node> nodePath, const ObstacleDistanceGrid& distances);
 
 
 

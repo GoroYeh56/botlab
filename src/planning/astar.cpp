@@ -20,11 +20,11 @@ robot_path_t search_for_path(pose_xyt_t start,
     //std::cout << "\n-1\n";
     while (!openList.empty()) {
         //std::cout << "\n0\n";
-        Node* q = openList.pop();
+        Node q = openList.pop();
         //std::cout << "\nq: " << q;
         std::cout << "\n q: " << q->cell.x << "," << q->cell.y;
          //std::cout << "\n1\n";
-        std::vector<Node*> kiddos = expand_node(q, distances, params);
+        std::vector<Node> kiddos = expand_node(q, distances, params);
        
         //std::cout << "\nkiddos size: " << kiddos.size();
 
@@ -33,7 +33,7 @@ robot_path_t search_for_path(pose_xyt_t start,
             // std::cout << "\nkiddos.at(i): " << kiddos.at(i);
            //std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos.at(i)->cell.y;
             
-            if ((kiddos.at(i)->cell.x == goalNode.cell.x) && (kiddos.at(i)->cell.y == goalNode.cell.y)) {
+            if ((kiddos.at(i).cell.x == goalNode.cell.x) && (kiddos.at(i).cell.y == goalNode.cell.y)) {
                 robot_path_t path;
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
@@ -46,16 +46,16 @@ robot_path_t search_for_path(pose_xyt_t start,
                //  std::cout << "\n kiddos.at(i)->g_cost: " << kiddos.at(i)->g_cost;
                 //std::cout << "\n q->g_cost: " << q->g_cost;
              //    std::cout << "\n g_cost(): " << g_cost(q, kiddos.at(i), distances, params);
-                kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
+                kiddos.at(i).g_cost = q.g_cost + g_cost(q, kiddos.at(i), distances, params);
                 //   std::cout << "\n3\n";
-                kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
+                kiddos.at(i).h_cost = h_cost(kiddos.at(i), &goalNode);
                 //    std::cout << "\n4\n";
                 bool skip = false;
                 if ((openList.is_member(kiddos.at(i)))) {
                     //      std::cout << "\n4.5\n";
                 //     std::cout << "kiddos.at(i)->f_cost: " << kiddos.at(i)->f_cost();
                //      std::cout << "\n4.6\n";
-                    if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) { // problem child
+                    if (!(openList.get_member(kiddos.at(i)).f_cost() > kiddos.at(i).f_cost())) { // problem child
                         skip = true;
                         //        std::cout << "\n6\n";
                         
@@ -63,7 +63,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 }
                 if ((closedList.is_member(kiddos.at(i)))) {
                     //         std::cout << "\n7\n";
-                    if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
+                    if (!(closedList.get_member(kiddos.at(i)).f_cost() > kiddos.at(i).f_cost())) {
                         skip = true;
                     }
                 }
@@ -71,9 +71,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                     //        std::cout << "\n8\n";
                     openList.push(kiddos.at(i));
                 }
-                else {
-                    delete kiddos.at(i);
-                }
+               
             }
         }
         //  std::cout << "\n9\n"; //
@@ -108,8 +106,8 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     return cost;
 }
 
-std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
-    std::vector<Node*> kiddos;
+std::vector<Node> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
+    std::vector<Node> kiddos;
     
     // This was super clever I can't believe I never thought of doing this before in this way
     // const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
@@ -119,9 +117,9 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
 
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
-        Node* currentKiddo = new Node(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
-        currentKiddo->parent = node;
-        if (distances.isCellInGrid(currentKiddo->cell.x,currentKiddo->cell.y)) {
+        Node currentKiddo(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
+        currentKiddo.parent = node;
+        if (distances.isCellInGrid(currentKiddo.cell.x,currentKiddo.cell.y)) {
             kiddos.push_back(currentKiddo);
         }
        
@@ -131,9 +129,9 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
 
 }
 
-std::vector<Node*> extract_node_path(Node* node) {
-    std::vector<Node*> path;
-    Node* currentNode = node;
+std::vector<Node> extract_node_path(Node* node) {
+    std::vector<Node> path;
+    Node currentNode = node;
     while (node != NULL) {
         path.push_back(node);
         node = node->parent;
