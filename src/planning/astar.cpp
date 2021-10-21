@@ -28,7 +28,6 @@ robot_path_t search_for_path(pose_xyt_t start,
        
         //std::cout << "\nkiddos size: " << kiddos.size();
 
-        
        
         for (int i = 0; i < kiddos.size(); i++) {
             // std::cout << "\nkiddos.at(i): " << kiddos.at(i);
@@ -71,6 +70,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                 if (!skip) {
                     //        std::cout << "\n8\n";
                     openList.push(kiddos.at(i));
+                }
+                else {
+                    delete kiddos.at(i);
                 }
             }
         }
