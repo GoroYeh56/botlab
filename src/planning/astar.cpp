@@ -41,20 +41,22 @@ robot_path_t search_for_path(pose_xyt_t start,
                 std::cout << "\n3\n";
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
                 std::cout << "\n4\n";
-                if (!(openList.is_member(kiddos.at(i)))) {
-                    std::cout << "\n5\n";
+                bool skip = false;
+                if ((openList.is_member(kiddos.at(i)))) {
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
+                        skip = true;
                         std::cout << "\n6\n";
-                        if (!(closedList.is_member(kiddos.at(i)))) {
-                            std::cout << "\n7\n";
-                            if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
-                                openList.push(kiddos.at(i));
-                            }
-                        }
+                        
+                    } 
+                }
+                if ((closedList.is_member(kiddos.at(i)))) {
+                    std::cout << "\n7\n";
+                    if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
+                        skip = true;
                     }
-                    else {
-                        std::cout << "\n5.5\n";
-                    }
+                }
+                if (!skip) {
+                    openList.push(kiddos.at(i));
                 }
             }
         }
