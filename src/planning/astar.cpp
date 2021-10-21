@@ -8,7 +8,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                              const SearchParams& params)
 {
     ////////////////// TODO: Implement your A* search here //////////////////////////
-    std::cout << "\n\ntesting if I can ever even print anything out :/\n\n";
+    //std::cout << "\n\ntesting if I can ever even print anything out :/\n\n";
     PriorityQueue openList;
     PriorityQueue closedList;
     Node goalNode(goal.x, goal.y);
@@ -39,7 +39,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
                 path.path_length = path.path.size();
-                // std::cout << "\nINF\n";
+                std::cout << "\nFOUND PATH!!\n";
                 return path;
             }
             else {
@@ -119,7 +119,10 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
     for (int i = 0; i < 8; i++) {
         Node* currentKiddo = new Node(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
         currentKiddo->parent = node;
-        kiddos.push_back(currentKiddo);
+        if (distances.isCellInGrid(currentKiddo->cell.x,currentKiddo->cell.y)) {
+            kiddos.push_back(currentKiddo);
+        }
+       
     }
 
     return kiddos;
