@@ -21,12 +21,18 @@ robot_path_t search_for_path(pose_xyt_t start,
     while (!openList.empty()) {
         std::cout << "\n0\n";
         Node* q = openList.pop();
+        std::cout << "\nq: " << q;
         std::cout << "\n1\n";
         std::vector<Node*> kiddos = expand_node(q, distances, params);
+       
         std::cout << "\nkiddos size: " << kiddos.size();
+
+        
        
         for (int i = 0; i < kiddos.size(); i++) {
+            std::cout << "\nkiddos.at(i): " << kiddos.at(i);
             std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos.at(i)->cell.y;
+            
             if (*kiddos.at(i) == goalNode) {
                 robot_path_t path;
                 path.utime = start.utime;
