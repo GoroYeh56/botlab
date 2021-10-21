@@ -18,12 +18,12 @@ robot_path_t search_for_path(pose_xyt_t start,
     startNode->cell.x = start.x;
     startNode->cell.y = start.y;
     openList.push(startNode);
-    
+
 
     while (!openList.empty()) {
         Node* q = openList.pop();
         std::vector<Node*> kiddos = expand_node(q, distances, params);
-        std::cout << "\nkiddos size: " << kiddos.size();
+        //std::cout << "\nkiddos size: " << kiddos.size();
         for (int i = 0; i < kiddos.size(); i++) {
             if (kiddos.at(i) == goalNode) {
                 robot_path_t path;
@@ -73,17 +73,17 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
 
 std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
     std::vector<Node*> kiddos;
-    Node* currentKiddo = node;
+    Node currentKiddo = *node;
     // This was super clever I can't believe I never thought of doing this before in this way
     const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
     const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };
 
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
-        currentKiddo->cell.x += xDeltas[i];
-        currentKiddo->cell.y += yDeltas[i];
-        currentKiddo->parent = node;
-        kiddos.push_back(currentKiddo);
+        currentKiddo.cell.x += xDeltas[i];
+        currentKiddo.cell.y += yDeltas[i];
+        currentKiddo.parent = node;
+        kiddos.push_back(&currentKiddo);
     }
 
     return kiddos;
