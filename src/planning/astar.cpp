@@ -74,7 +74,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 }
             }
         }
-        //  std::cout << "\n9\n";
+        //  std::cout << "\n9\n"; //
         closedList.push(q);
     }
 
