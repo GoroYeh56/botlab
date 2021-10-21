@@ -148,14 +148,14 @@ std::vector<Node*> extract_node_path(Node* node) {
 
 std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const ObstacleDistanceGrid& distances) {
     std::vector<pose_xyt_t> posePath;
-    std::cout << "\nPath:";
+    //std::cout << "\nPath:";
     for (int i = 0; i < nodePath.size(); i++) {
         auto globalPos = grid_position_to_global_position(nodePath.at(i)->cell, distances);
         pose_xyt_t currentPose;
         currentPose.x = globalPos.x;
         currentPose.y = globalPos.y;
         posePath.push_back(currentPose);
-        std::cout << "\n" << currentPose.x << "," << currentPose.y;
+        //std::cout << "\n" << currentPose.x << "," << currentPose.y;
         // deal with currentPose.theta later not really used rn 
     }
     return posePath;
