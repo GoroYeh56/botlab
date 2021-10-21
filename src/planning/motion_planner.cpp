@@ -80,7 +80,8 @@ bool MotionPlanner::isPathSafe(const robot_path_t& path) const
     return true;
 }
 
-
+// distances_ : an ObstacleDistanceGrid
+// setMap calls distances_.setDistance
 void MotionPlanner::setMap(const OccupancyGrid& map)
 {
     distances_.setDistances(map);
