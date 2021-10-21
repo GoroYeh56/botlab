@@ -25,10 +25,9 @@ robot_path_t search_for_path(pose_xyt_t start,
         std::cout << "\n q: " << q->cell.x << "," << q->cell.y;
          //std::cout << "\n1\n";
         std::vector<Node> kiddos = expand_node(q, distances, params);
-       
+        
         //std::cout << "\nkiddos size: " << kiddos.size();
 
-       
         for (int i = 0; i < kiddos.size(); i++) {
             // std::cout << "\nkiddos.at(i): " << kiddos.at(i);
            //std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos.at(i)->cell.y;
@@ -140,7 +139,7 @@ std::vector<Node> extract_node_path(Node* node) {
 }
 
 
-std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const ObstacleDistanceGrid& distances) {
+std::vector<pose_xyt_t> extract_pose_path(std::vector<Node> nodePath, const ObstacleDistanceGrid& distances) {
     std::vector<pose_xyt_t> posePath;
     
     for (int i = 0; i < nodePath.size(); i++) {

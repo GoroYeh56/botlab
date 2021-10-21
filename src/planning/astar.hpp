@@ -13,9 +13,9 @@ typedef Point<int> cell_t;
 struct Node {
 
     cell_t cell;
-    Node* parent;
     double h_cost;
     double g_cost;
+    Node* parent;
     double f_cost(void) const { 
         return g_cost + h_cost; 
     }
