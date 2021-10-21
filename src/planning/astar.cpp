@@ -65,7 +65,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 }
                 if ((closedList.is_member(kiddos.at(i)))) {
                     std::cout << "\n7\n";
-                    if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos->at(i).f_cost())) {
+                    if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                         skip = true;
                     }
                 }
@@ -120,10 +120,10 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
         Node* currentKiddo = new Node(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
-        currentKiddo.parent = node;
+        currentKiddo->parent = node;
         
-        if (distances.isCellInGrid(currentKiddo.cell.x,currentKiddo.cell.y)) {
-            if (distances(currentKiddo.cell.x, currentKiddo.cell.y) > params.minDistanceToObstacle) {
+        if (distances.isCellInGrid(currentKiddo->cell.x,currentKiddo->cell.y)) {
+            if (distances(currentKiddo->cell.x, currentKiddo->cell.y) > params.minDistanceToObstacle) {
                 kiddos.push_back(currentKiddo);
             }
         }
