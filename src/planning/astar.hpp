@@ -65,7 +65,7 @@ struct PriorityQueue {
 
     void push(Node* n) {
         elements.push_back(n);
-        std::cout << "\npushing\n"
+        std::cout << "\npushing\n";
         Q.push(n);
     }
 
