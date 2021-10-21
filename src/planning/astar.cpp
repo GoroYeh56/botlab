@@ -56,6 +56,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                     }
                 }
                 if (!skip) {
+                    std::cout << "\n8\n";
                     openList.push(kiddos.at(i));
                 }
             }
