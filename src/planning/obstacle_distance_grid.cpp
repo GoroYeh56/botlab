@@ -16,7 +16,7 @@ void ObstacleDistanceGrid::initializeDistances(const OccupancyGrid& map) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             if (map.logOdds(x, y) < 0) {
-                distance(x, y) = -1;
+                distance(x, y) = INFINITY;
             }
             else {
                 distance(x, y) = 0;
@@ -33,6 +33,7 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
     ///////////// TODO: Implement an algorithm to mark the distance to the nearest obstacle for every cell in the map.
     std::priority_queue<DistanceNode> searchQueue;
     enqueue_obstacle_cells(*this, searchQueue);
+    /*
     if (searchQueue.empty()) {
         int width = map.widthInCells();
         int height = map.heightInCells();
@@ -44,6 +45,7 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
             }
         }
     }
+    */
     else {
         while (!searchQueue.empty()) {
             DistanceNode nextNode = searchQueue.top();
@@ -102,7 +104,7 @@ void ObstacleDistanceGrid::expand_node(const DistanceNode& node, ObstacleDistanc
     for (int i = 0; i < 8; i++) {
         cell_t adjacentCell(node.cell.x + xDeltas[i], node.cell.y + yDeltas[i]);
         if (grid.isCellInGrid(adjacentCell.x, adjacentCell.y)) {
-            if (grid(adjacentCell.x, adjacentCell.y) == -1) {
+            if (grid(adjacentCell.x, adjacentCell.y) == INFINITY) {
                 DistanceNode adjacentNode(adjacentCell, node.distance + 1); //for diagonals needs to add sqrt(2)
                 grid(adjacentCell.x, adjacentCell.y) = adjacentNode.distance * grid.metersPerCell();
                 searchQueue.push(adjacentNode);
