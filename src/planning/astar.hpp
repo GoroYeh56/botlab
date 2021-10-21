@@ -55,10 +55,10 @@ struct PriorityQueue {
         return false;
     }
 
-    Node get_member(Node n) {
+    Node* get_member(Node n) {
         for (auto node : elements) {
             if (n == node) {
-                return n;
+                return &n;
             }
         }
         return NULL; // nullptr or NULL?
