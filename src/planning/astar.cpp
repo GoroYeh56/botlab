@@ -24,6 +24,7 @@ robot_path_t search_for_path(pose_xyt_t start,
 
     while (!openList.empty()) {
         Node* q = openList.pop();
+        std::cout << "\n1\n";
         std::vector<Node*> kiddos = expand_node(q, distances, params);
         //std::cout << "\nkiddos size: " << kiddos.size();
         for (int i = 0; i < kiddos.size(); i++) {
@@ -32,9 +33,11 @@ robot_path_t search_for_path(pose_xyt_t start,
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
                 path.path_length = path.path.size();
+                std::cout << "\n3\n";
                 return path;
             }
             else {
+                std::cout << "\n2\n";
                 kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), goalNode);
                 if (!(openList.is_member(kiddos.at(i)))) {
