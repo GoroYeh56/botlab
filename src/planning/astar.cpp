@@ -22,11 +22,11 @@ robot_path_t search_for_path(pose_xyt_t start,
         //std::cout << "\n0\n";
         Node q = openList.pop();
         //std::cout << "\nq: " << q;
-        std::cout << "\n q: " << q.cell.x << "," << q.cell.y;
+        std::cout << "\n q: " << q.cell.x << "," << q.cell.y << "\n";
          //std::cout << "\n1\n";
         std::vector<Node> kiddos = expand_node(&q, distances, params);
         
-        //std::cout << "\nkiddos size: " << kiddos.size();
+        std::cout << "\nkiddos size: " << kiddos.size();
 
         for (int i = 0; i < kiddos.size(); i++) {
             // std::cout << "\nkiddos.at(i): " << kiddos.at(i);
@@ -118,8 +118,11 @@ std::vector<Node> expand_node(Node* node, const ObstacleDistanceGrid& distances,
     for (int i = 0; i < 8; i++) {
         Node currentKiddo(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
         currentKiddo.parent = node;
+        
         if (distances.isCellInGrid(currentKiddo.cell.x,currentKiddo.cell.y)) {
-            kiddos.push_back(currentKiddo);
+            if (distances(currentKiddo.cell.x, currentKiddo.cell.y) > params.minDistanceToObstacle) {
+                kiddos.push_back(currentKiddo);
+            }
         }
        
     }
