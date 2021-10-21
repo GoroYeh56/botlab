@@ -23,13 +23,13 @@ robot_path_t search_for_path(pose_xyt_t start,
     while (!openList.empty()) {
         Node* q = openList.pop();
         std::vector<Node*> kiddos = expand_node(q, distances, params);
+        std::cout << "\nkiddos size: " << kiddos.size();
         for (int i = 0; i < kiddos.size(); i++) {
             if (kiddos.at(i) == goalNode) {
                 robot_path_t path;
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
                 path.path_length = path.path.size();
-                std::cout << "\npath length: " << path.path_length;
                 return path;
             }
             else {
