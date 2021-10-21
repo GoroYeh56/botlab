@@ -30,16 +30,21 @@ robot_path_t search_for_path(pose_xyt_t start,
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
                 path.path_length = path.path.size();
-                std::cout << "\n3\n";
+                std::cout << "\nINF\n";
                 return path;
             }
             else {
                 std::cout << "\n2\n";
                 kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
+                std::cout << "\n3\n";
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
+                std::cout << "\n4\n";
                 if (!(openList.is_member(kiddos.at(i)))) {
+                    std::cout << "\n5\n";
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
+                        std::cout << "\n6\n";
                         if (!(closedList.is_member(kiddos.at(i)))) {
+                            std::cout << "\n7\n";
                             if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                                 openList.push(kiddos.at(i));
                             }
