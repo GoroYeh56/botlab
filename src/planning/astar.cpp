@@ -71,7 +71,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     return cost;
 }
 
-std::vector<Node*> expand_node(Node* node, ObstacleDistanceGrid& distances, const SearchParams& params) {
+std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
     std::vector<Node*> kiddos;
     Node* currentKiddo = node;
     // This was super clever I can't believe I never thought of doing this before in this way
