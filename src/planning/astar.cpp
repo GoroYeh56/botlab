@@ -37,7 +37,7 @@ robot_path_t search_for_path(pose_xyt_t start,
             else {
                 kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), goalNode);
-                if (!(openList.is_member(kiddos.at(i))) {
+                if (!(openList.is_member(kiddos.at(i)))) {
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                         if (!(closedList.is_member(kiddos.at(i)))) {
                             if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
