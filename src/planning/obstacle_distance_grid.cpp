@@ -34,6 +34,8 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
     std::priority_queue<DistanceNode> searchQueue;
     enqueue_obstacle_cells(*this, searchQueue);
     if (searchQueue.empty()) {
+        int width = map.widthInCells();
+        int height = map.heightInCells();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 
