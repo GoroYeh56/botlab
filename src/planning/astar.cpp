@@ -8,7 +8,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                              const SearchParams& params)
 {
     ////////////////// TODO: Implement your A* search here //////////////////////////
-    
+    std::cout << "\n\ntesting if I can ever even print anything out :/\n\n"
     PriorityQueue openList;
     PriorityQueue closedList;
     Node* goalNode;
