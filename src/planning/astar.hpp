@@ -19,7 +19,7 @@ struct Node {
         return g_cost + h_cost; 
     }
 
-    bool operator==(const Node& rhs) const {
+    bool operator==(const Node rhs) const {
         return(cell == rhs.cell);
     }
 
