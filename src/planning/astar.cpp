@@ -144,7 +144,7 @@ std::vector<pose_xyt_t> extract_pose_path(std::vector<Node*> nodePath, const Obs
     pose_xyt_t currentPose;
     
     for (int i = 0; i < nodePath.size(); i++) {
-        auto globalPos = grid_position_to_global_position(nodePath.at(i)->cell, const distances);
+        auto globalPos = grid_position_to_global_position(nodePath.at(i)->cell, distances);
         currentPose.x = globalPos->x;
         currentPose.y = globalPos->y;
         posePath.push_back(currentPose);
