@@ -11,9 +11,12 @@ robot_path_t search_for_path(pose_xyt_t start,
     //std::cout << "\n\ntesting if I can ever even print anything out :/\n\n";
     PriorityQueue openList;
     PriorityQueue closedList;
-    Node goalNode(goal.x, goal.y);
 
-    Node startNode(start.x, start.y);
+    auto gridGoal = global_position_to_grid_position({ goal.x,goal.y }, distances);
+    Node goalNode(gridGoal.x, gridGoal.y);
+
+    auto gridStart = global_position_to_grid_position({ start.x,start.y }, distances);
+    Node startNode(gridStart.x, gridStart.y);
     startNode.parent = NULL;
     openList.push(startNode);
 
@@ -116,7 +119,7 @@ std::vector<Node> expand_node(Node* node, const ObstacleDistanceGrid& distances,
 
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
-        Node currentKiddo(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
+        Node currentKiddo (node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
         currentKiddo.parent = node;
         
         if (distances.isCellInGrid(currentKiddo.cell.x,currentKiddo.cell.y)) {
