@@ -40,7 +40,7 @@ struct CompareNode {
 
 struct PriorityQueue {
     std::priority_queue<Node*, std::vector<Node*>, CompareNode> Q;
-    std::vector<Node> elements;
+    std::vector<Node*> elements;
 
     bool empty() {
         return Q.empty();
