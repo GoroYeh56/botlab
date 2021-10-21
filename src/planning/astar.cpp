@@ -53,6 +53,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                         }
                     }
                 }
+                else {
+                    std::cout << "\n5.5\n";
+                }
             }
         }
         closedList.push(q);
