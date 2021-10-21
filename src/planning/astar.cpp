@@ -11,15 +11,15 @@ robot_path_t search_for_path(pose_xyt_t start,
     std::cout << "\n\ntesting if I can ever even print anything out :/\n\n";
     PriorityQueue openList;
     PriorityQueue closedList;
-    Node* goalNode;
-    goalNode->cell.x = goal.x;
-    goalNode->cell.y = goal.y;
+    Node goalNode;
+    goalNode.cell.x = goal.x;
+    goalNode.cell.y = goal.y;
 
-    Node* startNode;
-    startNode->cell.x = start.x;
-    startNode->cell.y = start.y;
-    startNode->parent = NULL;
-    openList.push(startNode);
+    Node startNode;
+    startNode.cell.x = start.x;
+    startNode.cell.y = start.y;
+    startNode.parent = NULL;
+    openList.push(&startNode);
 
     std::cout << "\n-1\n";
     while (!openList.empty()) {
@@ -29,7 +29,7 @@ robot_path_t search_for_path(pose_xyt_t start,
         std::vector<Node*> kiddos = expand_node(q, distances, params);
         //std::cout << "\nkiddos size: " << kiddos.size();
         for (int i = 0; i < kiddos.size(); i++) {
-            if (*kiddos.at(i) == *goalNode) {
+            if (*kiddos.at(i) == goalNode) {
                 robot_path_t path;
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
@@ -40,7 +40,7 @@ robot_path_t search_for_path(pose_xyt_t start,
             else {
                 std::cout << "\n2\n";
                 kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
-                kiddos.at(i)->h_cost = h_cost(kiddos.at(i), goalNode);
+                kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
                 if (!(openList.is_member(kiddos.at(i)))) {
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                         if (!(closedList.is_member(kiddos.at(i)))) {
