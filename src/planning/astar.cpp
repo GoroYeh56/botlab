@@ -15,16 +15,16 @@ robot_path_t search_for_path(pose_xyt_t start,
 
     Node startNode(start.x, start.y);
     startNode.parent = NULL;
-    openList.push(&startNode);
+    openList.push(startNode);
 
     //std::cout << "\n-1\n";
     while (!openList.empty()) {
         //std::cout << "\n0\n";
         Node q = openList.pop();
         //std::cout << "\nq: " << q;
-        std::cout << "\n q: " << q->cell.x << "," << q->cell.y;
+        std::cout << "\n q: " << q.cell.x << "," << q.cell.y;
          //std::cout << "\n1\n";
-        std::vector<Node> kiddos = expand_node(q, distances, params);
+        std::vector<Node> kiddos = expand_node(&q, distances, params);
         
         //std::cout << "\nkiddos size: " << kiddos.size();
 
@@ -35,7 +35,7 @@ robot_path_t search_for_path(pose_xyt_t start,
             if ((kiddos.at(i).cell.x == goalNode.cell.x) && (kiddos.at(i).cell.y == goalNode.cell.y)) {
                 robot_path_t path;
                 path.utime = start.utime;
-                path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
+                path.path = extract_pose_path(extract_node_path(&kiddos.at(i)),distances);
                 path.path_length = path.path.size();
                 std::cout << "\nFOUND PATH!!\n";
                 return path;
@@ -45,9 +45,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                //  std::cout << "\n kiddos.at(i)->g_cost: " << kiddos.at(i)->g_cost;
                 //std::cout << "\n q->g_cost: " << q->g_cost;
              //    std::cout << "\n g_cost(): " << g_cost(q, kiddos.at(i), distances, params);
-                kiddos.at(i).g_cost = q.g_cost + g_cost(q, kiddos.at(i), distances, params);
+                kiddos.at(i).g_cost = q.g_cost + g_cost(&q, &kiddos.at(i), distances, params);
                 //   std::cout << "\n3\n";
-                kiddos.at(i).h_cost = h_cost(kiddos.at(i), &goalNode);
+                kiddos.at(i).h_cost = h_cost(&kiddos.at(i), &goalNode);
                 //    std::cout << "\n4\n";
                 bool skip = false;
                 if ((openList.is_member(kiddos.at(i)))) {
