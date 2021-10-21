@@ -89,7 +89,7 @@ robot_path_t search_for_path(pose_xyt_t start,
 double h_cost(Node* from, Node* goal) {
     double dx = goal->cell.x - from->cell.x;
     double dy = goal->cell.y - from->cell.y;
-    return std::sqrt((dx * dx) - (dy * dy));
+    return std::sqrt((dx * dx) + (dy * dy));
 }
 
 // cost of the path up from one node to another
@@ -99,7 +99,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     Node* currentNode = to;
     //add checking for params later!
     while (currentNode != from) {
-        cost ++;
+        cost += 1.0;
         currentNode = currentNode->parent;
     }
 
