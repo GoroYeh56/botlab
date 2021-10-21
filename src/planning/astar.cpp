@@ -73,15 +73,16 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
 
 std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
     std::vector<Node*> kiddos;
-    Node currentKiddo = *node;
+    
     // This was super clever I can't believe I never thought of doing this before in this way
-    const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
-    const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };
+    // const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
+    // const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };
+    const int xDeltas[8] = { 1, 1, 1, 0, -1, -1, -1, 0};
+    const int yDeltas[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
     //add checking for params later!
     for (int i = 0; i < 8; i++) {
-        currentKiddo.cell.x += xDeltas[i];
-        currentKiddo.cell.y += yDeltas[i];
+        Node currentKiddo(node->x + xDeltas[i], node->y + yDeltas[i]);
         currentKiddo.parent = node;
         kiddos.push_back(&currentKiddo);
     }
