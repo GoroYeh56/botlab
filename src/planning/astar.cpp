@@ -130,9 +130,9 @@ std::vector<Node> expand_node(Node* node, const ObstacleDistanceGrid& distances,
 
 std::vector<Node> extract_node_path(Node* node) {
     std::vector<Node> path;
-    Node currentNode = node;
+    Node* currentNode = node;
     while (node != NULL) {
-        path.push_back(node);
+        path.push_back(*node);
         node = node->parent;
     }
     return path;
