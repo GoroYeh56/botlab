@@ -5,6 +5,7 @@
 #include <lcmtypes/pose_xyt_t.hpp>
 #include <queue>
 #include <common/point.hpp>
+#include <grid_utils.hpp>
 
 
 typedef Point<int> cell_t;
