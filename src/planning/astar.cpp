@@ -29,6 +29,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 path.utime = start.utime;
                 path.path = extract_pose_path(extract_node_path(kiddos.at(i)),distances);
                 path.path_length = path.path.size();
+                std::cout << "\npath length: " << path.path_length;
                 return path;
             }
             else {
