@@ -28,12 +28,12 @@ struct Node {
 };
 
 struct CompareNode {
-    bool operator() (Node* n1, Node* n2){
-        if (n1->f_cost() == n2->f_cost()) {
-            return (n1->h_cost) > (n2->h_cost);
+    bool operator() (Node n1, Node n2){
+        if (n1.f_cost() == n2.f_cost()) {
+            return (n1.h_cost) > (n2.h_cost);
         }
         else {
-            return (n1->f_cost()) > n2->f_cost();
+            return (n1.f_cost()) > n2.f_cost();
         }
     }
 };
