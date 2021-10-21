@@ -64,7 +64,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     Node* currentNode = to;
     //add checking for params later!
     while (currentNode != from) {
-        cost += distanes(currentNode->cell.x, currentNode->cell.y);
+        cost += distances(currentNode->cell.x, currentNode->cell.y);
         currentNode = currentNode->parent;
     }
 
