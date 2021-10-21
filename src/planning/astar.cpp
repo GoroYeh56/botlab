@@ -11,13 +11,9 @@ robot_path_t search_for_path(pose_xyt_t start,
     std::cout << "\n\ntesting if I can ever even print anything out :/\n\n";
     PriorityQueue openList;
     PriorityQueue closedList;
-    Node goalNode;
-    goalNode.cell.x = goal.x;
-    goalNode.cell.y = goal.y;
+    Node goalNode(goal.x, goal.y);
 
-    Node startNode;
-    startNode.cell.x = start.x;
-    startNode.cell.y = start.y;
+    Node startNode(start.x, start.y);
     startNode.parent = NULL;
     openList.push(&startNode);
 
