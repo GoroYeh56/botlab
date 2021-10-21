@@ -97,7 +97,7 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
     for (int i = 0; i < 8; i++) {
         Node* currentKiddo = new Node(node->cell.x + xDeltas[i], node->cell.y + yDeltas[i]);
         currentKiddo->parent = node;
-        kiddos.push_back(&currentKiddo);
+        kiddos.push_back(currentKiddo);
     }
 
     return kiddos;
