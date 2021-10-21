@@ -21,8 +21,9 @@ robot_path_t search_for_path(pose_xyt_t start,
     startNode->parent = NULL;
     openList.push(startNode);
 
-
+    std::cout << "\n-1\n";
     while (!openList.empty()) {
+        std::cout << "\n0\n";
         Node* q = openList.pop();
         std::cout << "\n1\n";
         std::vector<Node*> kiddos = expand_node(q, distances, params);
