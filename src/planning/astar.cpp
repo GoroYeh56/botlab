@@ -106,7 +106,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
         cost += 1.0;
         currentNode = currentNode->parent;
         float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
-        if (cellDistance > params.maxDistanceWithCost) {
+        if (cellDistance > minDistanceToObstacle && cellDistance < maxDistanceWithCost) {
             cost = std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
         }
     }
