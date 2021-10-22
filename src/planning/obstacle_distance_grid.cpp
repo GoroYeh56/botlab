@@ -101,7 +101,7 @@ void ObstacleDistanceGrid::expand_node(const DistanceNode& node, ObstacleDistanc
     const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
     const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };
     const float distances[8] = { 1, std::sqrt(2), 1, std::sqrt(2), 1, std::sqrt(2), 1, std::sqrt(2) };
-
+    
     for (int i = 0; i < 8; i++) {
         cell_t adjacentCell(node.cell.x + xDeltas[i], node.cell.y + yDeltas[i]);
         if (grid.isCellInGrid(adjacentCell.x, adjacentCell.y)) {
