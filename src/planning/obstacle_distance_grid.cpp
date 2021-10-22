@@ -100,12 +100,13 @@ void ObstacleDistanceGrid::enqueue_obstacle_cells(ObstacleDistanceGrid& grid, st
 void ObstacleDistanceGrid::expand_node(const DistanceNode& node, ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue) {
     const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
     const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };
+    const int distances[8] = { 1, std::sqrt(2), 1, std::sqrt(2), 1, std::sqrt(2), 1, std::sqrt(2) };
 
     for (int i = 0; i < 8; i++) {
         cell_t adjacentCell(node.cell.x + xDeltas[i], node.cell.y + yDeltas[i]);
         if (grid.isCellInGrid(adjacentCell.x, adjacentCell.y)) {
             if (grid(adjacentCell.x, adjacentCell.y) == -1) {
-                DistanceNode adjacentNode(adjacentCell, node.distance + 1); //for diagonals needs to add sqrt(2)
+                DistanceNode adjacentNode(adjacentCell, node.distance + distances[i]); //for diagonals needs to add sqrt(2)
                 grid(adjacentCell.x, adjacentCell.y) = adjacentNode.distance * grid.metersPerCell();
                 searchQueue.push(adjacentNode);
             }
