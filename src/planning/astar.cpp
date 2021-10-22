@@ -42,7 +42,7 @@ robot_path_t search_for_path(pose_xyt_t start,
                 std::reverse(pathVec.begin(), pathVec.end());
                 path.path = pathVec;
                 path.path_length = path.path.size();
-                std::cout << "\nFOUND PATH!!\n";
+                //std::cout << "\nFOUND PATH!!\n";
                 return path;
             }
             else {
@@ -105,7 +105,12 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     while (currentNode != from) {
         cost += 1.0;
         currentNode = currentNode->parent;
+        float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
+        if ( > params.maxDistanceWithCost) {
+            cost = std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
+        }
     }
+    
 
     return cost;
 }
