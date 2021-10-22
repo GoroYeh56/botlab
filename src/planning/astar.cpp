@@ -39,8 +39,8 @@ robot_path_t search_for_path(pose_xyt_t start,
                 robot_path_t path;
                 path.utime = start.utime;
                 std::vector<pose_xyt_t> pathVec = extract_pose_path(extract_node_path(kiddos.at(i)), distances);
-                std::reverse(path.begin(), path.end());
-                path.path = path;
+                std::reverse(pathVec.begin(), pathVec.end());
+                path.path = pathVec;
                 path.path_length = path.path.size();
                 std::cout << "\nFOUND PATH!!\n";
                 return path;
