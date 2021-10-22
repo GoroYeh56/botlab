@@ -39,9 +39,9 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
         int height = map.heightInCells();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-            
-                 distance(x, y) = INFINITY;
-                
+                if (distance(x, y) == -1) {
+                    distance(x, y) = INFINITY;
+                }                
             }
         }
     }
