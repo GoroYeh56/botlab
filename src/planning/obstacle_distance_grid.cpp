@@ -45,7 +45,6 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
             }
         }
     }
-    
     else {
         while (!searchQueue.empty()) {
             DistanceNode nextNode = searchQueue.top();
