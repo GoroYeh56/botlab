@@ -38,7 +38,7 @@ robot_path_t search_for_path(pose_xyt_t start,
             if ((kiddos.at(i)->cell.x == goalNode.cell.x) && (kiddos.at(i)->cell.y == goalNode.cell.y)) {
                 robot_path_t path;
                 path.utime = start.utime;
-                std::vector<pose_xyt_t> path = extract_pose_path(extract_node_path(kiddos.at(i)), distances);
+                std::vector<pose_xyt_t> pathVec = extract_pose_path(extract_node_path(kiddos.at(i)), distances);
                 std::reverse(path.begin(), path.end());
                 path.path = path;
                 path.path_length = path.path.size();
