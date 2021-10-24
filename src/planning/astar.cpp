@@ -106,7 +106,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
         
         currentNode = currentNode->parent;
         float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
-        if (cellDistance > params.minDistanceToObstacle/0.05 && cellDistance < params.maxDistanceWithCost/0.05) {
+        if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
             cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
         }
     }
@@ -129,7 +129,7 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
         currentKiddo->parent = node;
         
         if (distances.isCellInGrid(currentKiddo->cell.x,currentKiddo->cell.y)) {
-            if (distances(currentKiddo->cell.x, currentKiddo->cell.y) > params.minDistanceToObstacle/0.05) {
+            if (distances(currentKiddo->cell.x, currentKiddo->cell.y) > params.minDistanceToObstacle) {
                 kiddos.push_back(currentKiddo);
             }
         }
