@@ -7,7 +7,7 @@
 #include <common/point.hpp>
 
 typedef Point<int> cell_t;
-struct Node{
+typedef struct Node{
 
     Node(int a, int b):cell(a,b),g_cost(0.0),h_cost(0.0),parent(NULL){}
     cell_t cell;
@@ -16,10 +16,9 @@ struct Node{
     double g_cost;
     double f_cost(void){return g_cost + h_cost; };
     bool operator==(const Node& rhs)const{
-        return (cell == rhs.cell);
+        return (cell.x == rhs.cell.x && cell.y == rhs.cell.y);
     }
-};
-
+}Node;
 
 
 struct CompareNode{
@@ -27,26 +26,40 @@ struct CompareNode{
     {
         if(n1->f_cost() == n2->f_cost()){
             return n1->h_cost > n2->h_cost;
+            // return n1->h_cost < n2->h_cost;
         }
         else{
             return (n1->f_cost()) > (n2->f_cost());
+            // return n1->f_cost() < n2->f_cost();
         }
     }
 
 };
 
-
-struct PriorityQueue
+typedef struct PriorityQueue
 {
     std::priority_queue<Node*, std::vector<Node*>, CompareNode> Q;
     std::vector<Node*> elements;
     
+    ///// /
+    void print(){
+        std::priority_queue<Node*, std::vector<Node*>, CompareNode> Q2 = Q;
+        while(!Q2.empty()){
+            Node* node = Q2.top();
+            Q2.pop();
+            std::cout<<"\t("<<node->f_cost() <<", "<<node->h_cost <<", "<<node->cell.x<<", "<<node->cell.y<<")\n";
+        }
+        std::cout<<"\tQ length: "<<Q.size()<<std::endl;
+    }
+
+    //////
+
     bool empty(){
         return Q.empty();
     }
     bool is_member(Node* n){
         for(auto node: elements){
-            if(n==node){
+            if(node->cell.x == n->cell.x && node->cell.y == n->cell.y){
                 return true;
             }
         }
@@ -55,15 +68,15 @@ struct PriorityQueue
     Node* get_member(Node* n){
         // go through the element and return this node
         for(auto node: elements){
-            if(n==node){
+            if(node->cell.x == n->cell.x && node->cell.y == n->cell.y){
                 return node;
             }
         }
         return NULL; // if we didn't find it
     }
     void push(Node* n){
-        elements.push_back(n);
         Q.push(n);
+        elements.push_back(n);
     }
 
     Node* pop(){
@@ -71,7 +84,7 @@ struct PriorityQueue
         Q.pop();
         int idx = -1;
         for(int i=0; i< int(elements.size()); ++i){
-            if(top== elements[i]){
+            if(top->cell.x == elements[i]->cell.x && top->cell.y == elements[i]->cell.y){
                 idx = i;
                 break;
             }

@@ -28,12 +28,31 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
 
     // First step : expand 8-directions from obstacle grids
     enqueue_obstacle_cells(*this, searchQueue); 
-
     // Second step : This step is to expand from 'free' grids
-    while(!searchQueue.empty()){
-        DistanceNode nextNode = searchQueue.top();
-        searchQueue.pop();
-        expand_node(nextNode, *this, searchQueue); 
+
+
+    if(searchQueue.empty()){
+        int width = map.widthInCells(); // number of cells for "width" (how many cells in horizontal direction of the map)
+        int height =map.heightInCells();
+        // Note: row major (0, 1, 2, ...) => (0,0) (1,0) (2,0), ...
+        cell_t cell;
+        for(int y=0; y<height; y++){
+            for(int x=0; x<width; ++x){
+                // std::cout<< distance(x,y)<<" ";
+                distance(x,y) = 10;
+            }
+            // std::cout<<std::endl;
+        }       
+
+    }
+    else{
+
+        while(!searchQueue.empty()){
+            DistanceNode nextNode = searchQueue.top();
+            searchQueue.pop();
+            expand_node(nextNode, *this, searchQueue); 
+        }
+
     }
 
 }

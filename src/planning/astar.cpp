@@ -1,6 +1,6 @@
 #include <planning/astar.hpp>
 #include <planning/obstacle_distance_grid.hpp>
-
+#include <common/grid_utils.hpp>
 
 // TODO : Implement these functions below:
 double h_cost(Node* from, Node* goal){
@@ -19,7 +19,8 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
 
     double cellDistance = distances(to->cell.x, to->cell.y);
     double grid_to_obs_cost = pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
-    if(cellDistance > params.maxDistanceWithCost){
+    // if(cellDistance > params.maxDistanceWithCost){
+    if(true){
         return from->g_cost + delta_g;
     }
     else{
@@ -38,6 +39,7 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
         double next_y = node->cell.y + dirs[i+1];
         // if not obstacles
         if( distances.isCellInGrid(next_x, next_y) && distances(next_x, next_y) > params.minDistanceToObstacle ){
+            // std::cout<<"dis to obs: "<<distances(next_x, next_y)<<std::endl;
             Node* next_node = new Node(next_x, next_y);
             neighbors.push_back(next_node); //      push neighbor Node* into the neighbors vector
         }   
@@ -79,6 +81,11 @@ std::vector<pose_xyt_t> extract_path_pose(std::vector<Node*> path, const Obstacl
 }
 
 
+// void push(PriorityQueue Openlist, Node* node){
+//     Openlist.Q.push(node);
+//     Openlist.elements.push_back(node);
+// }
+
 ///////////////// A* here ///////////////////
 robot_path_t search_for_path(pose_xyt_t start, 
                              pose_xyt_t goal, 
@@ -89,75 +96,132 @@ robot_path_t search_for_path(pose_xyt_t start,
     
     robot_path_t path; // pose_xyt_t path[path_length]
     path.utime = start.utime;
-    path.path.push_back(start);
+    // path.path.push_back(start);
     // path.path[0] = start;    
-    path.path_length = path.path.size();
+    // path.path_length = path.path.size();
 
     // /* A* here */
+
     PriorityQueue Openlist;
     PriorityQueue Closedlist;
- 
-    Node* start_node = new Node(start.x, start.y);
-    Openlist.Q.push(start_node);
+    
+    // cell_t
+    Point<double> startp;
+    startp.x = start.x;
+    startp.y = start.y;
 
-    Node* goal_node = new Node(goal.x, goal.y);
+    Point<double> goalp;
+    goalp.x = goal.x;
+    goalp.y = goal.y;
+    // return Point<int> : cell_t here
+    // Point<int> start, goal
+    auto grid_start = global_position_to_grid_cell(startp, distances);
+    auto grid_goal = global_position_to_grid_cell(goalp, distances);
 
+    Node* start_node = new Node(grid_start.x, grid_start.y);
+    Openlist.push(start_node);
+    Node* goal_node = new Node(grid_goal.x, grid_goal.y);
+
+    std::vector<Node*> node_path;
+    bool success = false;
+
+    std::cout<<"Start : "<<start_node->cell.x<<", "<<start_node->cell.y<<std::endl; // (-5, 0)
+    std::cout<<"Goal : "<<goal_node->cell.x<<", "<<goal_node->cell.y<<std::endl;    // (5, 0)
+
+    int id = 0;
     while(!Openlist.empty()){
+        id++;
+
+        if(id >= 50) break;
         Node* cur = Openlist.pop();
-        Closedlist.Q.push(cur);
-        
-        pose_xyt_t cur_pose;
-        cur_pose.x = cur->cell.x;
-        cur_pose.y = cur->cell.y;
+        Closedlist.push(cur);
+        std::cout<<"\nIteration: "<<id<<std::endl;
+        std::cout<<"Current node: " << cur->cell.x <<", "<<cur->cell.y<< " f: "<< cur->f_cost()<<" g: "<< cur->g_cost<<" h: "<< cur->h_cost<< std::endl;
+        // std::cout<<"Closedlist: "<<std::endl;
+        // Closedlist.print();
    
-        if(cur == goal_node){
+        if(cur->cell.x == goal_node->cell.x && cur->cell.y == goal_node->cell.y){
             std::cout<<"A start success! Find path and break while loop.\n";
-            extract_path(cur); // extract path from this node
-            break;
+            node_path =  extract_path(cur); // extract path from this node
+            success = true;
+            break; 
         }
         // 4-direction
         std::vector<Node*> next_nodes = expand_node(cur, distances, params);
 
+        // std::cout<<"    neighbots: \n";
+        // for(auto n: next_nodes)
+        //     std::cout<<"( "<<n->cell.x<<", "<<n->cell.y<<")"<<std::endl;
+        // std::cout<<std::endl;
+
         for(auto node : next_nodes){
-            // int newx = node->cell.x;
-            // int newy = node->cell.y;
-            Node* next_node = node;
+
             int newx = node->cell.x;
             int newy = node->cell.y;
-            // if(!Openlist.is_member(next_node) && distances(newx, newy)>= params.minDistanceToObstacle){
-            //     Openlist.push(next_node);   
-            // }
+            Node* next_node = node;
+            next_node->h_cost = h_cost(next_node, goal_node);
 
             // Out of boundaries OR less than minDist OR in closed_list
-            if( !distances.isCellInGrid(newx, newy) || distances(newx, newy)< params.minDistanceToObstacle \
-            || Closedlist.is_member(next_node)){
+            // std::cout<<"Neighbor: "<<newx<<", "<<newy<<std::endl;
+            if(Closedlist.is_member(node)){
+                // Problem here: didn't push (50, 150) into Closedlist!
+                std::cout<<"Already explored node "<<newx<<", "<<newy<<std::endl;
                 continue;
             }
 
+            if( !distances.isCellInGrid(newx, newy)|| distances(newx, newy)< params.minDistanceToObstacle){
+                std::cout<<"Out of boundary or too close \n";
+                continue;
+            }
+
+
             // // Whether to change parent?
-            // float gt = g_cost[neighbor.id] + dist(chosen_loc , neighbor);    
-            double gt = next_node->g_cost + g_cost(cur, next_node, distances, params);               
+            // Calculate g for this next_node
+            double gt = g_cost(cur, next_node, distances, params);               
             bool change_parent = false;
+
             // // check whether to change y's parent -> x.
             // Case 1: First appear
             if(!Openlist.is_member(next_node)){
+                // std::cout<<"First visit this node\n";
+                // std::cout<<"Push "<<next_node->cell.x<<", "<<next_node->cell.y<<std::endl;
                 Openlist.push(next_node);
                 change_parent = true;
             }
             // Case 2: from cur to neighbor is closer than its original neighbor (relaxation here!!!!)
-            else if( gt < next_node->g_cost){
+            else if( gt < Openlist.get_member(next_node)->g_cost){
+                // std::cout<<"Find a closer node\n";
                 change_parent = true;
             }
-
             // This node might have been added to OpenList from other node
             // Suppose we now find a 'new parent' that can make this node's g to be smaller
             // Need to change its parent to this node
             if(change_parent){
-                next_node->parent = cur;
-                next_node->g_cost = gt;
+                // std::cout<<"change parent!\n";
+                Openlist.get_member(next_node)->parent = cur;
+                Openlist.get_member(next_node)->g_cost = gt;
             }            
         }
 
+    }
+
+    // TODO: problem: Can't find goal (10000 iterations)
+    if(success){
+        std::vector<pose_xyt_t> pose_path = extract_path_pose(node_path, distances);
+        path.path_length = pose_path.size();
+        int i=0; // start index
+        for(auto pose : pose_path){ // pose_xyt_t;
+            Point<double> posep;
+            posep.x = pose.x;
+            posep.y = pose.y;
+            Point<double> global_pose =  grid_position_to_global_position(posep, distances);
+            // auto grid_goal = grid_position_to_global_position(pose, distances);
+            pose_xyt_t p;
+            p.x = global_pose.x;
+            p.y = global_pose.y;
+            p.theta = 0.0;
+            path.path[i++] = p;
+        }
     }
 
     return path;
