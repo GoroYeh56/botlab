@@ -104,7 +104,7 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     Node* currentNode = to;
     double dx = to->cell.x - from->cell.x;
     double dy = to->cell.y - from->cell.y;
-    double distanceCost = std::sqrt((dx * dx) + (dy * dy))
+    double distanceCost = std::sqrt((dx * dx) + (dy * dy));
     //add checking for params later!
     while (currentNode != from) {
         cost += from->g_cost;
