@@ -141,7 +141,7 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
         if (distances.isCellInGrid(currentKiddo->cell.x,currentKiddo->cell.y)) {
             
             if (distances(currentKiddo->cell.x, currentKiddo->cell.y) > params.minDistanceToObstacle + 0.05) {
-                std::cout << "\n distance: " << distances(currentKiddo->cell.x, currentKiddo->cell.y);
+                //std::cout << "\n distance: " << distances(currentKiddo->cell.x, currentKiddo->cell.y);
                 kiddos.push_back(currentKiddo);
             }
         }
