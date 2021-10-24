@@ -32,17 +32,35 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
 
 
     if(searchQueue.empty()){
+
+        bool all_negative_one=true;
         int width = map.widthInCells(); // number of cells for "width" (how many cells in horizontal direction of the map)
         int height =map.heightInCells();
         // Note: row major (0, 1, 2, ...) => (0,0) (1,0) (2,0), ...
         cell_t cell;
         for(int y=0; y<height; y++){
             for(int x=0; x<width; ++x){
-                // std::cout<< distance(x,y)<<" ";
-                distance(x,y) = 10;
+                if(distance(x,y) != -1)
+                    all_negative_one = false;
             }
-            // std::cout<<std::endl;
-        }       
+        }
+
+        // all zero : test_filled 
+        // set flat : empty_path to (invalid goal)
+        if(all_negative_one){
+            // all -1 : free => overwrite to 10
+            int width = map.widthInCells(); // number of cells for "width" (how many cells in horizontal direction of the map)
+            int height =map.heightInCells();
+            // Note: row major (0, 1, 2, ...) => (0,0) (1,0) (2,0), ...
+            cell_t cell;
+            for(int y=0; y<height; y++){
+                for(int x=0; x<width; ++x){
+                    // std::cout<< distance(x,y)<<" ";
+                    distance(x,y) = 10;
+                }
+                // std::cout<<std::endl;
+            }       
+        }
 
     }
     else{

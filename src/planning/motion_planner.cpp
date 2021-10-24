@@ -64,7 +64,7 @@ bool MotionPlanner::isValidGoal(const pose_xyt_t& goal) const
         // And is far enough from obstacles that the robot can physically occupy the space
         // Add an extra cell to account for discretization error and make motion a little safer by not trying to
         // completely snuggle up against the walls in the motion plan
-        return distances_(goalCell.x, goalCell.y) > params_.robotRadius;
+        return distances_(goalCell.x, goalCell.y) > params_.robotRadius; 
     }
     
     // A goal must be in the map for the robot to reach it

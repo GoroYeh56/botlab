@@ -130,6 +130,8 @@ int main(int argc, char** argv)
                                                  test_wide_constriction_grid,
                                                  test_convex_grid,
                                                  test_maze_grid};
+    // std::vector<test_func> tests = {test_wide_constriction_grid};
+
     std::vector<test_func> selected_func_vec;
     if(selected_test != 6)
     {

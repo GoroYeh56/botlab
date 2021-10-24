@@ -24,11 +24,14 @@ typedef struct Node{
 struct CompareNode{
     bool operator()(Node* n1, Node* n2)
     {
+        return n1->f_cost() > n2->f_cost();
         if(n1->f_cost() == n2->f_cost()){
-            return n1->h_cost > n2->h_cost;
+            // std::cout<<"("<<n1->cell.x<<","<<n1->cell.y<<") h: "<<n1->h_cost<<" , "<<"("<<n2->cell.x<<","<<n2->cell.y<<") h: "<<n2->h_cost<<std::endl;
+            return n1->h_cost > n2->h_cost; // Ascending order (small h to large h)
             // return n1->h_cost < n2->h_cost;
         }
         else{
+            // std::cout<<"("<<n1->cell.x<<","<<n1->cell.y<<") f: "<<n1->f_cost()<<" , "<<"("<<n2->cell.x<<","<<n2->cell.y<<") f: "<<n2->f_cost()<<std::endl;
             return (n1->f_cost()) > (n2->f_cost());
             // return n1->f_cost() < n2->f_cost();
         }
@@ -47,7 +50,7 @@ typedef struct PriorityQueue
         while(!Q2.empty()){
             Node* node = Q2.top();
             Q2.pop();
-            std::cout<<"\t("<<node->f_cost() <<", "<<node->h_cost <<", "<<node->cell.x<<", "<<node->cell.y<<")\n";
+            std::cout<<"\tf: "<<node->f_cost() <<", h: "<<node->h_cost <<", g: "<<node->g_cost<<" (" <<node->cell.x<<", "<<node->cell.y<<")\n";
         }
         std::cout<<"\tQ length: "<<Q.size()<<std::endl;
     }
@@ -69,6 +72,7 @@ typedef struct PriorityQueue
         // go through the element and return this node
         for(auto node: elements){
             if(node->cell.x == n->cell.x && node->cell.y == n->cell.y){
+                // std::cout<<"get_member: ("<<node->cell.x<<","<<node->cell.y<<")"<<node->f_cost()<<std::endl;
                 return node;
             }
         }
