@@ -94,7 +94,7 @@ double h_cost(Node* from, Node* goal) {
     double dx = goal->cell.x - from->cell.x;
     double dy = goal->cell.y - from->cell.y;
 
-    return std::abs(dx) + std::abs(dy); //std::sqrt((dx * dx) + (dy * dy));
+    return std::sqrt((dx * dx) + (dy * dy));
 }
 
 // cost of the path up from one node to another
@@ -102,17 +102,21 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     
     double cost = 0.0;
     Node* currentNode = to;
+    double dx = to->cell.x - from->cell.x;
+    double dy = to->cell.y - from->cell.y;
+    double distanceCost = std::sqrt((dx * dx) + (dy * dy))
     //add checking for params later!
     while (currentNode != from) {
-        
+        cost += from->g_cost;
         currentNode = currentNode->parent;
         float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
         if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
             cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
         }
+
     }
 
-    return cost;
+    return cost + distanceCost;
 }
 
 std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
