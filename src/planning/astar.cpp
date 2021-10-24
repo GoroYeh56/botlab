@@ -71,9 +71,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                         skip = true;
                     }
                 }
-               /* if (distances(kiddos.at(i)->cell.x, kiddos.at(i)->cell.y) <= params.minDistanceToObstacle) {
+                if (distances(kiddos.at(i)->cell.x, kiddos.at(i)->cell.y) <= params.minDistanceToObstacle) {
                     skip = true;
-                } */
+                } 
                 if (!skip) {
                    // std::cout << "\n8\n";
                     openList.push(kiddos.at(i));
@@ -104,20 +104,20 @@ double h_cost(Node* from, Node* goal) {
 double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const SearchParams& params) {
     
     double cost = 0.0;
-    Node* currentNode = to;
-    double dx = to->cell.x - from->cell.x;
-    double dy = to->cell.y - from->cell.y;
-    double distanceCost = std::sqrt((dx * dx) + (dy * dy));
+    Node* currentNode = from;
+    //double dx = to->cell.x - from->cell.x;
+    //double dy = to->cell.y - from->cell.y;
+    //double distanceCost = std::sqrt((dx * dx) + (dy * dy));
     //add checking for params later!
     //while (currentNode != from) {
-    cost += from->g_cost;
-    cost += distanceCost;
+    //cost += from->g_cost;
+    //cost += distanceCost;
  
     float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
     if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
         cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
     }
-    currentNode = currentNode->parent;
+    //currentNode = currentNode->parent;
 
    // }
 
