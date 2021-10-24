@@ -20,20 +20,19 @@ robot_path_t search_for_path(pose_xyt_t start,
     startNode.parent = NULL;
     openList.push(&startNode);
 
-   // std::cout << "\n-1\n";
+   
     while (!openList.empty()) {
-        //std::cout << "\n0\n";
+
         Node* q = openList.pop();
-        //std::cout << "\nq: " << q;
+        
         std::cout << "\nq: " << q->cell.x << "," << q->cell.y;
-        //std::cout << "\n1\n";
+        
         std::vector<Node*> kiddos = expand_node(q, distances, params);
         
-        //std::cout << "\nkiddos size: " << kiddos.size();
+        
 
         for (int i = 0; i < kiddos.size(); i++) {
-            //std::cout << "\nkiddos.at(i): " << kiddos.at(i);
-            //std::cout << "\n kiddos.at(i): " << kiddos.at(i)->cell.x << "," << kiddos.at(i)->cell.y;
+            
             
             if ((kiddos.at(i)->cell.x == goalNode.cell.x) && (kiddos.at(i)->cell.y == goalNode.cell.y)) {
                 robot_path_t path;
@@ -42,31 +41,26 @@ robot_path_t search_for_path(pose_xyt_t start,
                 std::reverse(pathVec.begin(), pathVec.end());
                 path.path = pathVec;
                 path.path_length = path.path.size();
-                //std::cout << "\nFOUND PATH!!\n";
+                
                 return path;
             }
             else {
-                //std::cout << "\n2\n";
-                //std::cout << "\n kiddos.at(i)->g_cost: " << kiddos.at(i)->g_cost;
-                //std::cout << "\n q->g_cost: " << q->g_cost;
-                //std::cout << "\n g_cost(): " << g_cost(q, kiddos.at(i), distances, params);
+                
                 kiddos.at(i)->g_cost = q->g_cost + g_cost(q, kiddos.at(i), distances, params);
-                //std::cout << "\n3\n";
+                
                 kiddos.at(i)->h_cost = h_cost(kiddos.at(i), &goalNode);
-                //std::cout << "\n4\n";
+               
                 bool skip = false;
                 if ((openList.is_member(kiddos.at(i)))) {
-                    //std::cout << "\n4.5\n";
-                    //std::cout << "kiddos.at(i)->f_cost: " << kiddos.at(i)->f_cost();
-                    //std::cout << "\n4.6\n";
+                    
                     if (!(openList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) { // problem child
                         skip = true;
-                        //std::cout << "\n6\n";
+                        
                         
                     } 
                 }
                 if ((closedList.is_member(kiddos.at(i)))) {
-                    //std::cout << "\n7\n";
+                    
                     if (!(closedList.get_member(kiddos.at(i))->f_cost() > kiddos.at(i)->f_cost())) {
                         skip = true;
                     }
@@ -75,13 +69,13 @@ robot_path_t search_for_path(pose_xyt_t start,
                     skip = true;
                 } 
                 if (!skip) {
-                   // std::cout << "\n8\n";
+                   
                     openList.push(kiddos.at(i));
                 }
                
             }
         }
-       // std::cout << "\n9\n"; //
+      
         closedList.push(q);
     }
 
@@ -105,21 +99,21 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     
     double cost = 0.0;
     Node* currentNode = from;
-    //double dx = to->cell.x - from->cell.x;
-    //double dy = to->cell.y - from->cell.y;
-    //double distanceCost = std::sqrt((dx * dx) + (dy * dy));
-    //add checking for params later!
-    //while (currentNode != from) {
-    //cost += from->g_cost;
-    //cost += distanceCost;
+    double dx = to->cell.x - from->cell.x;
+    double dy = to->cell.y - from->cell.y;
+    double distanceCost = std::sqrt((dx * dx) + (dy * dy));
+    
+    
+    cost += from->g_cost;
+    cost += distanceCost;
  
     float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
     if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
         cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
     }
-    //currentNode = currentNode->parent;
+    currentNode = currentNode->parent;
 
-   // }
+  
 
     return cost;
 }
