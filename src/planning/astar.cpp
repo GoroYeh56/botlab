@@ -71,6 +71,9 @@ robot_path_t search_for_path(pose_xyt_t start,
                         skip = true;
                     }
                 }
+                if (distance(kiddos.at(i)->cell.x, kiddos.at(i)->cell.y) <= params.minDistancetoObstacle) {
+                    skip = true;
+                }
                 if (!skip) {
                    // std::cout << "\n8\n";
                     openList.push(kiddos.at(i));
