@@ -109,18 +109,19 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     double dy = to->cell.y - from->cell.y;
     double distanceCost = std::sqrt((dx * dx) + (dy * dy));
     //add checking for params later!
-    while (currentNode != from) {
-        cost += from->g_cost;
+    //while (currentNode != from) {
+    cost += from->g_cost;
+    cost += distanceCost;
  
-        float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
-        if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
-            cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
-        }
-        currentNode = currentNode->parent;
-
+    float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
+    if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
+        cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
     }
+    currentNode = currentNode->parent;
 
-    return cost + distanceCost;
+   // }
+
+    return cost;
 }
 
 std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances, const SearchParams& params) {
