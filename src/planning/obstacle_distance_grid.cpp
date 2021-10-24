@@ -83,7 +83,6 @@ void ObstacleDistanceGrid::resetGrid(const OccupancyGrid& map)
 
 }
 
-
 void ObstacleDistanceGrid::enqueue_obstacle_cells(ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue) {
     int width = grid.widthInCells();
     int height = grid.heightInCells();
@@ -99,6 +98,7 @@ void ObstacleDistanceGrid::enqueue_obstacle_cells(ObstacleDistanceGrid& grid, st
 
 
 void ObstacleDistanceGrid::expand_node(const DistanceNode& node, ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue) {
+    
     /*
     const int xDeltas[8] = { 1, 1, 1, 0, 0, -1, -1, -1 };
     const int yDeltas[8] = { 0, -1, -1, -1, 1, 1, -1, 0 };

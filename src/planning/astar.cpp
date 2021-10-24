@@ -93,7 +93,8 @@ robot_path_t search_for_path(pose_xyt_t start,
 double h_cost(Node* from, Node* goal) {
     double dx = goal->cell.x - from->cell.x;
     double dy = goal->cell.y - from->cell.y;
-    return std::sqrt((dx * dx) + (dy * dy));
+
+    return std::abs(dx) + std::abs(dy); //std::sqrt((dx * dx) + (dy * dy));
 }
 
 // cost of the path up from one node to another
