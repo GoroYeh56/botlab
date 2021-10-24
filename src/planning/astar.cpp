@@ -22,7 +22,7 @@ robot_path_t search_for_path(pose_xyt_t start,
 
    
     while (!openList.empty()) {
-        if(closedList.Q.size() > 10000){
+        if(closedList.Q.size() > 1000){
             break;
         }
         
@@ -103,8 +103,8 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     double distanceCost = std::sqrt((dx * dx) + (dy * dy));
     
     
-    cost += from->g_cost;
-    cost += distanceCost;
+    //cost += from->g_cost;
+    //cost += distanceCost;
  
     float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
     if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
