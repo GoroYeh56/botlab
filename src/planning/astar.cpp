@@ -111,11 +111,12 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     //add checking for params later!
     while (currentNode != from) {
         cost += from->g_cost;
-        currentNode = currentNode->parent;
+ 
         float cellDistance = distances(currentNode->cell.x, currentNode->cell.y);
         if (cellDistance > params.minDistanceToObstacle && cellDistance < params.maxDistanceWithCost) {
             cost += std::pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
         }
+        currentNode = currentNode->parent;
 
     }
 
