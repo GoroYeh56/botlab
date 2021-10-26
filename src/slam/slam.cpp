@@ -248,7 +248,7 @@ void OccupancyGridSLAM::initializePosesIfNeeded(void)
         currentPose_ = previousPose_;
         currentPose_.utime  = currentScan_.times.back();
         haveInitializedPoses_ = true;
-        if (this->uniformDistribution) {
+        if (this->uniformDistribution_) {
             filter_.initializeFilterUniformly(previousPose_, this->map_);
         }
         else {
