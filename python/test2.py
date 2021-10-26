@@ -3,6 +3,7 @@ import lcm
 from time import sleep
 import sys
 sys.path.append("lcmtypes")
+import threading
 
 from lcmtypes import mbot_motor_command_t
 from lcmtypes import odometry_t
@@ -23,10 +24,15 @@ turn_command = mbot_motor_command_t()
 turn_command.trans_v = 0.0
 turn_command.angular_v = (3.1415/2)
 
+
+
+
 class Localization():
     def __init__(self):
         self.lc = lcm.LCM('udpm://239.255.76.67:7667?ttl=2')
         self.msg = self.lc.subscribe("LIDAR", self.lidar_handler)
+        self._lcm_thread = threading.Thread(target=self.handle_lcm())
+        self._lcm_thread.start()
         
     def lidar_handler(self, channel, data):
         msg = lidar_t().decode(data)
@@ -35,7 +41,15 @@ class Localization():
         msg.thetas
         msg.times
         msg.intensities
-
+        
+    def handle_lcm(lcm_obj):
+        try:
+            while True:
+                lcm_obj.handle()
+        except KeyboardInterrupt:
+            print("lcm exit!");
+            sys.exit()
+    
 
 local = Localization()
 while(True):        

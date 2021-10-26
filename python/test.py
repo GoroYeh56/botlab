@@ -3,6 +3,10 @@ import lcm
 from time import sleep
 import sys
 sys.path.append("lcmtypes")
+import threading
+
+
+
 
 from lcmtypes import mbot_motor_command_t
 from lcmtypes import odometry_t
@@ -29,7 +33,10 @@ lc = lcm.LCM('udpm://239.255.76.67:7667?ttl=2')
 lc.subscribe("LIDAR", handleLIDAR)
 lc.subscribe("ODOMETRY", handleODOMETRY)
 
+
+
 while(True):
+    lc.handle()
     lc.publish("MBOT_MOTOR_COMMAND",drive_command.encode())
     sleep(1)
     lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
