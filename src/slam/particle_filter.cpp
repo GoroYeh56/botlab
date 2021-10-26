@@ -45,15 +45,15 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     double yLim = (double)map.heightInMeters();
     double xStep = (xLim*yLim)/ kNumParticles_;
     double yStep = (xLim * yLim)/ kNumParticles_;
-    double xPos = -xLim/2.0;
+    double xPos = -xLim / 2.0;
     double yPos = -yLim / 2.0;
 
     for (auto& p : posterior_) {
         std::cout << "\nxPos: " << xPos << "  yPos: " << yPos;
-        if(xPos<xLim) {
+        if(xPos<xLim / 2.0) {
             xPos+= xStep;
         }
-        else if (xPos == xLim){
+        else if (xPos == xLim / 2.0){
             xPos = 0;
             yPos+=yStep;
         }
