@@ -7,26 +7,28 @@
 #include <chrono>
 
 OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
-                                     int8_t      hitOddsIncrease,
-                                     int8_t      missOddsDecrease,
-                                     lcm::LCM&   lcmComm,
-                                     bool waitForOptitrack,
-                                     bool mappingOnlyMode,
-                                     bool actionOnlyMode,
-                                     const std::string localizationOnlyMap,
-                                     bool uniformDistribution)
-: mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
-, haveInitializedPoses_(false)
-, waitingForOptitrack_(waitForOptitrack)
-, haveMap_(false)
-, numIgnoredScans_(0)
-, filter_(numParticles)
-, map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
-, mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
-, lcm_(lcmComm)
-, mapUpdateCount_(0)
+    int8_t      hitOddsIncrease,
+    int8_t      missOddsDecrease,
+    lcm::LCM& lcmComm,
+    bool waitForOptitrack,
+    bool mappingOnlyMode,
+    bool actionOnlyMode,
+    const std::string localizationOnlyMap,
+    bool uniformDistribution)
+    : mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
+    , haveInitializedPoses_(false)
+    , waitingForOptitrack_(waitForOptitrack)
+    , haveMap_(false)
+    , numIgnoredScans_(0)
+    , filter_(numParticles)
+    , map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
+    , mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
+    , lcm_(lcmComm)
+    , mapUpdateCount_(0)
+    , uniformDistribution_(uniformDistribution)
+
 {
-    this->uniformDistribution_ = uniformDistribution;
+    //this->uniformDistribution_ = uniformDistribution;
     // Confirm that the mode is valid -- mapping-only and localization-only are not specified
     assert(!(mappingOnlyMode && localizationOnlyMap.length() > 0));
     
