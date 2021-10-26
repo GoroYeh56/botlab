@@ -46,7 +46,7 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     double xStep = std::sqrt(kNumParticles_)/xLim;
     double yStep = std::sqrt(kNumParticles_)/yLim;
 
-    for (auto& p : postrior_) {
+    for (auto& p : posterior_) {
         if(xPos<xLim) {
             xPos+= xStep;
         }
