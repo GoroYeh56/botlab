@@ -55,11 +55,11 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
         if(xPos<xLim / 2.0) {
             xPos+= xStep;
         }
-        else if (xPos == xLim / 2.0){
+        else if (xPos >= xLim / 2.0){
             xPos = 0;
             yPos+=yStep;
         }
-        else if (yPos == yLim / 2.0){
+        else if (yPos >= yLim / 2.0){
             break;
         }
         p.pose.x = xPos;
