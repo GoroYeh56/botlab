@@ -32,7 +32,7 @@ void ParticleFilter::initializeFilterAtPose(const pose_xyt_t& pose)
 
 }
 
-void ParticleFilter::initializeFilterUniformly(const OccupancyGrid& map)
+void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const OccupancyGrid& map)
 {
     ///////////// TODO: Implement your method for initializing the particles in the particle filter /////////////////
     double sampleWeight = 1.0 / kNumParticles_;
@@ -41,11 +41,11 @@ void ParticleFilter::initializeFilterUniformly(const OccupancyGrid& map)
     int ycell = 0;
     double xPos = 0.0;
     double yPos = 0.0;
-    double xLim = map.widthInMeters);
-    double yLim = map.heighInMeters();
+    double xLim = (double)map.widthInMeters();
+    double yLim = (double)map.heightInMeters();
     double xStep = std::sqrt(kNumParticles_)/xLim;
     double yStep = std::sqrt(kNumParticles_)/yLim;
-    
+
     for (auto& p : posterior_) {
         if(xPos<xLim) {
             xPos++;
