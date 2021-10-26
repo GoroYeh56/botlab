@@ -45,7 +45,7 @@ public:
                       bool mappingOnlyMode = false,
                       bool actionOnlyMode = false,
                       const std::string localizationOnlyMap = std::string(""),
-                      bool uniformDistribution);
+                      bool uniformDistribution = false);
     
     /**
     * runSLAM enters an infinite loop where SLAM will keep running as long as data is arriving.
