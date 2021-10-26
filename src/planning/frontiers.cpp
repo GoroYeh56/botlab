@@ -10,17 +10,177 @@
 
 bool is_frontier_cell(int x, int y, const OccupancyGrid& map);
 frontier_t grow_frontier(Point<int> cell, const OccupancyGrid& map, std::set<Point<int>>& visitedFrontiers);
-robot_path_t path_to_frontier(const frontier_t& frontier, 
-                              const pose_xyt_t& pose, 
-                              const OccupancyGrid& map,
-                              const MotionPlanner& planner);
-pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, 
-                                  Point<float> desiredPosition, 
-                                  const OccupancyGrid& map,
-                                  const MotionPlanner& planner);
-pose_xyt_t search_to_nearest_free_space(Point<float> position, const OccupancyGrid& map, const MotionPlanner& planner);
-double path_length(const robot_path_t& path);
 
+
+
+pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, Point<float> desiredPosition, const OccupancyGrid& map, const MotionPlanner& planner) {
+
+    Point<double> gridPos = global_position_to_grid_position((double)position.x, (double)position.y);
+    pose_xyt_t currentPose;
+    currentPose->x = gridPos.x;
+    currentPose->y = gridPos.y;
+
+    bool foundFreeSpace = false;
+
+    int w = 1;
+    int h = 1;
+    int x = w;
+    int y = 0;
+    int dir = 0;
+
+    while (!foundFreeSpace) {
+        currentPose->x = x;
+        currentPose->y = y;
+        if (planner.planPath(pose, currentPose)->path.size() > 1) {
+            foundFreeSpace = true;
+        }
+        else {
+            switch (dir) {
+            case 0: //up
+                if (y >= h) {
+                    dir = 1;
+                    x--;
+                }
+                else {
+                    y++;
+                }
+                break;
+            case 1: //left
+                if (x <= 0) {
+                    dir = 2;
+                    y--;
+                }
+                else {
+                    x--;
+                }
+                break;
+            case 2: //down
+                if (y <= 0) {
+                    dir = 3;
+                    x++;
+                }
+                else {
+                    y--;
+                }
+                break;
+            case 3: //right
+                if (x >= w) {
+                    dir = 0;
+                    x++;
+                    y--;
+                    w += 2;
+                    h += 2;
+                }
+                else {
+                    x++;
+                }
+                break;
+            }
+        }
+
+    }
+
+    Point<double> globalPos = grid_position_to_global_position(x, y);
+    currentPose->x = globalPos.x;
+    currentPose->y = globalPos.y;
+    return currentPose;
+}
+
+
+pose_xyt_t search_to_nearest_free_space(Point<float> position, const OccupancyGrid& map, const MotionPlanner& planner) {
+    
+    Point<double> gridPos = global_position_to_grid_position((double)position.x, (double)position.y);
+    pose_xyt_t currentPose;
+    currentPose->x = gridPos.x;
+    currentPose->y = gridPos.y;
+
+    bool foundFreeSpace = false;
+
+    int w = 1;
+    int h = 1;
+    int x = w;
+    int y = 0;
+    int dir = 0;
+    
+    while (!foundFreeSpace) {
+        
+        if (map(x, y) < 0) {
+            foundFreeSpace = true;
+        }
+        else {
+            switch (dir) {
+            case 0: //up
+                if (y >= h) {
+                    dir = 1;
+                    x--;
+                }
+                else {
+                    y++;
+                }
+                break;
+            case 1: //left
+                if (x <= 0) {
+                    dir = 2;
+                    y--;
+                }
+                else {
+                    x--;
+                }
+                break;
+            case 2: //down
+                if (y <= 0) {
+                    dir = 3;
+                    x++;
+                }
+                else {
+                    y--;
+                }
+                break;
+            case 3: //right
+                if (x >= w) {
+                    dir = 0;
+                    x++;
+                    y--;
+                    w += 2;
+                    h += 2;
+                }
+                else {
+                    x++;
+                }
+                break;
+            }
+        }
+
+    }
+
+    Point<double> globalPos = grid_position_to_global_position(x, y);
+    currentPose->x = globalPos.x;
+    currentPose->y = globalPos.y;
+    return currentPose;
+}
+
+double path_length(const robot_path_t& path) {
+    double length = 0.0;
+    pose_xyt_t prevPose = path->path.at(0);
+    pose_xyt_t currPose = path->path.at(0);
+    for (int i = 0; i < path->path.size() - 1; i++) {
+        currPose = path->path.at(i);
+        double dx = currPose->x - prevPose->x;
+        double dy = currpose->y - prevPose->y;
+        length += std::sqrt(dx * dx + dy * dy);
+        prevPose = currPose;
+    }
+    return length;
+}
+
+robot_path_t path_to_frontier(const frontier_t& frontier, const pose_xyt_t& pose, const OccupancyGrid& map, const MotionPlanner& planner) {
+    pose_xyt_t goal = (frontier.at((int)(frontiers.size() / 2));
+    Point<float> goalPoint(goal->x, goal->y);
+    goal = search_to_nearest_free_space(goalPoint, map, planner);
+    Point<float> freeGoalPoint(goal->x, goal->y);
+    goal = nearest_navigable_cell(pose, freeGoalPoint, map, planner);
+    return planner.planPath(pose, goal);
+}
 
 std::vector<frontier_t> find_map_frontiers(const OccupancyGrid& map, 
                                            const pose_xyt_t& robotPose,
@@ -99,9 +259,11 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
     *   - The cells along the frontier might not be in the configuration space of the robot, so you won't necessarily
     *       be able to drive straight to a frontier cell, but will need to drive somewhere close.
     */
-    robot_path_t emptyPath;
     
-    return emptyPath;
+
+    robot_path_t decentPath = path_to_frontier(frontiers.at(0), robotPose, map, planner);
+    
+    return decentPath;
 }
 
 

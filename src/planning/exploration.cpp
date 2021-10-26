@@ -144,69 +144,69 @@ void Exploration::executeStateMachine(void)
     int8_t nextState = state_;
     
     // Save the path from the previous iteration to determine if a new path was created and needs to be published
-    robot_path_t previousPath = currentPath_;
-    
-    // Run the state machine until the state remains the same after an iteration of the loop
-    do
+robot_path_t previousPath = currentPath_;
+
+// Run the state machine until the state remains the same after an iteration of the loop
+do
+{
+    switch (state_)
     {
-        switch(state_)
-        {
-            case exploration_status_t::STATE_INITIALIZING:
-                nextState = executeInitializing();
-                break;
-            case exploration_status_t::STATE_EXPLORING_MAP:
-                nextState = executeExploringMap(stateChanged);
-                break;
-                
-            case exploration_status_t::STATE_RETURNING_HOME:
-                nextState = executeReturningHome(stateChanged);
-                break;
+    case exploration_status_t::STATE_INITIALIZING:
+        nextState = executeInitializing();
+        break;
+    case exploration_status_t::STATE_EXPLORING_MAP:
+        nextState = executeExploringMap(stateChanged);
+        break;
 
-            case exploration_status_t::STATE_COMPLETED_EXPLORATION:
-                nextState = executeCompleted(stateChanged);
-                break;
-                
-            case exploration_status_t::STATE_FAILED_EXPLORATION:
-                nextState = executeFailed(stateChanged);
-                break;
-        }
-        
-        stateChanged = nextState != state_;
-        state_ = nextState;
-        
-    } while(stateChanged);
+    case exploration_status_t::STATE_RETURNING_HOME:
+        nextState = executeReturningHome(stateChanged);
+        break;
 
-    //if path confirmation was not received, resend path
-    if(!pathReceived_)
-    {
-        std::cout << "the current path was not received by motion_controller, attempting to send again:\n";
+    case exploration_status_t::STATE_COMPLETED_EXPLORATION:
+        nextState = executeCompleted(stateChanged);
+        break;
 
-        std::cout << "timestamp: " << currentPath_.utime << "\n";
-
-        for(auto pose : currentPath_.path){
-            std::cout << "(" << pose.x << "," << pose.y << "," << pose.theta << "); ";
-        }std::cout << "\n";
-
-        lcmInstance_->publish(CONTROLLER_PATH_CHANNEL, &currentPath_);
+    case exploration_status_t::STATE_FAILED_EXPLORATION:
+        nextState = executeFailed(stateChanged);
+        break;
     }
 
-    //if path changed, send current path
-    if(previousPath.path != currentPath_.path)
-    { 
+    stateChanged = nextState != state_;
+    state_ = nextState;
 
-        std::cout << "INFO: Exploration: A new path was created on this iteration. Sending to Mbot:\n";
+} while (stateChanged);
 
-        std::cout << "path timestamp: " << currentPath_.utime << "\npath: ";
+//if path confirmation was not received, resend path
+if (!pathReceived_)
+{
+    std::cout << "the current path was not received by motion_controller, attempting to send again:\n";
 
-        for(auto pose : currentPath_.path){
-            std::cout << "(" << pose.x << "," << pose.y << "," << pose.theta << "); ";
-        }std::cout << "\n";
+    std::cout << "timestamp: " << currentPath_.utime << "\n";
 
-        lcmInstance_->publish(CONTROLLER_PATH_CHANNEL, &currentPath_);
+    for (auto pose : currentPath_.path) {
+        std::cout << "(" << pose.x << "," << pose.y << "," << pose.theta << "); ";
+    }std::cout << "\n";
 
-        pathReceived_ = false;
-        most_recent_path_time = currentPath_.utime;
-    }
+    lcmInstance_->publish(CONTROLLER_PATH_CHANNEL, &currentPath_);
+}
+
+//if path changed, send current path
+if (previousPath.path != currentPath_.path)
+{
+
+    std::cout << "INFO: Exploration: A new path was created on this iteration. Sending to Mbot:\n";
+
+    std::cout << "path timestamp: " << currentPath_.utime << "\npath: ";
+
+    for (auto pose : currentPath_.path) {
+        std::cout << "(" << pose.x << "," << pose.y << "," << pose.theta << "); ";
+    }std::cout << "\n";
+
+    lcmInstance_->publish(CONTROLLER_PATH_CHANNEL, &currentPath_);
+
+    pathReceived_ = false;
+    most_recent_path_time = currentPath_.utime;
+}
 
 }
 
@@ -220,9 +220,9 @@ int8_t Exploration::executeInitializing(void)
     status.team_number = teamNumber_;
     status.state = exploration_status_t::STATE_INITIALIZING;
     status.status = exploration_status_t::STATUS_COMPLETE;
-    
+
     lcmInstance_->publish(EXPLORATION_STATUS_CHANNEL, &status);
-    
+
     return exploration_status_t::STATE_EXPLORING_MAP;
 }
 
@@ -235,7 +235,7 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *   - At the end of each iteration, then (1) or (2) must hold, otherwise exploration is considered to have failed:
     *       (1) frontiers_.empty() == true      : all frontiers have been explored as determined by find_map_frontiers()
     *       (2) currentPath_.path_length > 1 : currently following a path to the next frontier
-    * 
+    *
     *   - Use the provided function find_map_frontiers() to find all frontiers in the map.
     *   - You will need to implement logic to select which frontier to explore.
     *   - You will need to implement logic to decide when to select a new frontier to explore. Take into consideration:
@@ -243,7 +243,13 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *           explored more of the map.
     *       -- You will likely be able to see the frontier before actually reaching the end of the path leading to it.
     */
+    this->frontiers_ = find_map_frontiers();
+    if (!this->planner_.isPathSafe(this->currentPath_))){
+        this->currentPath = plan_path_to_frontier(this->frontiers_, this->currentPose_, this->currentMap, this->planner_);
+    }
     
+
+
     /////////////////////////////// End student code ///////////////////////////////
     
     /////////////////////////   Create the status message    //////////////////////////
