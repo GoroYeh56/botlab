@@ -243,9 +243,9 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *           explored more of the map.
     *       -- You will likely be able to see the frontier before actually reaching the end of the path leading to it.
     */
-    this->frontiers_ = find_map_frontiers();
-    if (!this->planner_.isPathSafe(this->currentPath_))){
-        this->currentPath = plan_path_to_frontier(this->frontiers_, this->currentPose_, this->currentMap, this->planner_);
+    this->frontiers_ = find_map_frontiers(this->currentMap_,this->currentPose_);
+    if (!this->planner_.isPathSafe(this->currentPath_)){
+        this->currentPath_ = plan_path_to_frontier(this->frontiers_, this->currentPose_, this->currentMap_, this->planner_);
     }
     
 

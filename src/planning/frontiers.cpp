@@ -12,13 +12,12 @@ bool is_frontier_cell(int x, int y, const OccupancyGrid& map);
 frontier_t grow_frontier(Point<int> cell, const OccupancyGrid& map, std::set<Point<int>>& visitedFrontiers);
 
 
-
 pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, Point<float> desiredPosition, const OccupancyGrid& map, const MotionPlanner& planner) {
 
-    Point<double> gridPos = global_position_to_grid_position((double)position.x, (double)position.y);
+    Point<double> gridPos = global_position_to_grid_position(Point<double>((double)desiredPosition.x, (double)desiredPosition.y), map );
     pose_xyt_t currentPose;
-    currentPose->x = gridPos.x;
-    currentPose->y = gridPos.y;
+    currentPose.x = gridPos.x;
+    currentPose.y = gridPos.y;
 
     bool foundFreeSpace = false;
 
@@ -29,9 +28,9 @@ pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, Point<float> desiredPosition,
     int dir = 0;
 
     while (!foundFreeSpace) {
-        currentPose->x = x;
-        currentPose->y = y;
-        if (planner.planPath(pose, currentPose)->path.size() > 1) {
+        currentPose.x = x;
+        currentPose.y = y;
+        if (planner.planPath(pose, currentPose).path.size() > 1) {
             foundFreeSpace = true;
         }
         else {
@@ -80,19 +79,19 @@ pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, Point<float> desiredPosition,
 
     }
 
-    Point<double> globalPos = grid_position_to_global_position(x, y);
-    currentPose->x = globalPos.x;
-    currentPose->y = globalPos.y;
+    Point<double> globalPos = grid_position_to_global_position(Point<double>((double)x, (double)y),map);
+    currentPose.x = globalPos.x;
+    currentPose.y = globalPos.y;
     return currentPose;
 }
 
 
 pose_xyt_t search_to_nearest_free_space(Point<float> position, const OccupancyGrid& map, const MotionPlanner& planner) {
     
-    Point<double> gridPos = global_position_to_grid_position((double)position.x, (double)position.y);
+    Point<double> gridPos = global_position_to_grid_position(Point<double>((double)position.x, (double)position.y),map);
     pose_xyt_t currentPose;
-    currentPose->x = gridPos.x;
-    currentPose->y = gridPos.y;
+    currentPose.x = gridPos.x;
+    currentPose.y = gridPos.y;
 
     bool foundFreeSpace = false;
 
@@ -153,20 +152,20 @@ pose_xyt_t search_to_nearest_free_space(Point<float> position, const OccupancyGr
 
     }
 
-    Point<double> globalPos = grid_position_to_global_position(x, y);
-    currentPose->x = globalPos.x;
-    currentPose->y = globalPos.y;
+    Point<double> globalPos = grid_position_to_global_position(Point<double>((double)x, (double)y),map);
+    currentPose.x = globalPos.x;
+    currentPose.y = globalPos.y;
     return currentPose;
 }
 
 double path_length(const robot_path_t& path) {
     double length = 0.0;
-    pose_xyt_t prevPose = path->path.at(0);
-    pose_xyt_t currPose = path->path.at(0);
-    for (int i = 0; i < path->path.size() - 1; i++) {
-        currPose = path->path.at(i);
-        double dx = currPose->x - prevPose->x;
-        double dy = currpose->y - prevPose->y;
+    pose_xyt_t prevPose = path.path.at(0);
+    pose_xyt_t currPose = path.path.at(0);
+    for (int i = 0; i < path.path.size() - 1; i++) {
+        currPose = path.path.at(i);
+        double dx = currPose.x - prevPose.x;
+        double dy = currPose.y - prevPose.y;
         length += std::sqrt(dx * dx + dy * dy);
         prevPose = currPose;
     }
@@ -174,10 +173,9 @@ double path_length(const robot_path_t& path) {
 }
 
 robot_path_t path_to_frontier(const frontier_t& frontier, const pose_xyt_t& pose, const OccupancyGrid& map, const MotionPlanner& planner) {
-    pose_xyt_t goal = (frontier.at((int)(frontiers.size() / 2));
-    Point<float> goalPoint(goal->x, goal->y);
-    goal = search_to_nearest_free_space(goalPoint, map, planner);
-    Point<float> freeGoalPoint(goal->x, goal->y);
+    Point<float> goalPoint = frontier.cells.at((int)(frontier.cells.size() / 2));
+    pose_xyt_t goal = search_to_nearest_free_space(goalPoint, map, planner);
+    Point<float> freeGoalPoint(goal.x, goal.y);
     goal = nearest_navigable_cell(pose, freeGoalPoint, map, planner);
     return planner.planPath(pose, goal);
 }
