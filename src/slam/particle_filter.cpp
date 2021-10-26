@@ -37,7 +37,7 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     ///////////// TODO: Implement your method for initializing the particles in the particle filter /////////////////
     std::cout << "\ninitializing particles uniformly!\n";
     double sampleWeight = 1.0 / kNumParticles_;
-    
+    posteriorPose_ = pose;
     int xcell = 0;
     int ycell = 0;
     double xPos = 0.0;
