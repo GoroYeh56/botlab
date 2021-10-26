@@ -44,7 +44,8 @@ public:
                       bool waitForOptitrack,
                       bool mappingOnlyMode = false,
                       bool actionOnlyMode = false,
-                      const std::string localizationOnlyMap = std::string(""));
+                      const std::string localizationOnlyMap = std::string(""),
+                      bool uniformDistribution);
     
     /**
     * runSLAM enters an infinite loop where SLAM will keep running as long as data is arriving.

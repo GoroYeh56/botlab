@@ -13,13 +13,14 @@ OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
                                      bool waitForOptitrack,
                                      bool mappingOnlyMode,
                                      bool actionOnlyMode,
-                                     const std::string localizationOnlyMap)
+                                     const std::string localizationOnlyMap,
+                                     bool uniformDistribution)
 : mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
 , haveInitializedPoses_(false)
 , waitingForOptitrack_(waitForOptitrack)
 , haveMap_(false)
 , numIgnoredScans_(0)
-, filter_(numParticles)
+, filter_(numParticles,uniformDistribution)
 , map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
 , mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
 , lcm_(lcmComm)
