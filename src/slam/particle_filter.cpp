@@ -41,8 +41,8 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     int xcell = 0;
     int ycell = 0;
     
-    double xLim = (double)map.widthInMeters();
-    double yLim = (double)map.heightInMeters();
+    double xLim = (double)map.widthInMeters()/2;
+    double yLim = (double)map.heightInMeters()/2;
     double xStep = ((xLim*yLim*2.0) / (double)kNumParticles_); //m^2/particle
     double yStep = ((xLim*yLim*2.0)/ (double)kNumParticles_);
     double xPos = -xLim / 2.0;
