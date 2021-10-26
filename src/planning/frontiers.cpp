@@ -181,13 +181,14 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
 
     int debug_cnt = 10;
     int it = 0;
-
+    std::cout<<"\n Call plan_path_to_frontier again:...\n";
     std::cout<<"PQ size: # frontiers cells: "<<pq.size()<<std::endl; // 5217
-    std::cout<<"logOdds(108,107) "<<(int)map.logOdds(108,107)<<std::endl;
-    std::cout<<"logOdds(115,104) "<<(int)map.logOdds(115,104)<<std::endl;
+    // std::cout<<"logOdds(108,107) "<<(int)map.logOdds(108,107)<<std::endl;
+    // std::cout<<"logOdds(115,104) "<<(int)map.logOdds(115,104)<<std::endl;
       
     while(!pq.empty() && !foundPath ){
         it++;
+        std::cout<<"PQ: "<<pq.size()<<" cells left\n";
         // if(it>=debug_cnt){
         //     std::cout<<"Iterate through "<<debug_cnt<<" frontier cells. Break\n";
         //     break;
@@ -205,12 +206,12 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
         while(!stk.empty() && !foundFreeCell){
 
             Point<int> cur = stk.top();
-            std::cout<<"cur free cell in stack: "<<cur.x<<", "<<cur.y;
+            // std::cout<<"cur free cell in stack: "<<cur.x<<", "<<cur.y;
 
-            if(planner.obstacleDistances().isCellInGrid(cur.x, cur.y))
-                std::cout<<"distance:"<<planner.obstacleDistances()(cur.x, cur.y)<<"\n";
-            else
-                std::cout<<"\n";
+            // if(planner.obstacleDistances().isCellInGrid(cur.x, cur.y))
+            //     std::cout<<"distance:"<<planner.obstacleDistances()(cur.x, cur.y)<<"\n";
+            // else
+            //     std::cout<<"\n";
 
             Point<double> cur_global = grid_position_to_global_position(cur, map);
             stk.pop();
@@ -218,35 +219,35 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
 
             // TODO: If goal is "too close to our self , Cannot!!" 
             
-            if(abs(cur.x-robotPose.x)>=3 && abs(cur.y-robotPose.y)>=3 && (int)map.logOdds(cur.x, cur.y) <0  && planner.isValidGoal(pose_xyt_t{robotPose.utime, (float)cur_global.x, (float)cur_global.y, 0})){
+            if(/*abs(cur.x-robotPose.x)>=3 && abs(cur.y-robotPose.y)>=3 &&*/ (int)map.logOdds(cur.x, cur.y) <0  && planner.isValidGoal(pose_xyt_t{robotPose.utime, (float)cur_global.x, (float)cur_global.y, 0})){
                 foundFreeCell = true;
                 target_cell = cur; // Point<int>
             }
             else{
-                int step_size = 5; // PARAMETERS TO BE TUNED
+                int step_size = 3; // PARAMETERS TO BE TUNED
                 // DFS 4 directions to push cells into stack
                 int dx[4] = {0, 0, 1, -1};
                 int dy[4] = {1, -1, 0, 0};
                 for(int k=0; k<4; ++k){
                     int next_x = cur.x + dx[k]*step_size;
                     int next_y = cur.y + dy[k]*step_size;
-                    if((int)map.isCellInGrid(next_x, next_y))
-                        std::cout<<"next x "<<next_x<<", y "<<next_y<<", odds: "<<(int)map.logOdds(next_x, next_y)<<"\n";
-                    else{
-                        std::cout<<"next x "<<next_x<<", y "<<next_y<<", NOT in map. Out of boundary.\n";
-                    }
+                    // if((int)map.isCellInGrid(next_x, next_y))
+                    //     std::cout<<"next x "<<next_x<<", y "<<next_y<<", odds: "<<(int)map.logOdds(next_x, next_y)<<"\n";
+                    // else{
+                    //     std::cout<<"next x "<<next_x<<", y "<<next_y<<", NOT in map. Out of boundary.\n";
+                    // }
 
-                    if( visited.find(Point<int>(next_x, next_y) ) !=visited.end()){
-                        std::cout<<"Already visit "<<next_x<<", "<<next_y<<"\n";
-                        continue;
-                    }
+                    // if( visited.find(Point<int>(next_x, next_y) ) !=visited.end()){
+                    //     std::cout<<"Already visit "<<next_x<<", "<<next_y<<"\n";
+                    //     continue;
+                    // }
 
-                    if(!map.isCellInGrid(next_x, next_y)){
-                        std::cout<<"Not in map "<<next_x<<", "<<next_y<<"\n";
-                        continue;
-                    }
+                    // if(!map.isCellInGrid(next_x, next_y)){
+                    //     std::cout<<"Not in map "<<next_x<<", "<<next_y<<"\n";
+                    //     continue;
+                    // }
                     if( visited.find(Point<int>(next_x, next_y) )==visited.end() && map.isCellInGrid(next_x, next_y) && (int)map.logOdds(next_x, next_y) < 0){
-                        std::cout<<"Push left free cell: "<<cur.x-step_size<<", "<<cur.y<<" dis: "<<planner.obstacleDistances()(next_x, next_y)<<std::endl;
+                        // std::cout<<"Push left free cell: "<<cur.x-step_size<<", "<<cur.y<<" dis: "<<planner.obstacleDistances()(next_x, next_y)<<std::endl;
                         stk.push(Point<int>(next_x, next_y));
                         visited.insert(Point<int>(next_x, next_y));
                     }
@@ -268,11 +269,12 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
                 }
             }             
         }
+        // delete &stk;
         // Found chosen target_cell
         if(foundFreeCell)
             std::cout<<"Found target cell: "<<target_cell.x<<", "<<target_cell.y<<std::endl;
         else
-            std::cout<<"Stack empty. DFS failed, no target cell\n";
+            std::cout<<"Stack empty. DFS failed, no target cell at this frontier\n";
         // while(1);
         pq.pop();
         Point<double> target_cell_global = grid_position_to_global_position(target_cell, map);
@@ -281,25 +283,14 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
     }
 
     
-
-
-    // for(int i=0; i<frontiers.size(); i++){
-    //     // Pick one fronter and pick the center of its "cells" (vector<Point<float>>)
-    //     frontier_t f = frontiers[i];
-    //     Point<float> frontier_mid_cell = f.cells[f.cells.size()/2];
-    //     // Calculate its nearest free cell (pose_xyt_t) using search_to_nearest_free_space
-    //     pose_xyt_t nearest_free_cell = search_to_nearest_free_space(frontier_mid_cell, map, planner); // params.minDistanceTo...
-    //     goal = nearest_free_cell;
-    //     Path = planner.planPath(start, goal);
-    //     if(!Path.path.empty()) break;
-    //     else continue;
-    // }   
-    // std::cout<<"Enter while(1) loop...\n";
-    // while(1);
     if(foundPath) return Path;
     else{
         std::cout<<"Fail to find a path to target_cell: "<<target_cell.x<<", "<<target_cell.y<<"\n";
     }
+
+
+    // delete &pq;
+
     return Path;
     // TODO : If all empty: means we've explored the whole environment
 

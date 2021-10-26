@@ -131,11 +131,14 @@ robot_path_t search_for_path(pose_xyt_t start,
     std::cout<<"Start : "<<start_node->cell.x<<", "<<start_node->cell.y<<std::endl; // (-5, 0)
     std::cout<<"Goal : "<<goal_node->cell.x<<", "<<goal_node->cell.y<<std::endl;    // (5, 0)
 
-    int id = 0;
-    int BREAKING_ITERS = 1000000;
+    long int id = 0;
+    long int BREAKING_ITERS = 1000000;
+    // int BREAKING_ITERS = 100000;
+
     // for(int i=0; i<1; i++){
     //     std::cout<<"distance(151,y): "<<distances(150,52)<<"\n";
     // }
+    std::vector< Node*> nodes_to_be_deleted;
 
     while(!Openlist.empty()){
         id++;
@@ -143,9 +146,9 @@ robot_path_t search_for_path(pose_xyt_t start,
         if(id >= BREAKING_ITERS) break;
 
         // #ifdef DEBUG
-        if(id% 100000 ==0){
-            std::cout<<"\nIteration: "<<id<<std::endl;
-        }
+        // if(id% 100000 ==0){
+        //     std::cout<<"\nIteration: "<<id<<std::endl;
+        // }
         // #endif
         // std::cout<<"Openlist:\n";
         // Openlist.print();
@@ -173,7 +176,9 @@ robot_path_t search_for_path(pose_xyt_t start,
         }
         // 4-direction
         std::vector<Node*> next_nodes = expand_node(cur, distances, params);
-
+        for(auto n: next_nodes){
+            nodes_to_be_deleted.push_back(n);
+        }
         // std::cout<<"    neighbots: \n";
         // for(auto n: next_nodes)
         //     std::cout<<"( "<<n->cell.x<<", "<<n->cell.y<<")"<<std::endl;
@@ -194,8 +199,8 @@ robot_path_t search_for_path(pose_xyt_t start,
                 // std::cout<<"Already explored node "<<newx<<", "<<newy<<std::endl;
                 continue;
             }
-            // std::cout<<params.minDistanceToObstacle<<std::endl; // 0.1 from astar_test.cpp
-            if( !distances.isCellInGrid(newx, newy) || distances(newx, newy) < params.minDistanceToObstacle + 0.05){
+            // std::cout<<params.minDistanceToObstacle<<std::endl; // 0.1 from astar_test.cpp   // TODO : +0.05
+            if( !distances.isCellInGrid(newx, newy) || distances(newx, newy) < params.minDistanceToObstacle){
                 // std::cout<<"Out of boundary or too close \n";
                 continue;
             }
@@ -230,6 +235,8 @@ robot_path_t search_for_path(pose_xyt_t start,
 
     }
 
+
+
     // TODO: problem: Can't find goal (10000 iterations)
     if(success){
         std::vector<pose_xyt_t> pose_path = extract_path_pose(node_path, distances);
@@ -262,10 +269,21 @@ robot_path_t search_for_path(pose_xyt_t start,
             i++;
         }
     }
-    
+    else{
+        if(Openlist.empty()){
+            std::cout<<"Explore all free cell but NOT reach goal\n";
+        }
+    }
     // for(auto p : astar_path.path){
     //     std::cout<<"("<<p.x<<","<<p.y<<"): distance: "<< distances(p.x, p.y)<<"\n";
     // }
+
+
+    // delete Openlist, Closedlist;
+    // free(Openlist);
+    for(auto n: nodes_to_be_deleted){
+        delete n;
+    }
 
     return astar_path;
 }

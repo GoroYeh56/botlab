@@ -36,7 +36,7 @@ struct frontier_t
 */
 std::vector<frontier_t> find_map_frontiers(const OccupancyGrid& map, 
                                            const pose_xyt_t& robotPose,
-                                           double minFrontierLength = 0.35);
+                                           double minFrontierLength =0.1 /*0.35*/); // TODO : smaller
 
 
 /**

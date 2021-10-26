@@ -156,6 +156,8 @@ void Exploration::executeStateMachine(void)
                 break;
             case exploration_status_t::STATE_EXPLORING_MAP:
                 nextState = executeExploringMap(stateChanged);
+                if(nextState == exploration_status_t::STATE_FAILED_EXPLORATION)
+                    std::cout<<"Fail exploration from STATE_EXPLORING_MAP\n";
                 break;
                 
             case exploration_status_t::STATE_RETURNING_HOME:
@@ -250,13 +252,41 @@ int8_t Exploration::executeExploringMap(bool initialize)
     // from currentPose, run BFS expand (4 connect ) to find frontier_cell and grow_frontier cells
     
     //////////////// Robert Lai !!! ////////////////
+    float delay_time = 6000000; // 6 sec
     frontiers_ = find_map_frontiers(currentMap_, currentPose_);
-    if (currentPath_.path_length < 3 || utime_now() - most_recent_path_time > 1000) { //Too close to frontier Or 1000us update
+    if (currentPath_.path_length < 3 || utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
+        if(currentPath_.path_length < 3)
+            std::cout<<"cur path length <3. "<<currentPath_.path_length<<"\n";
+        else
+            std::cout<<"Too long. delta time: "<<utime_now() - most_recent_path_time<<" us\n";
         planner_.setMap(currentMap_);
         currentPath_ = plan_path_to_frontier(frontiers_, currentPose_, currentMap_, planner_);
+
+        //Reduce waypoints.
+        // std::vector<pose_xyt_t> tmpPath;
+
+        // for(int i=0; i<currentPath_.path_length; ++i){
+        //     if(i%2==1){
+        //         tmpPath.push_back(currentPath_.path[i]);
+        //     }
+        // }
+    
+        // robot_path_t tmpPath2;
+        // tmpPath2.path_length = tmpPath.size();
+        // tmpPath2.path.resize(tmpPath.size());
+        // int i=0;
+        // for(auto waypoint: tmpPath){
+        //     tmpPath2.utime = this->currentPose_.utime;
+        //     tmpPath2.path[i++].x = float(waypoint.x);
+        //     tmpPath2.path[i++].y = float(waypoint.y);
+        //     tmpPath2.path[i++].theta = 0.0;
+        // }
+        // this->currentPath_ = tmpPath2;
     }
     ///////////////////////////////////////////////
 
+    // Exploration Thread:  A* gets the wrong map
+    // The map planner use is not the same as botgui sees.
 
     // bool stateChanged = initialize;
     // // If change state: re find new map_frontiers
@@ -299,16 +329,21 @@ int8_t Exploration::executeExploringMap(bool initialize)
     // If no frontiers remain, then exploration is complete
     if(frontiers_.empty())
     {
+        std::cout<<"No frontiers. STATUS_COMPLETE_EXPLORATION. =>RETURNING_HOME...\n";
         status.status = exploration_status_t::STATUS_COMPLETE;
     }
     // Else if there's a path to follow, then we're still in the process of exploring
     else if(currentPath_.path.size() > 1)
     {
+        std::cout<<"currentPath.path.size()>1. len: "<<currentPath_.path.size()<<std::endl;
         status.status = exploration_status_t::STATUS_IN_PROGRESS;
     }
     // Otherwise, there are frontiers, but no valid path exists, so exploration has failed
     else
     {
+        // PROBLEM HERE!!!10/26
+        std::cout<<"Have valid goal(target_cell) but A* can't find path (return empty path)\n";
+        std::cout<<"We have frontiers but NO valid path\n";
         status.status = exploration_status_t::STATUS_FAILED;
     }
     
@@ -319,6 +354,7 @@ int8_t Exploration::executeExploringMap(bool initialize)
     {
         // Don't change states if we're still a work-in-progress
         case exploration_status_t::STATUS_IN_PROGRESS:
+            std::cout<<"executeExploringMap: we still has a path to follow...\n";
             return exploration_status_t::STATE_EXPLORING_MAP;
             
         // If exploration is completed, then head home
@@ -345,9 +381,12 @@ int8_t Exploration::executeReturningHome(bool initialize)
     *       (1) dist(currentPose_, targetPose_) < kReachedPositionThreshold  :  reached the home pose 0.05
     *       (2) currentPath_.path_length > 1  :  currently following a path to the home pose
     */
-    
-    this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
-    
+    std::cout<<"executeReturningHome: homePose_: "<<homePose_.x<<", "<<homePose_.y<<std::endl;
+    if(planner_.isValidGoal(pose_xyt_t{currentPose_.utime, (float)homePose_.x, (float)homePose_.y, 0}))
+        this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
+    else{
+        std::cout<<"homePose NOT valid goal.\n ";
+    }
     /////////////////////////////// End student code ///////////////////////////////
     
     /////////////////////////   Create the status message    //////////////////////////
