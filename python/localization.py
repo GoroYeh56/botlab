@@ -25,7 +25,8 @@ turn_command.angular_v = (3.1415/2)
 
 log = lcm.EventLog(sys.argv[1],"r")
 
-for event in log:
+while(True):
+    for event in log:
     if event.channel == "LIDAR":
         msg = lidar_t.decode(event.data)
         msg_num_ranges = msg.num_ranges
