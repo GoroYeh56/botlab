@@ -44,8 +44,8 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     double yPos = 0.0;
     double xLim = (double)map.widthInMeters();
     double yLim = (double)map.heightInMeters();
-    double xStep = kNumParticles_ /(xLim*yLim);
-    double yStep = kNumParticles_ / (xLim * yLim);
+    double xStep = (xLim*yLim)/ kNumParticles_;
+    double yStep = (xLim * yLim)/ kNumParticles_;
 
     for (auto& p : posterior_) {
         std::cout << "\nxPos: " << xPos << "  yPos: " << yPos;
