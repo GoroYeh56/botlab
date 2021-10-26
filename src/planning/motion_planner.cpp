@@ -32,7 +32,7 @@ robot_path_t MotionPlanner::planPath(const pose_xyt_t& start,
         failedPath.path_length = 1;
         failedPath.path.push_back(start);
 
-        std::cout << "INFO: path rejected due to invalid goal\n";        
+        std::cout << "INFO: path rejected due to invalid goal.\n";        
 
         return failedPath;
     }
@@ -57,16 +57,22 @@ bool MotionPlanner::isValidGoal(const pose_xyt_t& goal) const
     if(num_frontiers != 1 && distanceFromPrev < 2 * searchParams_.minDistanceToObstacle) return false;
 
     auto goalCell = global_position_to_grid_cell(Point<double>(goal.x, goal.y), distances_);
-
+    // std::cout<<"In isValidGoal\n";
     // A valid goal is in the grid
     if(distances_.isCellInGrid(goalCell.x, goalCell.y))
     {
         // And is far enough from obstacles that the robot can physically occupy the space
         // Add an extra cell to account for discretization error and make motion a little safer by not trying to
         // completely snuggle up against the walls in the motion plan
+        if(distances_(goalCell.x, goalCell.y) > params_.robotRadius){
+            std::cout<<"Valid goal. distance: "<<distances_(goalCell.x, goalCell.y)<<"\n";
+        }
+        else{
+            std::cout<<"Invalid goal. distance: "<<distances_(goalCell.x, goalCell.y)<<"\n";            
+        }
         return distances_(goalCell.x, goalCell.y) > params_.robotRadius; 
     }
-    
+    // std::cout<<"Goal cell "<< goalCell.x <<", "<< goalCell.y <<" not in grid\n";      
     // A goal must be in the map for the robot to reach it
     return false;
 }

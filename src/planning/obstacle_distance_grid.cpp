@@ -46,7 +46,7 @@ void ObstacleDistanceGrid::setDistances(const OccupancyGrid& map)
         }
 
         // all zero : test_filled 
-        // set flat : empty_path to (invalid goal)
+        // all -1 : empty_path to (invalid goal)
         if(all_negative_one){
             // all -1 : free => overwrite to 10
             int width = map.widthInCells(); // number of cells for "width" (how many cells in horizontal direction of the map)

@@ -4,8 +4,10 @@
 #include <slam/occupancy_grid.hpp>
 #include <lcmtypes/robot_path_t.hpp>
 #include <queue>
+#include <stack>
 #include <set>
 #include <cassert>
+// #include <bits/stdc+.h>
 
 
 bool is_frontier_cell(int x, int y, const OccupancyGrid& map);
@@ -35,7 +37,7 @@ std::vector<frontier_t> find_map_frontiers(const OccupancyGrid& map,
     */
     std::vector<frontier_t> frontiers;
     std::set<Point<int>> visitedCells;
-    
+    // Start from the robot current position(cell)
     Point<int> robotCell = global_position_to_grid_cell(Point<float>(robotPose.x, robotPose.y), map);
     std::queue<Point<int>> cellQueue;
     cellQueue.push(robotCell);
@@ -85,6 +87,52 @@ std::vector<frontier_t> find_map_frontiers(const OccupancyGrid& map,
     return frontiers;
 }
 
+pose_xyt_t nearest_navigable_cell(pose_xyt_t pose, 
+                                  Point<float> desiredPosition, 
+                                  const OccupancyGrid& map,
+                                  const MotionPlanner& planner)
+{
+    pose_xyt_t navigable_cell;
+
+    return navigable_cell;
+
+}
+
+pose_xyt_t search_to_nearest_free_space(Point<float> position, const OccupancyGrid& map, const MotionPlanner& planner)
+{
+    /*The cells along the frontier might not be in the configuration space of the robot, so you won't necessarily
+           be able to drive straight to a frontier cell, but will need to drive somewhere close*/
+
+    pose_xyt_t free_space;
+
+    // current frontier.cells[mid] : position (float x, float y)
+    // map  ( isCellinMap)
+    // planner: minD
+    // float radius = planner.Searchparams_.minDistanceToObstacle; // 0.2
+    float radius = 0.2;
+
+    // expand 4 directions:
+    int dx[4] = {0, 0, 1, -1};
+    int dy[4] = {1, -1, 0, 0};
+    for(int i=0; i<4; i++){
+
+        int newx = position.x + dx[i];
+        int newy = position.y + dy[i];
+        if(map.isCellInGrid(newx, newy)){
+            
+            free_space.x = newx;
+            free_space.y = newy;
+            break;
+        }
+    }
+
+
+
+
+    return free_space;
+
+}
+
 
 robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers, 
                                    const pose_xyt_t& robotPose,
@@ -99,15 +147,168 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
     *   - The cells along the frontier might not be in the configuration space of the robot, so you won't necessarily
     *       be able to drive straight to a frontier cell, but will need to drive somewhere close.
     */
-    robot_path_t emptyPath;
+    robot_path_t Path;
+    // pose_xyt_t start = robotPose;
+    // pose_xyt_t goal;
+
+    // TODO
+    // self-define compare function for priority_queue
+    auto eucDistance = [robotPose](Point<double> a, Point<double> b) {
+        return sqrt((a.x - robotPose.x)*(a.x-robotPose.x) + (a.y-robotPose.y)*(a.y-robotPose.y))
+                > sqrt((b.x - robotPose.x)*(b.x-robotPose.x) + (b.y-robotPose.y)*(b.y-robotPose.y));
+    };
+    // Priority queue : push all frontier's cells and search for a nearest free cell 
+    std::priority_queue< Point<double>, std::vector<Point<double>>, decltype(eucDistance)> pq(eucDistance);
+
+    // Push all cells into pq
+    for(int i=0; i< frontiers.size(); ++i){
+        for(int j=0; j<frontiers[i].cells.size(); ++j){
+            pq.push(frontiers[i].cells[j]);
+        }
+    }
+
+    // update ObstacleDistanceGrid (setDistance)
+    // planner.setMap(map);
+    // planner.setMap(map);
+
+    // Use pq to pop one cell at a time, then
+    // use DFS to explore 4 direction from that cell to find a FREE cell 
+    // that is the nearest to the robot current position
+    static bool testOnce = false;
+
+    bool foundPath = false;
+    Point<int> target_cell; 
+
+    int debug_cnt = 10;
+    int it = 0;
+
+    std::cout<<"PQ size: # frontiers cells: "<<pq.size()<<std::endl; // 5217
+    std::cout<<"logOdds(108,107) "<<(int)map.logOdds(108,107)<<std::endl;
+    std::cout<<"logOdds(115,104) "<<(int)map.logOdds(115,104)<<std::endl;
+      
+    while(!pq.empty() && !foundPath ){
+        it++;
+        // if(it>=debug_cnt){
+        //     std::cout<<"Iterate through "<<debug_cnt<<" frontier cells. Break\n";
+        //     break;
+        // }
+
+        Point<int> cur_cell = global_position_to_grid_cell(pq.top(), map);
+        std::cout<<"Current frontier cell: "<<cur_cell.x<<", "<<cur_cell.y<<std::endl;
+        // a stack for cells
+        std::stack<Point<int>> stk;
+        stk.push(cur_cell); // Point<int> (x,y)
+
+        std::set<Point<int>> visited;
+        bool foundFreeCell = false; // if found : break and return A* path
+        
+        while(!stk.empty() && !foundFreeCell){
+
+            Point<int> cur = stk.top();
+            std::cout<<"cur free cell in stack: "<<cur.x<<", "<<cur.y;
+
+            if(planner.obstacleDistances().isCellInGrid(cur.x, cur.y))
+                std::cout<<"distance:"<<planner.obstacleDistances()(cur.x, cur.y)<<"\n";
+            else
+                std::cout<<"\n";
+
+            Point<double> cur_global = grid_position_to_global_position(cur, map);
+            stk.pop();
+
+
+            // TODO: If goal is "too close to our self , Cannot!!" 
+            
+            if(abs(cur.x-robotPose.x)>=3 && abs(cur.y-robotPose.y)>=3 && (int)map.logOdds(cur.x, cur.y) <0  && planner.isValidGoal(pose_xyt_t{robotPose.utime, (float)cur_global.x, (float)cur_global.y, 0})){
+                foundFreeCell = true;
+                target_cell = cur; // Point<int>
+            }
+            else{
+                int step_size = 5; // PARAMETERS TO BE TUNED
+                // DFS 4 directions to push cells into stack
+                int dx[4] = {0, 0, 1, -1};
+                int dy[4] = {1, -1, 0, 0};
+                for(int k=0; k<4; ++k){
+                    int next_x = cur.x + dx[k]*step_size;
+                    int next_y = cur.y + dy[k]*step_size;
+                    if((int)map.isCellInGrid(next_x, next_y))
+                        std::cout<<"next x "<<next_x<<", y "<<next_y<<", odds: "<<(int)map.logOdds(next_x, next_y)<<"\n";
+                    else{
+                        std::cout<<"next x "<<next_x<<", y "<<next_y<<", NOT in map. Out of boundary.\n";
+                    }
+
+                    if( visited.find(Point<int>(next_x, next_y) ) !=visited.end()){
+                        std::cout<<"Already visit "<<next_x<<", "<<next_y<<"\n";
+                        continue;
+                    }
+
+                    if(!map.isCellInGrid(next_x, next_y)){
+                        std::cout<<"Not in map "<<next_x<<", "<<next_y<<"\n";
+                        continue;
+                    }
+                    if( visited.find(Point<int>(next_x, next_y) )==visited.end() && map.isCellInGrid(next_x, next_y) && (int)map.logOdds(next_x, next_y) < 0){
+                        std::cout<<"Push left free cell: "<<cur.x-step_size<<", "<<cur.y<<" dis: "<<planner.obstacleDistances()(next_x, next_y)<<std::endl;
+                        stk.push(Point<int>(next_x, next_y));
+                        visited.insert(Point<int>(next_x, next_y));
+                    }
+                    // if( visited.find(Point<int>(cur.x, cur.y-step_size))==visited.end() && planner.obstacleDistances().isCellInGrid(cur.x, cur.y-step_size) && map.logOdds(cur.x, cur.y-step_size) < 0){                   
+                    //     std::cout<<"Push down free cell: "<<cur.x<<", "<<cur.y-step_size<<" dis: "<<planner.obstacleDistances()(cur.x,cur.y-step_size)<<std::endl;
+                    //     stk.push(Point<int>(cur.x, cur.y-step_size));
+                    //     visited.insert(Point<int>(cur.x, cur.y-step_size));
+                    // }
+                    // if( visited.find(Point<int>(cur.x+step_size, cur.y))==visited.end() && planner.obstacleDistances().isCellInGrid(cur.x+step_size, cur.y) && map.logOdds(cur.x+step_size, cur.y) < 0){                  
+                    //     std::cout<<"Push right free cell: "<<cur.x+step_size<<", "<<cur.y<<" dis: "<<planner.obstacleDistances()(cur.x+step_size,cur.y)<<std::endl;
+                    //     stk.push(Point<int>(cur.x+step_size, cur.y));
+                    //     visited.insert(Point<int>(cur.x+step_size, cur.y));
+                    // }
+                    // if( visited.find(Point<int>(cur.x, cur.y+step_size))==visited.end() && planner.obstacleDistances().isCellInGrid(cur.x, cur.y+step_size) && map.logOdds(cur.x, cur.y+step_size) < 0){                
+                    //     std::cout<<"Push up free cell: "<<cur.x<<", "<<cur.y+step_size<<" dis: "<<planner.obstacleDistances()(cur.x,cur.y+step_size)<<std::endl;
+                    //     stk.push(Point<int>(cur.x, cur.y+step_size));
+                    //     visited.insert(Point<int>(cur.x, cur.y+step_size));
+                    // }
+                }
+            }             
+        }
+        // Found chosen target_cell
+        if(foundFreeCell)
+            std::cout<<"Found target cell: "<<target_cell.x<<", "<<target_cell.y<<std::endl;
+        else
+            std::cout<<"Stack empty. DFS failed, no target cell\n";
+        // while(1);
+        pq.pop();
+        Point<double> target_cell_global = grid_position_to_global_position(target_cell, map);
+        Path = planner.planPath(robotPose, pose_xyt_t{robotPose.utime, (float)target_cell_global.x, (float)target_cell_global.y, 0});
+        if(Path.path_length >1 ) foundPath = true;
+    }
+
     
-    return emptyPath;
+
+
+    // for(int i=0; i<frontiers.size(); i++){
+    //     // Pick one fronter and pick the center of its "cells" (vector<Point<float>>)
+    //     frontier_t f = frontiers[i];
+    //     Point<float> frontier_mid_cell = f.cells[f.cells.size()/2];
+    //     // Calculate its nearest free cell (pose_xyt_t) using search_to_nearest_free_space
+    //     pose_xyt_t nearest_free_cell = search_to_nearest_free_space(frontier_mid_cell, map, planner); // params.minDistanceTo...
+    //     goal = nearest_free_cell;
+    //     Path = planner.planPath(start, goal);
+    //     if(!Path.path.empty()) break;
+    //     else continue;
+    // }   
+    // std::cout<<"Enter while(1) loop...\n";
+    // while(1);
+    if(foundPath) return Path;
+    else{
+        std::cout<<"Fail to find a path to target_cell: "<<target_cell.x<<", "<<target_cell.y<<"\n";
+    }
+    return Path;
+    // TODO : If all empty: means we've explored the whole environment
+
 }
 
-
+// 1. It is in the map 2. its log odds is zero 3. its neighbor is free
 bool is_frontier_cell(int x, int y, const OccupancyGrid& map)
 {
-    // A cell if a frontier if it has log-odds 0 and a neighbor has log-odds < 0
+    // A cell if a frontier if it has log-odds 0 and a neighbor has log-odds < 0 (its neighbor is a free cell)
     
     // A cell must be in the grid and must have log-odds 0 to even be considered as a frontier
     if(!map.isCellInGrid(x, y) || (map(x, y) != 0))

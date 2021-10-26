@@ -60,7 +60,7 @@ bool Exploration::exploreEnvironment()
         // If data is ready, then run an update of the exploration routine
         if(isReadyToUpdate())
         {
-            runExploration();
+            runExploration(); // copyDataforUpdate to update Map & Pose
         }
         // Otherwise wait a bit for data to arrive
         else
@@ -95,7 +95,7 @@ void Exploration::handleConfirmation(const lcm::ReceiveBuffer* rbuf, const std::
     std::lock_guard<std::mutex> autoLock(dataLock_);
     if(confirm->channel == CONTROLLER_PATH_CHANNEL && confirm->creation_time == most_recent_path_time) pathReceived_ = true;
 }
-
+// if lcm pass new map and pose channel
 bool Exploration::isReadyToUpdate(void)
 {
     std::lock_guard<std::mutex> autoLock(dataLock_);
@@ -107,7 +107,7 @@ void Exploration::runExploration(void)
 {
     assert(isReadyToUpdate());
     
-    copyDataForUpdate();
+    copyDataForUpdate();  // update currentMap_ & currentPose_
     executeStateMachine();
 }
 
@@ -152,7 +152,7 @@ void Exploration::executeStateMachine(void)
         switch(state_)
         {
             case exploration_status_t::STATE_INITIALIZING:
-                nextState = executeInitializing();
+                nextState = executeInitializing(); // nextState = exploring_map
                 break;
             case exploration_status_t::STATE_EXPLORING_MAP:
                 nextState = executeExploringMap(stateChanged);
@@ -243,7 +243,51 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *           explored more of the map.
     *       -- You will likely be able to see the frontier before actually reaching the end of the path leading to it.
     */
+    double minFrontierLength = 1;
+
+    // When to select a new frontier (of cells) to explore
+    // 1. front 
+    // from currentPose, run BFS expand (4 connect ) to find frontier_cell and grow_frontier cells
     
+    //////////////// Robert Lai !!! ////////////////
+    frontiers_ = find_map_frontiers(currentMap_, currentPose_);
+    if (currentPath_.path_length < 3 || utime_now() - most_recent_path_time > 1000) { //Too close to frontier Or 1000us update
+        planner_.setMap(currentMap_);
+        currentPath_ = plan_path_to_frontier(frontiers_, currentPose_, currentMap_, planner_);
+    }
+    ///////////////////////////////////////////////
+
+
+    // bool stateChanged = initialize;
+    // // If change state: re find new map_frontiers
+
+    // // if there is still frontier points: we should keep exploreing
+    // if(stateChanged){
+    //     std::cout<<"frontiers:\n";
+    // // Use a flag(goal threshold) to determine whether we're still heading to the current exploring goal (frontier point)
+    //     // Use a priority_queue (priority: distance from robot to frontier)
+        // planner_.setMap(currentMap_);
+        // this->frontiers_ = find_map_frontiers(this->currentMap_, 
+        //                                     this->currentPose_,
+        //                                     minFrontierLength);
+        // if(this->frontiers_.empty()){
+        //     std::cout<<"Empty frontiers!\n";
+
+        // }
+        // else{
+        //     std::cout<<"Frontiers:\n";
+        //     for(int i=0; i<this->frontiers_.size(); i++){
+        //         std::cout<<frontiers_[i].cells[0];
+        //     }
+        //     std::cout<<std::endl;            
+                                                
+        //     this->currentPath_ = plan_path_to_frontier(this->frontiers_, 
+        //                                 this->currentPose_,
+        //                                 currentMap_,
+        //                                 planner_);
+        // }
+    // }
+
     /////////////////////////////// End student code ///////////////////////////////
     
     /////////////////////////   Create the status message    //////////////////////////
@@ -298,12 +342,12 @@ int8_t Exploration::executeReturningHome(bool initialize)
     /*
     * NOTES:
     *   - At the end of each iteration, then (1) or (2) must hold, otherwise exploration is considered to have failed:
-    *       (1) dist(currentPose_, targetPose_) < kReachedPositionThreshold  :  reached the home pose
+    *       (1) dist(currentPose_, targetPose_) < kReachedPositionThreshold  :  reached the home pose 0.05
     *       (2) currentPath_.path_length > 1  :  currently following a path to the home pose
     */
     
-
-
+    this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
+    
     /////////////////////////////// End student code ///////////////////////////////
     
     /////////////////////////   Create the status message    //////////////////////////

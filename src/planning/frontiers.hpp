@@ -53,6 +53,6 @@ std::vector<frontier_t> find_map_frontiers(const OccupancyGrid& map,
 robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers, 
                                    const pose_xyt_t& robotPose,
                                    const OccupancyGrid& map,
-                                   const MotionPlanner& planner);
+                                   const MotionPlanner& planner) ;
 
 #endif // PLANNING_FRONTIERS_HPP

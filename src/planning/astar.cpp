@@ -16,16 +16,16 @@ double g_cost(Node* from, Node* to, const ObstacleDistanceGrid& distances, const
     // TODO: use params and distances?
     double dx = to->cell.x - from->cell.x;
     double dy = to->cell.y - from->cell.y;
-    double delta_g = sqrt(pow(dx,2) + pow(dy, 2));
+    double delta_g = sqrt(pow(abs(dx),2) + pow(abs(dy), 2));
 
     double cellDistance = distances(to->cell.x, to->cell.y);
-    double grid_to_obs_cost = pow(params.maxDistanceWithCost - cellDistance, params.distanceCostExponent);
+    double grid_to_obs_cost = pow(abs(params.maxDistanceWithCost - cellDistance), params.distanceCostExponent);
     // if(cellDistance > params.maxDistanceWithCost){
-    // if(true){
-        // return from->g_cost + delta_g;
-    // }
+    if(true){
+        return from->g_cost + delta_g;
+    }
     // else{
-        return from->g_cost + delta_g + grid_to_obs_cost;
+        // return from->g_cost + delta_g + grid_to_obs_cost;
     // }
 }
 
@@ -34,12 +34,13 @@ std::vector<Node*> expand_node(Node* node, const ObstacleDistanceGrid& distances
 
     // TODO : 4-connect or 8-connect
     std::vector<Node*> neighbors;
-    int dirs[5] = {0, 1, 0, -1, 0};
-    for(int i=0; i<4; ++i){
-        double next_x = node->cell.x + dirs[i];
-        double next_y = node->cell.y + dirs[i+1];
+    int dirxs[8] = {1, -1, 0, 0, 1, -1, 1, -1};
+    int dirys[8] = {0, 0, 1, -1, 1, 1, -1, -1};
+    for(int i=0; i<8; ++i){
+        double next_x = node->cell.x + dirxs[i];
+        double next_y = node->cell.y + dirys[i];
         // if not obstacles
-        if( distances.isCellInGrid(next_x, next_y) && distances(next_x, next_y) > params.minDistanceToObstacle ){
+        if( distances.isCellInGrid(next_x, next_y) && distances(next_x, next_y) >= params.minDistanceToObstacle ){
             // std::cout<<"dis to obs: "<<distances(next_x, next_y)<<std::endl;
             Node* next_node = new Node(next_x, next_y);
             neighbors.push_back(next_node); //      push neighbor Node* into the neighbors vector
@@ -58,10 +59,10 @@ std::vector<Node* > extract_path(Node* node)          // Backtracing from goal t
     }
     // std::vector<Node*> ans(path.rbegin(), path.rend())
     
-    printf("======= Path ==========\n");
-    for(auto n: path){
-        std::cout<< "( "<< n->cell.x<<", "<<n->cell.y<<" )"<<std::endl;
-    }
+    // printf("======= Path ==========\n");
+    // for(auto n: path){
+    //     std::cout<< "( "<< n->cell.x<<", "<<n->cell.y<<" )"<<std::endl;
+    // }
     return path;
 
 }
@@ -82,10 +83,7 @@ std::vector<pose_xyt_t> extract_path_pose(std::vector<Node*> path, const Obstacl
 }
 
 
-// void push(PriorityQueue Openlist, Node* node){
-//     Openlist.Q.push(node);
-//     Openlist.elements.push_back(node);
-// }
+
 
 ///////////////// A* here ///////////////////
 robot_path_t search_for_path(pose_xyt_t start, 
@@ -134,26 +132,40 @@ robot_path_t search_for_path(pose_xyt_t start,
     std::cout<<"Goal : "<<goal_node->cell.x<<", "<<goal_node->cell.y<<std::endl;    // (5, 0)
 
     int id = 0;
+    int BREAKING_ITERS = 1000000;
+    // for(int i=0; i<1; i++){
+    //     std::cout<<"distance(151,y): "<<distances(150,52)<<"\n";
+    // }
+
     while(!Openlist.empty()){
         id++;
 
-        if(id >= 500) break;
+        if(id >= BREAKING_ITERS) break;
 
-        #ifdef DEBUG
+        // #ifdef DEBUG
+        if(id% 100000 ==0){
             std::cout<<"\nIteration: "<<id<<std::endl;
-        #endif
+        }
+        // #endif
         // std::cout<<"Openlist:\n";
         // Openlist.print();
         Node* cur = Openlist.pop();
+        // std::priority_queue<Node*, std::vector<Node*>, CompareNode> Q2 = Openlist.Q;
+        // while(!Q2.empty()){
+        //     Node* node = Q2.top();
+        //     Q2.pop();
+        //     std::cout<<"\tdistance: "<<distances(node->cell.x, node->cell.y)<<" f: "<<node->f_cost() <<", h: "<<node->h_cost <<", g: "<<node->g_cost<<" (" <<node->cell.x<<", "<<node->cell.y<<")\n";
+        // }
+
         // Closedlist.push(cur);
-        #ifdef DEBUG
-            std::cout<<"Current node: " << cur->cell.x <<", "<<cur->cell.y<< " f: "<< cur->f_cost()<<" g: "<< cur->g_cost<<" h: "<< cur->h_cost<< std::endl;
-        #endif
+        // #ifdef DEBUG
+            // std::cout<<"Current node: " << cur->cell.x <<", "<<cur->cell.y<< " f: "<< cur->f_cost()<<" g: "<< cur->g_cost<<" h: "<< cur->h_cost<< std::endl;
+        // #endif
         // std::cout<<"Closedlist: "<<std::endl;
         // Closedlist.print();
    
         if(cur->cell.x == goal_node->cell.x && cur->cell.y == goal_node->cell.y){
-            std::cout<<"A start success! Find path and break while loop.\n";
+            std::cout<<"A* success! Find path and break while loop.\n";
             node_path =  extract_path(cur); // extract path from this node
             success = true;
             break; 
@@ -182,12 +194,11 @@ robot_path_t search_for_path(pose_xyt_t start,
                 // std::cout<<"Already explored node "<<newx<<", "<<newy<<std::endl;
                 continue;
             }
-
-            if( !distances.isCellInGrid(newx, newy)|| distances(newx, newy)< params.minDistanceToObstacle){
-                std::cout<<"Out of boundary or too close \n";
+            // std::cout<<params.minDistanceToObstacle<<std::endl; // 0.1 from astar_test.cpp
+            if( !distances.isCellInGrid(newx, newy) || distances(newx, newy) < params.minDistanceToObstacle + 0.05){
+                // std::cout<<"Out of boundary or too close \n";
                 continue;
             }
-
 
             // // Whether to change parent?
             // Calculate g for this next_node
@@ -224,16 +235,24 @@ robot_path_t search_for_path(pose_xyt_t start,
         std::vector<pose_xyt_t> pose_path = extract_path_pose(node_path, distances);
         astar_path.path_length = pose_path.size();
         astar_path.path.resize(astar_path.path_length);
+        // std::cout<<"size of path: "<<node_path.size()<<"\n";
+        #ifdef DEBUG
+        for(auto p : node_path){
+            std::cout<<"("<<p->cell.x<<","<<p->cell.y<<"): distance: "<< distances(p->cell.x, p->cell.y)<<"\n";
+        }
+        #endif
         // std::cout<<"path length: "<<astar_path.path_length<<std::endl;
         // while(1);
         // robot_path_t path;
         // pose_xyt_t path[path_length];
         int i=0; // start index
+        // std::cout<<"size of path: "<<pose_path.size()<<"\n";
         for(auto pose : pose_path){ // pose_xyt_t;
             // std::cout<<"i: "<<i<<std::endl;
             Point<double> posep;
             posep.x = pose.x;
             posep.y = pose.y;
+            
             Point<double> global_pose =  grid_position_to_global_position(posep, distances);
             // pose_xyt_t p;
             astar_path.path[i].utime = start.utime; //TODO  now
@@ -245,7 +264,7 @@ robot_path_t search_for_path(pose_xyt_t start,
     }
     
     // for(auto p : astar_path.path){
-    //     std::cout<<"("<<p.x<<","<<p.y<<")\n";
+    //     std::cout<<"("<<p.x<<","<<p.y<<"): distance: "<< distances(p.x, p.y)<<"\n";
     // }
 
     return astar_path;
