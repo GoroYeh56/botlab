@@ -20,12 +20,13 @@ OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
 , waitingForOptitrack_(waitForOptitrack)
 , haveMap_(false)
 , numIgnoredScans_(0)
-, filter_(numParticles,uniformDistribution)
+, filter_(numParticles)
 , map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
 , mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
 , lcm_(lcmComm)
 , mapUpdateCount_(0)
 {
+    this->uniformDistribution_ = uniformDistribution;
     // Confirm that the mode is valid -- mapping-only and localization-only are not specified
     assert(!(mappingOnlyMode && localizationOnlyMap.length() > 0));
     
@@ -245,8 +246,13 @@ void OccupancyGridSLAM::initializePosesIfNeeded(void)
         currentPose_ = previousPose_;
         currentPose_.utime  = currentScan_.times.back();
         haveInitializedPoses_ = true;
+        if (this->uniformDistribution) {
+            filter_.initializeFilterUniformly(previousPose_, this->map_);
+        }
+        else {
+            filter_.initializeFilterAtPose(previousPose_);
+        }
         
-        filter_.initializeFilterAtPose(previousPose_);
     }
     
     assert(haveInitializedPoses_);

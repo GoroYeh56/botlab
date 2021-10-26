@@ -54,7 +54,8 @@ int main(int argc, char** argv)
                            useOptitrack, 
                            mappingOnly,
                            actionOnly,
-                           localizationMap);
+                           localizationMap,
+                           uniformParticles);
     
     std::thread slamThread([&slam]() {
         slam.runSLAM();

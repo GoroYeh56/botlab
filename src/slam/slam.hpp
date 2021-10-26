@@ -95,6 +95,7 @@ private:
     ParticleFilter filter_;
     OccupancyGrid map_;
     Mapping mapper_;
+    bool uniformDistribution_;
     
     lcm::LCM& lcm_;
     int mapUpdateCount_;  // count so we only send the map occasionally, as it takes lots of bandwidth
