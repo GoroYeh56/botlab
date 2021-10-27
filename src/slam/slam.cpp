@@ -274,7 +274,8 @@ void OccupancyGridSLAM::updateLocalization(void)
         }
         
         auto particles = filter_.particles();
-        auto distance = filter_.averageParticleDistanceFromMean();
+        distance_t distance;
+        distance.distance = filter_.averageParticleDistanceFromMean();
 
         lcm_.publish(SLAM_POSE_CHANNEL, &currentPose_);
         lcm_.publish(SLAM_PARTICLES_CHANNEL, &particles);
