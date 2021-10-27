@@ -147,6 +147,8 @@ public:
     */
     ObstacleDistanceGrid obstacleDistances(void) const { return distances_; }
 
+    pose_xyt_t getPrevGoal(void) const{return prev_goal;}
+
 private:
     
     ObstacleDistanceGrid distances_;

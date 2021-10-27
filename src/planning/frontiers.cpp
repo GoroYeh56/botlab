@@ -224,11 +224,11 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
                 target_cell = cur; // Point<int>
             }
             else{
-                int step_size = 3; // PARAMETERS TO BE TUNED
+                int step_size = 2; // PARAMETERS TO BE TUNED
                 // DFS 4 directions to push cells into stack
-                int dx[4] = {0, 0, 1, -1};
-                int dy[4] = {1, -1, 0, 0};
-                for(int k=0; k<4; ++k){
+                int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
+                int dy[8] = {1, -1, 0, 0, 1, -1, 1, -1};
+                for(int k=0; k< 8; ++k){
                     int next_x = cur.x + dx[k]*step_size;
                     int next_y = cur.y + dy[k]*step_size;
                     // if((int)map.isCellInGrid(next_x, next_y))

@@ -59,10 +59,10 @@ std::vector<Node* > extract_path(Node* node)          // Backtracing from goal t
     }
     // std::vector<Node*> ans(path.rbegin(), path.rend())
     
-    // printf("======= Path ==========\n");
-    // for(auto n: path){
-    //     std::cout<< "( "<< n->cell.x<<", "<<n->cell.y<<" )"<<std::endl;
-    // }
+    printf("======= Path ==========\n");
+    for(auto n: path){
+        std::cout<< "( "<< n->cell.x<<", "<<n->cell.y<<" )"<<std::endl;
+    }
     return path;
 
 }

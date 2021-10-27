@@ -67,7 +67,7 @@ public:
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
     {
-        return ((fabs(pose.x - target.x) < 0.1) && (fabs(pose.y - target.y)  < DRIVE_CRITERIA));
+        return ((fabs(pose.x - target.x) < DRIVE_CRITERIA) && (fabs(pose.y - target.y)  < DRIVE_CRITERIA));
     }
     virtual bool target_reached2(const pose_xyt_t& pose, const float& target_theta)  override
     {
