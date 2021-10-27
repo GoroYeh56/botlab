@@ -78,6 +78,8 @@ public:
     * particles retrieves the posterior set of particles being used by the algorithm.
     */
     particles_t particles(void) const;
+
+    double averageParticleDistanceFromMean(void);
     
 private:
     

@@ -1,0 +1,3 @@
+struct distance_t {     
+    double distance;
+    }

@@ -281,3 +281,23 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
 
     return pose;
 }
+
+
+double ParticleFilter::averageParticleDistanceFromMean() {
+    pose_xyt_t meanPose = this->estimatePosteriorPose(this->posterior_);
+    double xMean = meanPose.x;
+    double yMean = meanPose.y;
+    double totalDistance = 0.0;
+
+    for (auto& p : this->posterior_){
+
+        double dx = std::abs(p.pose.x - xMean);
+        double dy = std::abs(p.pose.y - yMean);
+
+        totalDistance += std::sqrt(dx * dx + dy * dy);
+
+    }
+
+    return totalDistance / this->posterior_.size();
+
+}
