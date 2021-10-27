@@ -255,7 +255,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
             return lhs.weight < rhs.weight;
         });
     double threshold = 0.8;
-    std::vector<particle_t> posterior_sorted_cut(posterior_sorted.begin(), posterior_sorted.begin() - threshold * posterior_sorted.size());
+    std::vector<particle_t> posterior_sorted_cut(posterior_sorted.begin(), posterior_sorted.begin() + threshold * posterior_sorted.size());
     
     double sumWeights = 0.0;
     for (auto p : posterior_sorted_cut) {
