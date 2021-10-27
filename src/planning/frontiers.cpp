@@ -197,7 +197,8 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
         Point<int> cur_cell = global_position_to_grid_cell(pq.top(), map);
         std::cout<<"Current frontier cell: "<<cur_cell.x<<", "<<cur_cell.y<<std::endl;
         // a stack for cells
-        std::stack<Point<int>> stk;
+        // std::stack<Point<int>> stk;
+        std::queue<Point<int>> stk;
         stk.push(cur_cell); // Point<int> (x,y)
 
         std::set<Point<int>> visited;
@@ -205,7 +206,9 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
         
         while(!stk.empty() && !foundFreeCell){
 
-            Point<int> cur = stk.top();
+            // Point<int> cur = stk.top();
+            Point<int> cur = stk.front();
+            
             // std::cout<<"cur free cell in stack: "<<cur.x<<", "<<cur.y;
 
             // if(planner.obstacleDistances().isCellInGrid(cur.x, cur.y))
@@ -226,9 +229,11 @@ robot_path_t plan_path_to_frontier(const std::vector<frontier_t>& frontiers,
             else{
                 int step_size = 2; // PARAMETERS TO BE TUNED
                 // DFS 4 directions to push cells into stack
-                int dx[8] = {0, 0, 1, -1, 1, 1, -1, -1};
-                int dy[8] = {1, -1, 0, 0, 1, -1, 1, -1};
-                for(int k=0; k< 8; ++k){
+                // int dx[8] = {0,  0, 1, 1,  1, -1, -1, -1};
+                // int dy[8] = {1, -1, 0, 1, -1, -1,  0,  1};
+                int dx[4] = {0,  0, 1, -1};
+                int dy[4] = {1, -1, 0, 0};                
+                for(int k=0; k< 4; ++k){
                     int next_x = cur.x + dx[k]*step_size;
                     int next_y = cur.y + dy[k]*step_size;
                     // if((int)map.isCellInGrid(next_x, next_y))

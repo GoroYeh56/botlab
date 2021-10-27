@@ -13,7 +13,7 @@
 #include <deque>
 #include <mutex>
 
-#define MAPPING_UPDATE_PERIOD 5
+#define MAPPING_UPDATE_PERIOD 4
 
 /**
 * OccupancyGridSLAM runs on a thread and handles mapping.

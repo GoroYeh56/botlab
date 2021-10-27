@@ -169,14 +169,14 @@ public:
             {
                 if(straight_controller.target_reached(pose, target))
                 {
-                    cmd.trans_v = 0;
-                    cmd.angular_v = 0;
-                    printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
-                    if(!assignNextTarget())
-                    {
-                        std::cout << "\rTarget Reached!\n";
-                    }
-                    // state_ = TURN2;
+                    // cmd.trans_v = 0;
+                    // cmd.angular_v = 0;
+                    // printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
+                    // if(!assignNextTarget())
+                    // {
+                    //     std::cout << "\rTarget Reached!\n";
+                    // }
+                    state_ = TURN2;
                 }
                 else
                 { 
@@ -357,10 +357,10 @@ int main(int argc, char** argv)
     Ktheta = (speed_mode==0)?0.5 : 2.2;
 
     cout<<"Speed mode: "<< mode<<endl;
-    MAX_FWD_VEL = (speed_mode==0)? 0.2 : 0.8;
-    MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;
-    // MAX_FWD_VEL = (speed_mode==0)? 0.2 : 1;
+    // MAX_FWD_VEL = (speed_mode==0)? 0.2 : 0.8;
     // MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;
+    MAX_FWD_VEL = (speed_mode==0)? 0.2 : 1;
+    MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;
     while(true)
     {
         lcmInstance.handleTimeout(50);  // update at 20Hz minimum

@@ -245,7 +245,7 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *           explored more of the map.
     *       -- You will likely be able to see the frontier before actually reaching the end of the path leading to it.
     */
-    double minFrontierLength = 1;
+    double minFrontierLength = 0.15; // 0.05 * 3 = 
 
     // When to select a new frontier (of cells) to explore
     // 1. front 
@@ -253,8 +253,8 @@ int8_t Exploration::executeExploringMap(bool initialize)
     
     //////////////// Robert Lai !!! ////////////////
     float delay_time = 6000000; // 6 sec
-    frontiers_ = find_map_frontiers(currentMap_, currentPose_);
-    if (currentPath_.path_length < 2 || utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
+    frontiers_ = find_map_frontiers(currentMap_, currentPose_, minFrontierLength );
+    if (currentPath_.path.size()< 2 || utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
         if(currentPath_.path_length < 2)
             std::cout<<"cur path length <2. "<<currentPath_.path_length<<"\n";
         else
@@ -269,7 +269,7 @@ int8_t Exploration::executeExploringMap(bool initialize)
         // pose_xyt_t path[path_length];
         
         //Reduce waypoints.
-        if(currentPath_.path_length > 5){
+        if(currentPath_.path.size() > 5){
 
             std::vector<pose_xyt_t> tmpPath;
 
@@ -286,12 +286,33 @@ int8_t Exploration::executeExploringMap(bool initialize)
         if(currentPath_.path.size()>0){
             if(currentPath_.path.back().x == planner_.getPrevGoal().x && currentPath_.path.back().y == planner_.getPrevGoal().y)
             {
+                std::cout<<"current goal == prev_goal , "<<currentPath_.path.back().x<<", "<<currentPath_.path.back().y<< "\n";
                 // Manually set a path ahead of the robot current cell
-                // current_cell = global_position_to_grid_cell(currentPose_, map);
+                // current_cell = global_position_to_grid_cell(currentPose_, map); 
+                float dx, dy;
+                const float PI = 3.14159;
+                if(currentPose_.theta>= 0.0 &&  currentPose_.theta < PI/2 ){ // GO right up
+                    dx = +currentMap_.metersPerCell();
+                    dy = +currentMap_.metersPerCell();
+                }
+                else if( currentPose_.theta>= PI/2 &&  currentPose_.theta < PI ){ // GO left up
+                    dx = -currentMap_.metersPerCell();
+                    dy = +currentMap_.metersPerCell();
+
+                }
+                else if(currentPose_.theta <= -PI/2 &&  currentPose_.theta > -PI){ // Go left down
+                    dx = -currentMap_.metersPerCell();
+                    dy = -currentMap_.metersPerCell();
+
+                }
+                else{ // currentPose_.theta <0  &&  currentPose_.theta > -PI/2 : Go right down
+                    dx = +currentMap_.metersPerCell();
+                    dy = -currentMap_.metersPerCell();
+                }
                 std::vector<pose_xyt_t> forward_path {
-                    pose_xyt_t{currentPose_.utime, currentPose_.x+currentMap_.metersPerCell(), currentPose_.y+currentMap_.metersPerCell(), 0 },
-                    pose_xyt_t{currentPose_.utime, currentPose_.x+2*currentMap_.metersPerCell(), currentPose_.y+2*currentMap_.metersPerCell(), 0 },
-                    pose_xyt_t{currentPose_.utime, currentPose_.x+3*currentMap_.metersPerCell(), currentPose_.y+3*currentMap_.metersPerCell(), 0 }
+                    pose_xyt_t{currentPose_.utime, currentPose_.x + dx, currentPose_.y + dy, 0 },
+                    pose_xyt_t{currentPose_.utime, currentPose_.x + 2*dx, currentPose_.y + 2*dy, 0 }
+                    // ,pose_xyt_t{currentPose_.utime, currentPose_.x+3*currentMap_.metersPerCell(), currentPose_.y+3*currentMap_.metersPerCell(), 0 }
                 };
                 currentPath_.path = forward_path;
             }
@@ -350,12 +371,13 @@ int8_t Exploration::executeExploringMap(bool initialize)
     // Else if there's a path to follow, then we're still in the process of exploring
     else if(currentPath_.path.size() > 1)
     {
-        std::cout<<"currentPath.path.size()>1. len: "<<currentPath_.path.size()<<std::endl;
+        // std::cout<<"currentPath.path.size()>1. len: "<<currentPath_.path.size()<<std::endl;
         status.status = exploration_status_t::STATUS_IN_PROGRESS;
     }
     // Otherwise, there are frontiers, but no valid path exists, so exploration has failed
     else
     {
+
         // PROBLEM HERE!!!10/26
         std::cout<<"Have valid goal(target_cell) but A* can't find path (return empty path)\n";
         std::cout<<"We have frontiers but NO valid path\n";
@@ -397,28 +419,32 @@ int8_t Exploration::executeReturningHome(bool initialize)
     *       (2) currentPath_.path_length > 1  :  currently following a path to the home pose
     */
     std::cout<<"executeReturningHome: homePose_: "<<homePose_.x<<", "<<homePose_.y<<std::endl;
-    if(planner_.isValidGoal(pose_xyt_t{currentPose_.utime, (float)homePose_.x, (float)homePose_.y, 0})){
-        
-        
-        this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
-        //Reduce waypoints.
-        if(currentPath_.path_length > 5){
+    float delay_time = 6000000; // 6 sec
+    
+    if ( utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
+        if(planner_.isValidGoal(pose_xyt_t{currentPose_.utime, (float)homePose_.x, (float)homePose_.y, 0})){
+            
+            
+            this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
+            //Reduce waypoints.
+            if(currentPath_.path_length > 5){
 
-            std::vector<pose_xyt_t> tmpPath;
+                std::vector<pose_xyt_t> tmpPath;
 
-            for(int i=0; i<currentPath_.path_length; ++i){
-                if(i%2==1){
-                    tmpPath.push_back(currentPath_.path[i]);
+                for(int i=0; i<currentPath_.path_length; ++i){
+                    if(i%2==1){
+                        tmpPath.push_back(currentPath_.path[i]);
+                    }
                 }
+                this->currentPath_.path = tmpPath;
+                this->currentPath_.path_length = tmpPath.size();
+                std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
             }
-            this->currentPath_.path = tmpPath;
-            this->currentPath_.path_length = tmpPath.size();
-            std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
-        }
 
-    }
-    else{
-        std::cout<<"homePose NOT valid goal.\n ";
+        }
+        else{
+            std::cout<<"homePose NOT valid goal.\n ";
+        }
     }
     /////////////////////////////// End student code ///////////////////////////////
     
@@ -430,6 +456,8 @@ int8_t Exploration::executeReturningHome(bool initialize)
     
     double distToHome = distance_between_points(Point<float>(homePose_.x, homePose_.y), 
                                                 Point<float>(currentPose_.x, currentPose_.y));
+
+    // distToHome =  0.0422591;
     std::cout << "Distance to home: " << distToHome << std::endl;
     // If we're within the threshold of home, then we're done.
     if(distToHome <= kReachedPositionThreshold)

@@ -271,7 +271,7 @@ robot_path_t search_for_path(pose_xyt_t start,
     }
     else{
         if(Openlist.empty()){
-            std::cout<<"Explore all free cell but NOT reach goal\n";
+            std::cout<<"Openlist empty. Explore all free cell but NOT reach goal\n";
         }
     }
     // for(auto p : astar_path.path){
