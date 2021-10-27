@@ -57,7 +57,7 @@ while(True):
             break
         else:
             continue
-    if distanceData.distance < 0.3:
+    if distanceData.distance < 0.2:
         state = "STOP"
 
     if state == "TURN":
