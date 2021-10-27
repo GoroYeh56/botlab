@@ -4,6 +4,7 @@
 #include <lcmtypes/lidar_t.hpp>
 #include <lcmtypes/odometry_t.hpp>
 #include <lcmtypes/pose_xyt_t.hpp>
+#include <lcmtypes/distance_t.hpp>
 #include <slam/particle_filter.hpp>
 #include <slam/mapping.hpp>
 #include <common/pose_trace.hpp>
