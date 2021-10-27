@@ -54,7 +54,7 @@ void ParticleFilter::initializeFilterUniformly(const pose_xyt_t& pose,const Occu
     std::cout << "\nxStep: " << xStep << "  yStep: " << yStep;
     for (auto& p : posterior_) {
         std::cout << "\nxPos: " << xPos << "  yPos: " << yPos;
-        if(xPos<xLim / 2.0) {
+        if(xPos + xStep < xLim / 2.0) {
             xPos += xStep;
         }
         else if (xPos >= xLim / 2.0){
