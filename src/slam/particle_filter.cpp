@@ -258,15 +258,15 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     std::vector<particle_t> posterior_sorted_cut(posterior_sorted.begin(), posterior_sorted.begin() + threshold * posterior_sorted.size());
     
     double sumWeights = 0.0;
-    for (auto p : posterior_sorted_cut) {
+    for (auto& p : posterior_sorted_cut) {
         sumWeights += p.weight;
     }
-    for (auto p : posterior_sorted_cut) {
+    for (auto& p : posterior_sorted_cut) {
         p.weight /= sumWeights;
     }
 
    
-    for (auto p : posterior){
+    for (auto& p : posterior){
         
         xMean += p.weight * p.pose.x;
         yMean += p.weight * p.pose.y;
