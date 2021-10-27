@@ -252,10 +252,10 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     std::sort(posterior_sorted.begin(), posterior_sorted.end(),
         [](const particle_t& lhs, const particle_t& rhs) -> bool
         {
-            return lhs.weight > rhs.weight;
+            return lhs.weight < rhs.weight;
         });
         
-    double threshold = 0.4;
+    double threshold = 0.8;
     double sumWeights = 0.0;
     for (int i = 0; i < kNumParticles_ * threshold; i++) {
         sumWeights += posterior_sorted[i].weight;
@@ -265,10 +265,10 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     }
 
     int max = kNumParticles_ * threshold;
-    int i = 0;
-    for (auto& p : posterior_sorted) {
+   
+    for (int i = 0; i < max; i++){
+        auto p = posterior_sorted.at(i);
         
-        if (i > max) break;
         xMean += p.weight * p.pose.x;
         yMean += p.weight * p.pose.y;
         cosThetaMean += p.weight * std::cos(p.pose.theta);
