@@ -10,6 +10,7 @@ from lcmtypes import pose_xyt_t
 from lcmtypes import robot_path_t
 from lcmtypes import timestamp_t
 from lcmtypes import lidar_t
+from lcmtypes import distance_t
 
 stop_command = mbot_motor_command_t()
 stop_command.trans_v = 0.0 #m/s
@@ -25,6 +26,8 @@ turn_command.angular_v = (3.1415/2)
 
 
 lidarData = lidar_t()
+distanceData = distance_t()
+
 
 def handleLIDAR(channel, data):
     msg = lidar_t.decode(data)
@@ -34,11 +37,15 @@ def handleLIDAR(channel, data):
     lidarData.times = msg.times
     lidarData.intensities = msg.intensities
     
+def handleDISTANCE(channel, data):
+    msg = distance_t.decode(data)
+    distanceData.distance = msg.distance
+    
     
     
 lc = lcm.LCM('udpm://239.255.76.67:7667?ttl=2')
 lc.subscribe("LIDAR", handleLIDAR)
-sleep(2)
+lc.subscribe("SLAM_DISTANCE_CHANNEL", handleDISTANCE)
 
 while(True):
     lc.handle()
@@ -50,11 +57,15 @@ while(True):
             break
         else:
             continue
+    if distanceData.distance < 0.3:
+        state = "STOP"
 
     if state == "TURN":
         lc.publish("MBOT_MOTOR_COMMAND",turn_command.encode())
-    else:
+    else if state == "DRIVE":
         lc.publish("MBOT_MOTOR_COMMAND",drive_command.encode())
+    else
+        lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
         
 """
 #lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
