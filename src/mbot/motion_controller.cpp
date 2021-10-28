@@ -169,14 +169,22 @@ public:
             {
                 if(straight_controller.target_reached(pose, target))
                 {
-                    cmd.trans_v = 0;
-                    cmd.angular_v = 0;
-                    printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
-                    if(!assignNextTarget())
-                    {
-                        std::cout << "\rTarget Reached!\n";
+
+                    if( abs( target.x - 0) <0.1 && abs(target.y - 0) <0.1 ){
+                            std::cout<<"Return Home pose (0, 0, 0)\n";
+                            target.theta = 0;
+                            state_ = TURN2;                    
                     }
-                    // state_ = TURN2;
+                    else{
+                        cmd.trans_v = 0;
+                        cmd.angular_v = 0;
+                        printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
+                        if(!assignNextTarget())
+                        {
+                            std::cout << "\rTarget Reached!\n";
+                        }
+                    }
+
                 }
                 else
                 { 
@@ -292,12 +300,23 @@ private:
     {
 	    return utime_now() + time_offset;
     }
+
+    bool  considerPose = false;
     
     bool assignNextTarget(void)
     {  
         if(!targets_.empty()) { 
             cout<<"Target:"<<index++<<", "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
+            if(targets_.size()==1){
+                // std::cout<<"dx: "<<targets_.back().x
+                if( abs(targets_.back().x - 0) <0.1 && abs(targets_.back().y - 0) <0.1 ){
+                    considerPose = true;
+                    std::cout<<"Set Home pose theta to 0.0\n";
+                    targets_.back().theta = 0;
+                }
+            }
             targets_.pop_back(); 
+            
         }
         state_ = TURN; 
         return !targets_.empty();

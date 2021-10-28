@@ -419,7 +419,7 @@ int8_t Exploration::executeReturningHome(bool initialize)
     *       (2) currentPath_.path_length > 1  :  currently following a path to the home pose
     */
     std::cout<<"executeReturningHome: homePose_: "<<homePose_.x<<", "<<homePose_.y<<std::endl;
-    float delay_time = 6000000; // 6 sec
+    float delay_time = 15000000; // 6 sec
     
     if ( utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
         if(planner_.isValidGoal(pose_xyt_t{currentPose_.utime, (float)homePose_.x, (float)homePose_.y, 0})){
@@ -427,19 +427,23 @@ int8_t Exploration::executeReturningHome(bool initialize)
             
             this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
             //Reduce waypoints.
-            if(currentPath_.path_length > 5){
+            
+            // if(currentPath_.path_length > 5){
 
-                std::vector<pose_xyt_t> tmpPath;
+            //     std::vector<pose_xyt_t> tmpPath;
 
-                for(int i=0; i<currentPath_.path_length; ++i){
-                    if(i%2==1){
-                        tmpPath.push_back(currentPath_.path[i]);
-                    }
-                }
-                this->currentPath_.path = tmpPath;
-                this->currentPath_.path_length = tmpPath.size();
-                std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
-            }
+            //     for(int i=0; i<currentPath_.path_length; ++i){
+            //         if(i%2==1){
+            //             tmpPath.push_back(currentPath_.path[i]);
+            //         }
+            //     }
+            //     if(currentPath_.path.size()%2==0)
+            //         tmpPath.push_back(currentPath_.path[currentPath_.path.size()-1]);
+
+            //     this->currentPath_.path = tmpPath;
+            //     this->currentPath_.path_length = tmpPath.size();
+            //     std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
+            // }
 
         }
         else{

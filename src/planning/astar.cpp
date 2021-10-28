@@ -72,12 +72,25 @@ std::vector<pose_xyt_t> extract_path_pose(std::vector<Node*> path, const Obstacl
 
     // TODO: Why need distances? 
     std::vector<pose_xyt_t> path_poses;
-    for(auto node: path){
+    // for(auto node: path){
+    for(int i=0; i<path.size()-1; ++i){
         pose_xyt_t pose;
-        pose.x = node->cell.x;
-        pose.y = node->cell.y;
+        pose.x = path[i]->cell.x;
+        pose.y = path[i]->cell.y;
+        float dx = path[i+1]->cell.x - pose.x;
+        float dy = path[i+1]->cell.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        pose.theta = target_heading;
         path_poses.push_back(pose);
     }
+
+    // the last pose
+    pose_xyt_t lastpose;
+    lastpose.x = path.back()->cell.x;
+    lastpose.y = path.back()->cell.y;
+    lastpose.theta =path_poses.back().theta;
+    path_poses.push_back(lastpose);
+
     return path_poses;
 
 }
