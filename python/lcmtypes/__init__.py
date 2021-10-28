@@ -19,3 +19,4 @@ from .reset_odometry_t import reset_odometry_t
 from .robot_path_t import robot_path_t
 from .timestamp_t import timestamp_t
 from .wifi_data_t import wifi_data_t
+from .distance_t import distance_t
