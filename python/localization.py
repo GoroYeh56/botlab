@@ -31,6 +31,7 @@ turn_command_right.angular_v = -(3.1415/2)
 
 lidarData = lidar_t()
 distanceData = distance_t()
+distanceData.distance = 10
 
 
 def handleLIDAR(channel, data):
@@ -40,7 +41,7 @@ def handleLIDAR(channel, data):
     lidarData.thetas = msg.thetas
     lidarData.times = msg.times
     lidarData.intensities = msg.intensities
-    print("lidar recieved")
+    #print("lidar recieved")
     
 def handleDISTANCE(channel, data):
     msg = distance_t.decode(data)
@@ -48,7 +49,7 @@ def handleDISTANCE(channel, data):
     print("\nParticle Filter avg Distance: " + str(msg.distance));
     
     
-lc = lcm.LCM('udpm://239.255.76.67:7667?ttl=2')
+lc = lcm.LCM('udpm://239.255.76.67:7667?ttl=1')
 lc.subscribe("LIDAR", handleLIDAR)
 lc.subscribe("SLAM_DISTANCE", handleDISTANCE)
 
@@ -58,7 +59,7 @@ while(go):
     lc.handle()
     
     state = "DRIVE"
-    for i in range(20):
+    for i in range(10):
         if lidarData.ranges[i+20] > 0.10:
             state = "TURNRIGHT"
         if lidarData.ranges[i] < 0.10 or lidarData.ranges[-i] < 0.10:
@@ -66,19 +67,20 @@ while(go):
             break
         else:
             continue
-    if distanceData.distance < 0.05:
-        state = "STOP"
-        go = False
+    #if distanceData.distance < 0.05:
+     #   state = "STOP"
+     #   go = False
 
     # very simple state machine
+    print(state)
     if state == "TURNLEFT":
         lc.publish("MBOT_MOTOR_COMMAND",turn_command_left.encode())
     elif state == "TURNRIGHT":
         lc.publish("MBOT_MOTOR_COMMAND",turn_command_right.encode())
     elif state == "DRIVE":
         lc.publish("MBOT_MOTOR_COMMAND",drive_command.encode())
-    else:
-        lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
+    
+        
 lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
   
   
