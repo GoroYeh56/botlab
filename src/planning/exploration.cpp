@@ -264,6 +264,8 @@ int8_t Exploration::executeExploringMap(bool initialize)
         if(currentPath_.path.size() >1)
             planner_.setPrevGoal(currentPath_.path[currentPath_.path_length-1]);
 
+        
+        usleep(1000000); // 1s
         currentPath_ = plan_path_to_frontier(frontiers_, currentPose_, currentMap_, planner_);
         //robotpath_t
         // pose_xyt_t path[path_length];

@@ -36,7 +36,7 @@ using namespace std;
 
 
 
-#define DRIVE_CRITERIA 0.05
+#define DRIVE_CRITERIA 0.08 
 // #define DRIVE_CRITERIA 0.026 // m (2cm)
 #define TURN_CRITERIA 0.04 //  radian 5 degree
 #define TURN2_CRITERIA 0.04 // radian
@@ -45,7 +45,7 @@ using namespace std;
 // const float Kdrive_w = 0.5;
 float Kp = 1.5;
 float Ktheta = 0.5;
-float Kdrive_w = 2;
+float Kdrive_w = 2.4;
 
 
 // const float MAX_FWD_VEL = 0.8;
@@ -170,12 +170,12 @@ public:
                 if(straight_controller.target_reached(pose, target))
                 {
 
-                    // if( abs( target.x - 0) <0.1 && abs(target.y - 0) <0.1 ){
-                    //         std::cout<<"Return Home pose (0, 0, 0)\n";
-                    //         target.theta = 0;
-                    //         state_ = TURN2;                    
-                    // }
-                    // else{
+                    if( abs( target.x - 0) <0.1 && abs(target.y - 0) <0.1 ){
+                            std::cout<<"Return Home pose (0, 0, 0)\n";
+                            target.theta = 0;
+                            state_ = TURN2;                    
+                    }
+                    else{
                         cmd.trans_v = 0;
                         cmd.angular_v = 0;
                         printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
@@ -183,7 +183,7 @@ public:
                         {
                             std::cout << "\rTarget Reached!\n";
                         }
-                    // }
+                    }
 
                 }
                 else
@@ -376,7 +376,7 @@ int main(int argc, char** argv)
     Ktheta = (speed_mode==0)?0.5 : 2.2;
 
     cout<<"Speed mode: "<< mode<<endl;
-    MAX_FWD_VEL = (speed_mode==0)? 0.2 : 0.8;
+    MAX_FWD_VEL = (speed_mode==0)? 0.2 : 0.9;
     MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;
     // MAX_FWD_VEL = (speed_mode==0)? 0.2 : 1;
     // MAX_TURN_VEL = (speed_mode==0)? M_PI/4 : M_PI;

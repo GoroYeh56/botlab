@@ -46,6 +46,7 @@ using namespace std;
 float Kp = 1.5;
 float Ktheta = 0.5;
 float Kdrive_w = 1;
+float Kdrive_w_rev = 0.7; 
 
 
 // const float MAX_FWD_VEL = 0.8;
@@ -54,6 +55,7 @@ float Kdrive_w = 1;
 // Default value
 float MAX_FWD_VEL = 0.2;
 float MAX_TURN_VEL = M_PI/4;
+float MAX_REV_VEL = 0.8;
 
 
 class StraightManeuverController : public ManeuverControllerBase
@@ -244,7 +246,7 @@ public:
                     float dy = target.y - pose.y;
                     float target_heading = atan2(dy, dx);
                     float angle_err = angle_diff(target_heading, pose.theta);
-                    cmd.angular_v = Kdrive_w * angle_err;
+                    cmd.angular_v = -Kdrive_w_rev * angle_err;
 
                     // cmd = straight_controller.get_command(pose, target);
                 }
@@ -377,7 +379,7 @@ private:
     void subscribeToLcm()
     {
         lcmInstance->subscribe(ODOMETRY_CHANNEL, &MotionController::handleOdometry, this);
-        lcmInstance->subscribe(SLAM_POSE_CHANNEL, &MotionController::handlePose, this);
+        // lcmInstance->subscribe(SLAM_POSE_CHANNEL, &MotionController::handlePose, this);
         lcmInstance->subscribe(CONTROLLER_PATH_CHANNEL, &MotionController::handlePath, this);
         lcmInstance->subscribe(MBOT_TIMESYNC_CHANNEL, &MotionController::handleTimesync, this);
     }
@@ -411,8 +413,19 @@ int main(int argc, char** argv)
 
     	if(controller.timesync_initialized()){
             	mbot_motor_command_t cmd = controller.updateCommand();
-                cmd.trans_v = std::max( std::min(MAX_FWD_VEL, cmd.trans_v), float(0));
-                cmd.angular_v = std::min(MAX_TURN_VEL, cmd.angular_v);
+                if(cmd.trans_v >= 0){
+                    cmd.trans_v = std::min(MAX_FWD_VEL, cmd.trans_v);
+                }
+                else{
+                    cmd.trans_v = std::max(  -MAX_REV_VEL, cmd.trans_v);
+                }
+
+                if(cmd.angular_v >=0 ){
+                    cmd.angular_v = std::min(MAX_TURN_VEL, cmd.angular_v);
+                }
+                else{
+                    cmd.angular_v = std::max( -MAX_TURN_VEL, cmd.angular_v);
+                }
                 // printf("%f, %f\n",cmd.trans_v, cmd.angular_v);
             	lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
     	}
