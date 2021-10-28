@@ -36,10 +36,10 @@ using namespace std;
 
 
 
-#define DRIVE_CRITERIA 0.05
+#define DRIVE_CRITERIA 0.02
 // #define DRIVE_CRITERIA 0.026 // m (2cm)
-#define TURN_CRITERIA 0.04 //  radian 5 degree
-#define TURN2_CRITERIA 0.04 // radian
+#define TURN_CRITERIA 0.02 //  radian 5 degree
+#define TURN2_CRITERIA 0.02 // radian
 // const float Kp = 1;
 // const float Ktheta = 0.5;
 // const float Kdrive_w = 0.5;

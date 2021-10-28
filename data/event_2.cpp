@@ -45,7 +45,7 @@ using namespace std;
 // const float Kdrive_w = 0.5;
 float Kp = 1.5;
 float Ktheta = 0.5;
-float Kdrive_w = 2;
+float Kdrive_w = 1;
 
 
 // const float MAX_FWD_VEL = 0.8;
@@ -169,22 +169,16 @@ public:
             {
                 if(straight_controller.target_reached(pose, target))
                 {
+                    cmd.trans_v = 0;
+                    cmd.angular_v = 0;
+                    state_ = REVERSE;
 
-                    // if( abs( target.x - 0) <0.1 && abs(target.y - 0) <0.1 ){
-                    //         std::cout<<"Return Home pose (0, 0, 0)\n";
-                    //         target.theta = 0;
-                    //         state_ = TURN2;                    
-                    // }
-                    // else{
-                        cmd.trans_v = 0;
-                        cmd.angular_v = 0;
-                        printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
-                        if(!assignNextTarget())
-                        {
-                            std::cout << "\rTarget Reached!\n";
-                        }
-                    // }
-
+                    // printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
+                    if(!assignNextTargetReverse())
+                    {
+                        std::cout << "\rTarget Reached!\n";
+                    }
+                    // state_ = TURN2;
                 }
                 else
                 { 
@@ -223,6 +217,38 @@ public:
                 }
 		    }
 
+            else if(state_ == REVERSE) 
+            {
+                if(straight_controller.target_reached(pose, target))
+                {
+                    cmd.trans_v = 0;
+                    cmd.angular_v = 0;
+                    state_ = REVERSE;
+
+                    printf("\rDRIVE: Reached target (x,y) %.2f, %.2f\n",target.x, target.y);
+                    if(!assignNextTargetReverse())
+                    {
+                        std::cout << "\rTarget Reached!\n";
+                    }
+                    // state_ = TURN2;
+                }
+                else
+                { 
+                    float distance_err = sqrt( pow((target.x - pose.x),2) + pow((target.y-pose.y),2) );
+                    // float x_err = fabs(pose.x - target.x);
+                    // float y_err = fabs(pose.y - target.y);
+                    // printf("\rDRIVE: cur x %.3f, goal x %.3f x_err %.4f y_err %4f\n",pose.x, target.x, x_err, y_err);
+                    cmd.trans_v = -Kp * distance_err ;
+
+                    float dx = target.x - pose.x;
+                    float dy = target.y - pose.y;
+                    float target_heading = atan2(dy, dx);
+                    float angle_err = angle_diff(target_heading, pose.theta);
+                    cmd.angular_v = Kdrive_w * angle_err;
+
+                    // cmd = straight_controller.get_command(pose, target);
+                }
+		    }
 
 
             else
@@ -278,7 +304,8 @@ private:
     {
         TURN,
         DRIVE,
-        TURN2
+        TURN2,
+        REVERSE
     };
     int index = 1; // target
     pose_xyt_t odomToGlobalFrame_;      // transform to convert odometry into the global/map coordinates for navigating in a map
@@ -300,25 +327,23 @@ private:
     {
 	    return utime_now() + time_offset;
     }
-
-    bool  considerPose = false;
     
     bool assignNextTarget(void)
     {  
         if(!targets_.empty()) { 
             cout<<"Target:"<<index++<<", "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
-            if(targets_.size()==1){
-                // std::cout<<"dx: "<<targets_.back().x
-                if( abs(targets_.back().x - 0) <0.1 && abs(targets_.back().y - 0) <0.1 ){
-                    considerPose = true;
-                    std::cout<<"Set Home pose theta to 0.0\n";
-                    targets_.back().theta = 0;
-                }
-            }
             targets_.pop_back(); 
-            
         }
         state_ = TURN; 
+        return !targets_.empty();
+
+    bool assignNextTargetReverse(void)
+    {  
+        if(!targets_.empty()) { 
+            cout<<"Target:"<<index++<<", "<<targets_.back().x<<", "<<targets_.back().y<<", "<<targets_.back().theta<<endl;
+            targets_.pop_back(); 
+        }
+        // state_ = TURN; 
         return !targets_.empty();
     }
     
@@ -395,3 +420,4 @@ int main(int argc, char** argv)
     
     return 0;
 }
+
