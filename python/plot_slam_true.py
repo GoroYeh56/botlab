@@ -21,7 +21,7 @@ for event in log:
         if init==0:
             start_utime = msg.utime
             init = 1
-        trueData = np.append(data, np.array([[ \
+        trueData = np.append(trueData, np.array([[ \
             (msg.utime-start_utime)/1.0E6, \
             msg.x, \
             msg.y, \
@@ -32,13 +32,13 @@ for event in log:
         if init==0:
             start_utime = msg.utime
             init = 1
-        slamData = np.append(data, np.array([[ \
+        slamData = np.append(slamData, np.array([[ \
             (msg.utime-start_utime)/1.0E6, \
             msg.x, \
             msg.y, \
             msg.theta
             ]]), axis=0)
 
-plt.plot(trueData[:,1], data[:,2], 'r')
-plt.plot(slamData[:,1], data[:,2], 'r')
+plt.plot(trueData[:,1], trueData[:,2], 'r')
+plt.plot(slamData[:,1], slamData[:,2], 'r')
 plt.show()
