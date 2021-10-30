@@ -76,7 +76,7 @@ particle_t ActionModel::applyAction(const particle_t& sample)
 
     newSample.pose.x += sampledTrans * cos(sample.pose.theta + sampledRot1);
     newSample.pose.y += sampledTrans * sin(sample.pose.theta + sampledRot1);
-    newSample.pose.theta = wrap_to_pi(sample.pose.theta - sampledRot1 + sampledRot2);
+    newSample.pose.theta = wrap_to_pi(sample.pose.theta + sampledRot1 - sampledRot2);
     newSample.pose.utime = utime_;
     newSample.parent_pose = sample.pose;
     return newSample;
