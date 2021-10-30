@@ -74,9 +74,9 @@ particle_t ActionModel::applyAction(const particle_t& sample)
     float sampledTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerator_);
     float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
 
-    newSample.pose.x += (trans_ + sampledTrans) * cos(sample.pose.theta + sampledRot1 + rot1_);
-    newSample.pose.y += (trans_ + sampledTrans) * sin(sample.pose.theta + sampledRot1 + rot1_);
-    newSample.pose.theta = wrap_to_pi(sample.pose.theta - rot1_ - rot2_ + sampledRot1 + sampledRot2);
+    newSample.pose.x += (sampledTrans) * cos(sample.pose.theta + sampledRot1);
+    newSample.pose.y += (sampledTrans) * sin(sample.pose.theta + sampledRot1);
+    newSample.pose.theta = wrap_to_pi(sample.pose.theta + sampledRot1 + sampledRot2);
     newSample.pose.utime = utime_;
     newSample.parent_pose = sample.pose;
     return newSample;
