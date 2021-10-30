@@ -81,7 +81,7 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
                                         const OccupancyGrid&   map)
 {
 
-    clock_t startTime = clock();
+    //clock_t startTime = clock();
     // Only update the particles if motion was detected. If the robot didn't move, then
     // obviously don't do anything.
     bool hasRobotMoved = actionModel_.updateAction(odometry);
@@ -96,9 +96,9 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
     
     posteriorPose_.utime = odometry.utime;
 
-    clock_t endTime = clock();
+    //clock_t endTime = clock();
 
-    std::cout <<"\n" << (double)(endTime - startTime)/CLOCKS_PER_SEC;
+    //std::cout <<"\n" << (double)(endTime - startTime)/CLOCKS_PER_SEC;
 
     return posteriorPose_;
 }
