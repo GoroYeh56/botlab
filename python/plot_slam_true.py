@@ -27,16 +27,16 @@ for event in log:
             msg.theta
             ]]), axis=0)
     if event.channel == "SLAM_POSE":
-    msg = odometry_t.decode(event.data)
-    if init==0:
-        start_utime = msg.utime
-        init = 1
-    slamData = np.append(data, np.array([[ \
-        (msg.utime-start_utime)/1.0E6, \
-        msg.x, \
-        msg.y, \
-        msg.theta
-        ]]), axis=0)
+        msg = odometry_t.decode(event.data)
+        if init==0:
+            start_utime = msg.utime
+            init = 1
+        slamData = np.append(data, np.array([[ \
+            (msg.utime-start_utime)/1.0E6, \
+            msg.x, \
+            msg.y, \
+            msg.theta
+            ]]), axis=0)
 
 plt.plot(trueData[:,1], data[:,2], 'r')
 plt.plot(slamData[:,1], data[:,2], 'r')
