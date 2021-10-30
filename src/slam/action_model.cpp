@@ -13,7 +13,7 @@ ActionModel::ActionModel(void)
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
     std::random_device rd;
-    numberGenerateor_ = std::mt19937(rd()); // ensure to get a random number every time
+    numberGenerator_ = std::mt19937(rd()); // ensure to get a random number every time
 }
 
 
