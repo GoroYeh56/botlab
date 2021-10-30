@@ -3,6 +3,7 @@
 #include <lcmtypes/pose_xyt_t.hpp>
 #include <cassert>
 #include <common/angle_functions.hpp>
+#include <time.h>
 
 ParticleFilter::ParticleFilter(int numParticles)
 : kNumParticles_ (numParticles)
@@ -79,6 +80,8 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
                                         const lidar_t& laser,
                                         const OccupancyGrid&   map)
 {
+
+    clock_t startTime = clock();
     // Only update the particles if motion was detected. If the robot didn't move, then
     // obviously don't do anything.
     bool hasRobotMoved = actionModel_.updateAction(odometry);
@@ -92,7 +95,11 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
     }
     
     posteriorPose_.utime = odometry.utime;
-    
+
+    clock_t endTime = clock();
+
+    std::cout << "\nTime: " << endTime - startTime;
+
     return posteriorPose_;
 }
 
