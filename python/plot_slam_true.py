@@ -39,6 +39,18 @@ for event in log:
             msg.theta
             ]]), axis=0)
 
-plt.plot(trueData[:,1], trueData[:,2], 'r')
-plt.plot(slamData[:,1], slamData[:,2], 'r')
+errorData = np.empty((0,4), dtype=float)
+for point,i in enumerate(trueData):
+    np.append(errorData, np.array([[ \
+            point.utime, \
+            point.x - errorData[i,1], \
+            point.y- errorData[i,2], \
+            point.theta- errorData[i,3]
+            ]]), axis=0)
+#plt.plot(trueData[:,1], trueData[:,2], 'r')
+#plt.plot(slamData[:,1], slamData[:,2], 'r')
+
+plt.plot(errorData[:,1], errorData[:,0], 'r')
+plt.plot(errorData[:,2], errorData[:,0], 'r')
+plt.plot(errorData[:,3], errorData[:,0], 'r')
 plt.show()
