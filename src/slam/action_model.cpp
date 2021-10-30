@@ -70,9 +70,9 @@ particle_t ActionModel::applyAction(const particle_t& sample)
 
     particle_t newSample = sample; // first copy
     // sample from 3 diff. distribution
-    float sampledRot1 = std::normal_distribution<>(rot1_, rot1Std_)(numberGenerateor_);
-    float sampledTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerateor_);
-    float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerateor_);
+    float sampledRot1 = std::normal_distribution<>(rot1_, rot1Std_)(numberGenerator_);
+    float sampledTrans = std::normal_distribution<>(trans_, transStd_)(numberGenerator_);
+    float sampledRot2 = std::normal_distribution<>(rot2_, rot2Std_)(numberGenerator_);
 
     newSample.pose.x += sampledTrans * cos(sample.pose.theta + sampledRot1);
     newSample.pose.y += sampledTrans * sin(sample.pose.theta + sampledRot1);
