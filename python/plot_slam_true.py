@@ -40,12 +40,12 @@ for event in log:
             ]]), axis=0)
 
 errorData = np.empty((0,4), dtype=float)
-for point,i in enumerate(trueData):
+for i in range(errorData.shape()[0]):
     np.append(errorData, np.array([[ \
-            point.utime, \
-            point.x - errorData[i,1], \
-            point.y- errorData[i,2], \
-            point.theta- errorData[i,3]
+            trueData[i,0], \
+            trueData[i,1] - slamData[i,1], \
+            trueData[i,2] - slamData[i,2], \
+            trueData[i,3] - slamData[i,3]
             ]]), axis=0)
 #plt.plot(trueData[:,1], trueData[:,2], 'r')
 #plt.plot(slamData[:,1], slamData[:,2], 'r')
