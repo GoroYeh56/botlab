@@ -40,7 +40,7 @@ for event in log:
             ]]), axis=0)
 
 errorData = np.empty((0,4), dtype=float)
-for i in range(errorData.shape()[0]):
+for i in range(np.shape(errorData)[0]):
     np.append(errorData, np.array([[ \
             trueData[i,0], \
             trueData[i,1] - slamData[i,1], \
