@@ -9,6 +9,7 @@ if len(sys.argv) < 2:
     sys.stderr.write("usage: plot_slam_true.py <logfile>")
     sys.exit(1)
 
+print(str(sys.argv[1]))
 log = lcm.EventLog(sys.argv[1],"r")
 
 trueData = np.empty((0,4), dtype=float)
