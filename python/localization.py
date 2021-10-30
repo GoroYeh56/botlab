@@ -59,24 +59,24 @@ while(go):
     lc.handle()
     
     state = "DRIVE"
-    for i in range(10):
-        if lidarData.ranges[i+20] > 0.10:
-            state = "TURNRIGHT"
+    for i in range(20):
+        #if lidarData.ranges[i+20] > 0.10:
+        #    state = "TURNRIGHT"
         if lidarData.ranges[i] < 0.10 or lidarData.ranges[-i] < 0.10:
             state = "TURNLEFT"
             break
         else:
             continue
-    #if distanceData.distance < 0.05:
-     #   state = "STOP"
-     #   go = False
+    if distanceData.distance < 0.1:
+        state = "STOP"
+        go = False
 
     # very simple state machine
     print(state)
     if state == "TURNLEFT":
         lc.publish("MBOT_MOTOR_COMMAND",turn_command_left.encode())
-    elif state == "TURNRIGHT":
-        lc.publish("MBOT_MOTOR_COMMAND",turn_command_right.encode())
+    #elif state == "TURNRIGHT":
+     #   lc.publish("MBOT_MOTOR_COMMAND",turn_command_right.encode())
     elif state == "DRIVE":
         lc.publish("MBOT_MOTOR_COMMAND",drive_command.encode())
     

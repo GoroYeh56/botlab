@@ -40,18 +40,19 @@ for event in log:
             ]]), axis=0)
 
 errorData = np.empty((0,4), dtype=float)
-for i in range(np.shape(errorData)[0]):
-    np.append(errorData, np.array([[ \
-            trueData[i,0], \
-            trueData[i,1] - slamData[i,1], \
-            trueData[i,2] - slamData[i,2], \
-            trueData[i,3] - slamData[i,3]
-            ]]), axis=0)
-    print(trueData[i,1] - slamData[i,1])
+for i in range(np.shape(trueData)[0]-1):
+    if(i < np.shape(slamData)[0]):
+        np.append(errorData, np.array([[ \
+                trueData[i,0], \
+                trueData[i,1] - slamData[i,1], \
+                trueData[i,2] - slamData[i,2], \
+                trueData[i,3] - slamData[i,3]
+                ]]), axis=0)
+        print(trueData[i,1] - slamData[i,1])
 #plt.plot(trueData[:,1], trueData[:,2], 'r')
 #plt.plot(slamData[:,1], slamData[:,2], 'r')
 
-plt.plot(errorData[:,1], errorData[:,0], 'r')
-plt.plot(errorData[:,2], errorData[:,0], 'b')
-plt.plot(errorData[:,3], errorData[:,0], 'g')
+plt.plot(errorData[:,0], errorData[:,1], 'r')
+#plt.plot(errorData[:,2], errorData[:,0], 'b')
+#plt.plot(errorData[:,3], errorData[:,0], 'g')
 plt.show()
