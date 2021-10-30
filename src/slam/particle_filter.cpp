@@ -21,11 +21,12 @@ void ParticleFilter::initializeFilterAtPose(const pose_xyt_t& pose)
     std::random_device rd;
     std::mt19937 numberGenerator = std::mt19937(rd());
     std::normal_distribution<> dist(0.0, 0.007);
+    std::normal_distribution<> ang(0.0, std::_Pi/4);
     
     for (auto& p : posterior_) {
         p.pose.x = posteriorPose_.x + dist(numberGenerator);
         p.pose.y = posteriorPose_.y + dist(numberGenerator);
-        p.pose.theta = wrap_to_pi(posteriorPose_.theta + dist(numberGenerator));
+        p.pose.theta = wrap_to_pi(posteriorPose_.theta + ang(numberGenerator));
         p.pose.utime = pose.utime;
         p.parent_pose = p.pose;
         p.weight = sampleWeight;
