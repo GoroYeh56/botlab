@@ -98,7 +98,7 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
 
     clock_t endTime = clock();
 
-    std::cout << endTime - startTime;
+    std::cout <<"\n" << endTime - startTime;
 
     return posteriorPose_;
 }
