@@ -237,6 +237,62 @@ std::vector<particle_t> ParticleFilter::computeNormalizedPosterior(const std::ve
 
 pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& posterior)
 {
+    pose_xyt_t pose;
+
+    // // Create priority-queue of posterior:
+    // std::priority_queue<particle_t, std::vector<particle_t>, Compare()> better_particles; // take best 40%
+
+    // auto compare = [](particle_t a, particle_t b) { return a.weight > b.weight; }  ;
+    // int SIZE = kNumParticles_ * 0.4;
+
+    // for(auto &p: posterior){
+    //     better_particles.push_back(p);
+    //     if(better_particles.size()>= SIZE){
+    //         better_particles.pop();
+    //     }
+    // }
+
+    std::vector<particle_t> posterior_sorted = posterior;
+    //Sort the posterior (weighted) distribution
+    std::sort(posterior_sorted.begin(), posterior_sorted.end(),
+        [](const particle_t& lhs, const particle_t& rhs) -> bool
+        {
+            return lhs.weight > rhs.weight;
+        });
+
+
+    double sumWeights = 0.0;
+    for (int i = 0; i < kNumParticles_ * 0.4; i++) {
+        sumWeights += posterior_sorted[i].weight;
+    }
+    for (int i = 0; i < kNumParticles_ * 0.4; i++) {
+        posterior_sorted[i].weight /= sumWeights;
+    }
+
+    // mean x, y, theta of all posterior particles
+    double xMean = 0.0, yMean = 0.0, cosThetaMean = 0.0, sinThetaMean = 0.0;
+    // for(auto &p: posterior){
+    int index = 0;
+    for (auto& p : posterior_sorted) {
+        index++;
+        if (index > kNumParticles_ * 0.4) break;
+        // xMean += p.weight * p.pose.x;
+        // yMean += p.weight * p.pose.y;
+        // cosThetaMean += p.weight * std::cos(p.pose.theta);
+        // sinThetaMean += p.weight * std::sin(p.pose.theta);
+        xMean += p.weight * p.pose.x;
+        yMean += p.weight * p.pose.y;
+        cosThetaMean += p.weight * std::cos(p.pose.theta);
+        sinThetaMean += p.weight * std::sin(p.pose.theta);
+    }
+
+    pose.x = xMean;
+    pose.y = yMean;
+    pose.theta = std::atan2(sinThetaMean, cosThetaMean);
+
+    return pose;
+
+    /*
     //////// TODO: Implement your method for computing the final pose estimate based on the posterior distribution
     pose_xyt_t pose;
 
@@ -279,7 +335,7 @@ pose_xyt_t ParticleFilter::estimatePosteriorPose(const std::vector<particle_t>& 
     pose.y = yMean;
     pose.theta = std::atan2(sinThetaMean, cosThetaMean);
 
-    return pose;
+    return pose;*/
 }
 
 
