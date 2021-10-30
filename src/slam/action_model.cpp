@@ -7,8 +7,8 @@
 
 
 ActionModel::ActionModel(void)
-    : k1_(0.1f) // how much dispersion we have for v and w k1: rotation, k2: translation
-    , k2_(0.007f) // 
+    : k1_(0.2f) // how much dispersion we have for v and w k1: rotation, k2: translation
+    , k2_(0.01f) // 
     , initialized_(false)
 {
     //////////////// TODO: Handle any initialization for your ActionModel /////////////////////////
