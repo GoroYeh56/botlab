@@ -21,7 +21,7 @@ using namespace std;
 /**
  * Code below is a little more than a template. You will need
  * to update the maneuver controllers to function more effectively
- * and/or add different controllers. 
+ * and/or add different controllers.
  * You will at least want to:
  *  - Add a form of PID to control the speed at which your
  *      robot reaches its target pose.
@@ -59,7 +59,7 @@ float MAX_TURN_VEL = M_PI/4;
 class StraightManeuverController : public ManeuverControllerBase
 {
 public:
-    StraightManeuverController() = default;   
+    StraightManeuverController() = default;
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
         return {0, 0.1, 0};
@@ -80,7 +80,7 @@ public:
 class TurnManeuverController : public ManeuverControllerBase
 {
 public:
-    TurnManeuverController() = default;   
+    TurnManeuverController() = default;
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
         return {0, 0, 0.5};
@@ -103,9 +103,9 @@ public:
 
 
 class MotionController
-{ 
-public: 
-    
+{
+public:
+
     /**
     * Constructor for MotionController.
     */
@@ -118,20 +118,20 @@ public:
 
 	    time_offset = 0;
 	    timesync_initialized_ = false;
-    } 
-    
+    }
+
     /**
     * \brief updateCommand calculates the new motor command to send to the Mbot. This method is called after each call to
     * lcm.handle. You need to check if you have sufficient data to calculate a new command, or if the previous command
     * should just be used again until for feedback becomes available.
-    * 
+    *
     * \return   The motor command to send to the mbot_driver.
     */
-    mbot_motor_command_t updateCommand(void) 
+    mbot_motor_command_t updateCommand(void)
     {
         mbot_motor_command_t cmd {now(), 0.0, 0.0};
-        
-        if(!targets_.empty() && !odomTrace_.empty()) 
+
+        if(!targets_.empty() && !odomTrace_.empty())
         {
             pose_xyt_t target = targets_.back(); // 
             pose_xyt_t pose = currentPose();
@@ -145,12 +145,12 @@ public:
 
             ///////  TODO: Add different states when adding maneuver controls /////// 
             if(state_ == TURN)
-            { 
+            {
                 if(turn_controller.target_reached(pose, target))
                 {   
                     printf("\rTURN: Reached target theta %.2f\n",target.theta);
 		            state_ = DRIVE;
-                } 
+                }
                 else
                 {   
                     // TODO: calculate cmd by error
@@ -165,7 +165,7 @@ public:
                     // cmd = turn_controller.get_command(pose, target);
                 }
             }
-            else if(state_ == DRIVE) 
+            else if(state_ == DRIVE)
             {
                 if(straight_controller.target_reached(pose, target))
                 {
@@ -229,8 +229,8 @@ public:
             {
                 std::cerr << "ERROR: MotionController: Entered unknown state: " << state_ << '\n';
             }
-		} 
-        return cmd; 
+		}
+        return cmd;
     }
 
     bool timesync_initialized(){ return timesync_initialized_; }
@@ -240,7 +240,7 @@ public:
 	    timesync_initialized_ = true;
 	    time_offset = timesync->utime-utime_now();
     }
-    
+
     void handlePath(const lcm::ReceiveBuffer* buf, const std::string& channel, const robot_path_t* path)
     {
         targets_ = path->path;
@@ -260,20 +260,20 @@ public:
         message_received_t confirm {now(), path->utime, channel};
         lcmInstance->publish(MESSAGE_CONFIRMATION_CHANNEL, &confirm);
     }
-    
+
     void handleOdometry(const lcm::ReceiveBuffer* buf, const std::string& channel, const odometry_t* odometry)
     {
         pose_xyt_t pose {odometry->utime, odometry->x, odometry->y, odometry->theta};
         odomTrace_.addPose(pose);
     }
-    
+
     void handlePose(const lcm::ReceiveBuffer* buf, const std::string& channel, const pose_xyt_t* pose)
     {
         computeOdometryOffset(*pose);
     }
-    
+
 private:
-    
+
     enum State
     {
         TURN,
@@ -321,31 +321,31 @@ private:
         state_ = TURN; 
         return !targets_.empty();
     }
-    
+
     void computeOdometryOffset(const pose_xyt_t& globalPose)
     {
         pose_xyt_t odomAtTime = odomTrace_.poseAt(globalPose.utime);
         double deltaTheta = globalPose.theta - odomAtTime.theta;
         double xOdomRotated = (odomAtTime.x * std::cos(deltaTheta)) - (odomAtTime.y * std::sin(deltaTheta));
         double yOdomRotated = (odomAtTime.x * std::sin(deltaTheta)) + (odomAtTime.y * std::cos(deltaTheta));
-         
+
         odomToGlobalFrame_.x = globalPose.x - xOdomRotated;
-        odomToGlobalFrame_.y = globalPose.y - yOdomRotated; 
+        odomToGlobalFrame_.y = globalPose.y - yOdomRotated;
         odomToGlobalFrame_.theta = deltaTheta;
     }
-    
+
     pose_xyt_t currentPose(void)
     {
         assert(!odomTrace_.empty());
-        
+
         pose_xyt_t odomPose = odomTrace_.back();
         pose_xyt_t pose;
-        pose.x = (odomPose.x * std::cos(odomToGlobalFrame_.theta)) - (odomPose.y * std::sin(odomToGlobalFrame_.theta)) 
+        pose.x = (odomPose.x * std::cos(odomToGlobalFrame_.theta)) - (odomPose.y * std::sin(odomToGlobalFrame_.theta))
             + odomToGlobalFrame_.x;
         pose.y = (odomPose.x * std::sin(odomToGlobalFrame_.theta)) + (odomPose.y * std::cos(odomToGlobalFrame_.theta))
             + odomToGlobalFrame_.y;
         pose.theta = angle_sum(odomPose.theta, odomToGlobalFrame_.theta);
-        
+
         return pose;
     }
 
@@ -392,6 +392,6 @@ int main(int argc, char** argv)
             	lcmInstance.publish(MBOT_MOTOR_COMMAND_CHANNEL, &cmd);
     	}
     }
-    
+
     return 0;
 }

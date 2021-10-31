@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     {
         numTimes = std::atoi(argv[1]);
     }
-    
+
     std::cout << "Commanding robot to drive around 1m square " << numTimes << " times.\n";
     
    
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     {
         path.path[4*n + 3] = nextPose;
     }
-    
+
     // Return to original heading after completing all circuits
     
     // nextPose.x = 0.0f*SCALAR;
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     // path.path.insert(path.path.end(), nextPose);
     
     path.path_length = path.path.size();
-    
+
     lcm::LCM lcmInstance(MULTICAST_URL);
 	std::cout << "publish to: " << CONTROLLER_PATH_CHANNEL << std::endl;
     lcmInstance.publish(CONTROLLER_PATH_CHANNEL, &path);
