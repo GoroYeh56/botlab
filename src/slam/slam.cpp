@@ -35,6 +35,7 @@ OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
     // Determine which mode to run based on the inputs
     if(mappingOnlyMode)
     {
+        std::cout<<"mapping only mode!"<<std::endl;
         mode_ = mapping_only;
     }
     else if(localizationOnlyMap.length() > 0)
@@ -203,6 +204,7 @@ void OccupancyGridSLAM::runSLAMIteration(void)
     {
        
         updateLocalization();
+        // std::cout<<"runSLAMIteration"<<std::endl;
         updateMap();
     }
     else 
@@ -302,9 +304,9 @@ void OccupancyGridSLAM::updateMap(void)
     {
         auto mapMessage = map_.toLCM();
         lcm_.publish(SLAM_MAP_CHANNEL, &mapMessage);
-        //map_.saveToFile("current.map");
+        map_.saveToFile(this->mapname);
 
     }
-
     ++mapUpdateCount_;
+    std::cout<<"update map: "<<mapUpdateCount_<<std::endl;
 }

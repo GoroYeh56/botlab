@@ -13,6 +13,8 @@ from lcmtypes import mbot_motor_command_t
 LIN_VEL_CMD = 0.2
 ANG_VEL_CMD = 1
 
+Scale = 0.3
+
 lc = lcm.LCM("udpm://239.255.76.67:7667?ttl=1")
 pygame.init()
 pygame.display.set_caption("MBot TeleOp")
@@ -40,13 +42,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             cv2.destroyAllWindows()
     key_input = pygame.key.get_pressed()  
     if key_input[pygame.K_LEFT]:
-        turn_vel += 1.0
+        turn_vel += 1.0*Scale
     if key_input[pygame.K_UP]:
-        fwd_vel +=1.0
+        fwd_vel +=1.0*Scale
     if key_input[pygame.K_RIGHT]:
-        turn_vel -= 1.0
+        turn_vel -= 1.0*Scale
     if key_input[pygame.K_DOWN]:
-        fwd_vel -= 1.0
+        fwd_vel -= 1.0*Scale
     command = mbot_motor_command_t()
     command.trans_v = fwd_vel * LIN_VEL_CMD
     command.angular_v = turn_vel * ANG_VEL_CMD

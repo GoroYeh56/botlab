@@ -86,10 +86,21 @@ pose_xyt_t ParticleFilter::updateFilter(const pose_xyt_t&      odometry,
     // Only update the particles if motion was detected. If the robot didn't move, then
     // obviously don't do anything.
     bool hasRobotMoved = actionModel_.updateAction(odometry);
-    
+    // Don't update our pose if the robot didn't move.
     if(hasRobotMoved)
     {
-        auto prior = resamplePosteriorDistribution();
+
+        /*
+            1. Sample proposal distribution particles
+                - need information from last particle set
+                - low variance sampling (kNumparticles_)
+            2. ComputeNormalizedPosterior (the same)
+            3. Generate a posteriorPose_ (the same)
+        
+        */
+
+        auto prior = LowVarianceResampling();
+        // auto prior = resamplePosteriorDistribution(); // from motion model x ~ p(xt|u, x_t-1)
         auto proposal = computeProposalDistribution(prior);
         posterior_ = computeNormalizedPosterior(proposal, laser, map);
         posteriorPose_ = estimatePosteriorPose(posterior_);

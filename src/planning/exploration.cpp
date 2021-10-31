@@ -47,7 +47,7 @@ Exploration::Exploration(int32_t teamNumber,
     lcmInstance_->publish(EXPLORATION_STATUS_CHANNEL, &status);
     
     MotionPlannerParams params;
-    params.robotRadius = 0.2;
+    params.robotRadius = 0.2; // TODO : Larger (original 0.2)
     planner_.setParams(params);
 }
 
@@ -60,7 +60,7 @@ bool Exploration::exploreEnvironment()
         // If data is ready, then run an update of the exploration routine
         if(isReadyToUpdate())
         {
-            runExploration();
+            runExploration(); // copyDataforUpdate to update Map & Pose
         }
         // Otherwise wait a bit for data to arrive
         else
@@ -95,7 +95,7 @@ void Exploration::handleConfirmation(const lcm::ReceiveBuffer* rbuf, const std::
     std::lock_guard<std::mutex> autoLock(dataLock_);
     if(confirm->channel == CONTROLLER_PATH_CHANNEL && confirm->creation_time == most_recent_path_time) pathReceived_ = true;
 }
-
+// if lcm pass new map and pose channel
 bool Exploration::isReadyToUpdate(void)
 {
     std::lock_guard<std::mutex> autoLock(dataLock_);
@@ -107,7 +107,7 @@ void Exploration::runExploration(void)
 {
     assert(isReadyToUpdate());
     
-    copyDataForUpdate();
+    copyDataForUpdate();  // update currentMap_ & currentPose_
     executeStateMachine();
 }
 
@@ -144,12 +144,42 @@ void Exploration::executeStateMachine(void)
     int8_t nextState = state_;
     
     // Save the path from the previous iteration to determine if a new path was created and needs to be published
-robot_path_t previousPath = currentPath_;
+    robot_path_t previousPath = currentPath_;
+    
+    // Run the state machine until the state remains the same after an iteration of the loop
+    do
+    {
+        switch(state_)
+        {
+            case exploration_status_t::STATE_INITIALIZING:
+                nextState = executeInitializing(); // nextState = exploring_map
+                break;
+            case exploration_status_t::STATE_EXPLORING_MAP:
+                nextState = executeExploringMap(stateChanged);
+                if(nextState == exploration_status_t::STATE_FAILED_EXPLORATION)
+                    std::cout<<"Fail exploration from STATE_EXPLORING_MAP\n";
+                break;
+                
+            case exploration_status_t::STATE_RETURNING_HOME:
+                nextState = executeReturningHome(stateChanged);
+                break;
 
-// Run the state machine until the state remains the same after an iteration of the loop
-do
-{
-    switch (state_)
+            case exploration_status_t::STATE_COMPLETED_EXPLORATION:
+                nextState = executeCompleted(stateChanged);
+                break;
+                
+            case exploration_status_t::STATE_FAILED_EXPLORATION:
+                nextState = executeFailed(stateChanged);
+                break;
+        }
+        
+        stateChanged = nextState != state_;
+        state_ = nextState;
+        
+    } while(stateChanged);
+
+    //if path confirmation was not received, resend path
+    if(!pathReceived_)
     {
     case exploration_status_t::STATE_INITIALIZING:
         nextState = executeInitializing();
@@ -243,12 +273,116 @@ int8_t Exploration::executeExploringMap(bool initialize)
     *           explored more of the map.
     *       -- You will likely be able to see the frontier before actually reaching the end of the path leading to it.
     */
-    this->frontiers_ = find_map_frontiers(this->currentMap_,this->currentPose_);
-    if (!this->planner_.isPathSafe(this->currentPath_)){
-        this->currentPath_ = plan_path_to_frontier(this->frontiers_, this->currentPose_, this->currentMap_, this->planner_);
-    }
-    
+    double minFrontierLength = 0.15; // 0.05 * 3 = 
 
+    // When to select a new frontier (of cells) to explore
+    // 1. front 
+    // from currentPose, run BFS expand (4 connect ) to find frontier_cell and grow_frontier cells
+    
+    //////////////// Robert Lai !!! ////////////////
+    float delay_time = 6000000; // 6 sec
+    frontiers_ = find_map_frontiers(currentMap_, currentPose_, minFrontierLength );
+    if (currentPath_.path.size()< 2 || utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
+        if(currentPath_.path_length < 2)
+            std::cout<<"cur path length <2. "<<currentPath_.path_length<<"\n";
+        else
+            std::cout<<"Too long. delta time: "<<utime_now() - most_recent_path_time<<" us\n";
+        planner_.setMap(currentMap_);
+
+        if(currentPath_.path.size() >1)
+            planner_.setPrevGoal(currentPath_.path[currentPath_.path_length-1]);
+
+        
+        usleep(1000000); // 1s
+        currentPath_ = plan_path_to_frontier(frontiers_, currentPose_, currentMap_, planner_);
+        //robotpath_t
+        // pose_xyt_t path[path_length];
+        
+        //Reduce waypoints.
+        if(currentPath_.path.size() > 5){
+
+            std::vector<pose_xyt_t> tmpPath;
+
+            for(int i=0; i<currentPath_.path_length; ++i){
+                if(i%2==1){
+                    tmpPath.push_back(currentPath_.path[i]);
+                }
+            }
+            this->currentPath_.path = tmpPath;
+            this->currentPath_.path_length = tmpPath.size();
+            std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
+        }
+
+        if(currentPath_.path.size()>0){
+            if(currentPath_.path.back().x == planner_.getPrevGoal().x && currentPath_.path.back().y == planner_.getPrevGoal().y)
+            {
+                std::cout<<"current goal == prev_goal , "<<currentPath_.path.back().x<<", "<<currentPath_.path.back().y<< "\n";
+                // Manually set a path ahead of the robot current cell
+                // current_cell = global_position_to_grid_cell(currentPose_, map); 
+                float dx, dy;
+                const float PI = 3.14159;
+                if(currentPose_.theta>= 0.0 &&  currentPose_.theta < PI/2 ){ // GO right up
+                    dx = +currentMap_.metersPerCell();
+                    dy = +currentMap_.metersPerCell();
+                }
+                else if( currentPose_.theta>= PI/2 &&  currentPose_.theta < PI ){ // GO left up
+                    dx = -currentMap_.metersPerCell();
+                    dy = +currentMap_.metersPerCell();
+
+                }
+                else if(currentPose_.theta <= -PI/2 &&  currentPose_.theta > -PI){ // Go left down
+                    dx = -currentMap_.metersPerCell();
+                    dy = -currentMap_.metersPerCell();
+
+                }
+                else{ // currentPose_.theta <0  &&  currentPose_.theta > -PI/2 : Go right down
+                    dx = +currentMap_.metersPerCell();
+                    dy = -currentMap_.metersPerCell();
+                }
+                std::vector<pose_xyt_t> forward_path {
+                    pose_xyt_t{currentPose_.utime, currentPose_.x + dx, currentPose_.y + dy, 0 },
+                    pose_xyt_t{currentPose_.utime, currentPose_.x + 2*dx, currentPose_.y + 2*dy, 0 }
+                    // ,pose_xyt_t{currentPose_.utime, currentPose_.x+3*currentMap_.metersPerCell(), currentPose_.y+3*currentMap_.metersPerCell(), 0 }
+                };
+                currentPath_.path = forward_path;
+            }
+        }
+        // this->currentPath_ = tmpPath2;
+    }
+    ///////////////////////////////////////////////
+
+    // Exploration Thread:  A* gets the wrong map
+    // The map planner use is not the same as botgui sees.
+
+    // bool stateChanged = initialize;
+    // // If change state: re find new map_frontiers
+
+    // // if there is still frontier points: we should keep exploreing
+    // if(stateChanged){
+    //     std::cout<<"frontiers:\n";
+    // // Use a flag(goal threshold) to determine whether we're still heading to the current exploring goal (frontier point)
+    //     // Use a priority_queue (priority: distance from robot to frontier)
+        // planner_.setMap(currentMap_);
+        // this->frontiers_ = find_map_frontiers(this->currentMap_, 
+        //                                     this->currentPose_,
+        //                                     minFrontierLength);
+        // if(this->frontiers_.empty()){
+        //     std::cout<<"Empty frontiers!\n";
+
+        // }
+        // else{
+        //     std::cout<<"Frontiers:\n";
+        //     for(int i=0; i<this->frontiers_.size(); i++){
+        //         std::cout<<frontiers_[i].cells[0];
+        //     }
+        //     std::cout<<std::endl;            
+                                                
+        //     this->currentPath_ = plan_path_to_frontier(this->frontiers_, 
+        //                                 this->currentPose_,
+        //                                 currentMap_,
+        //                                 planner_);
+        // }
+    // }
 
     /////////////////////////////// End student code ///////////////////////////////
     
@@ -261,16 +395,22 @@ int8_t Exploration::executeExploringMap(bool initialize)
     // If no frontiers remain, then exploration is complete
     if(frontiers_.empty())
     {
+        std::cout<<"No frontiers. STATUS_COMPLETE_EXPLORATION. =>RETURNING_HOME...\n";
         status.status = exploration_status_t::STATUS_COMPLETE;
     }
     // Else if there's a path to follow, then we're still in the process of exploring
     else if(currentPath_.path.size() > 1)
     {
+        // std::cout<<"currentPath.path.size()>1. len: "<<currentPath_.path.size()<<std::endl;
         status.status = exploration_status_t::STATUS_IN_PROGRESS;
     }
     // Otherwise, there are frontiers, but no valid path exists, so exploration has failed
     else
     {
+
+        // PROBLEM HERE!!!10/26
+        std::cout<<"Have valid goal(target_cell) but A* can't find path (return empty path)\n";
+        std::cout<<"We have frontiers but NO valid path\n";
         status.status = exploration_status_t::STATUS_FAILED;
     }
     
@@ -281,6 +421,7 @@ int8_t Exploration::executeExploringMap(bool initialize)
     {
         // Don't change states if we're still a work-in-progress
         case exploration_status_t::STATUS_IN_PROGRESS:
+            std::cout<<"executeExploringMap: we still has a path to follow...\n";
             return exploration_status_t::STATE_EXPLORING_MAP;
             
         // If exploration is completed, then head home
@@ -304,12 +445,41 @@ int8_t Exploration::executeReturningHome(bool initialize)
     /*
     * NOTES:
     *   - At the end of each iteration, then (1) or (2) must hold, otherwise exploration is considered to have failed:
-    *       (1) dist(currentPose_, targetPose_) < kReachedPositionThreshold  :  reached the home pose
+    *       (1) dist(currentPose_, targetPose_) < kReachedPositionThreshold  :  reached the home pose 0.05
     *       (2) currentPath_.path_length > 1  :  currently following a path to the home pose
     */
+    std::cout<<"executeReturningHome: homePose_: "<<homePose_.x<<", "<<homePose_.y<<std::endl;
+    float delay_time = 15000000; // 6 sec
     
+    if ( utime_now() - most_recent_path_time > delay_time) { //Too close to frontier Or 1000us update
+        if(planner_.isValidGoal(pose_xyt_t{currentPose_.utime, (float)homePose_.x, (float)homePose_.y, 0})){
+            
+            
+            this->currentPath_ = this->planner_.planPath(this->currentPose_, this->homePose_);
+            //Reduce waypoints.
+            
+            // if(currentPath_.path_length > 5){
 
+            //     std::vector<pose_xyt_t> tmpPath;
 
+            //     for(int i=0; i<currentPath_.path_length; ++i){
+            //         if(i%2==1){
+            //             tmpPath.push_back(currentPath_.path[i]);
+            //         }
+            //     }
+            //     if(currentPath_.path.size()%2==0)
+            //         tmpPath.push_back(currentPath_.path[currentPath_.path.size()-1]);
+
+            //     this->currentPath_.path = tmpPath;
+            //     this->currentPath_.path_length = tmpPath.size();
+            //     std::cout<<"set currentPath_ : length: "<<currentPath_.path_length<<"\n";
+            // }
+
+        }
+        else{
+            std::cout<<"homePose NOT valid goal.\n ";
+        }
+    }
     /////////////////////////////// End student code ///////////////////////////////
     
     /////////////////////////   Create the status message    //////////////////////////
@@ -320,6 +490,9 @@ int8_t Exploration::executeReturningHome(bool initialize)
     
     double distToHome = distance_between_points(Point<float>(homePose_.x, homePose_.y), 
                                                 Point<float>(currentPose_.x, currentPose_.y));
+
+    // distToHome =  0.0422591;
+    std::cout << "Distance to home: " << distToHome << std::endl;
     // If we're within the threshold of home, then we're done.
     if(distToHome <= kReachedPositionThreshold)
     {
@@ -342,6 +515,9 @@ int8_t Exploration::executeReturningHome(bool initialize)
     if(status.status == exploration_status_t::STATUS_IN_PROGRESS)
     {
         return exploration_status_t::STATE_RETURNING_HOME;
+    }
+    else if(status.status == exploration_status_t::STATUS_COMPLETE){
+        return exploration_status_t::STATE_COMPLETED_EXPLORATION;
     }
     else // if(status.status == exploration_status_t::STATUS_FAILED)
     {

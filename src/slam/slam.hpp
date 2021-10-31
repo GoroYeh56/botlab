@@ -14,6 +14,8 @@
 #include <deque>
 #include <mutex>
 
+#define MAPPING_UPDATE_PERIOD 4
+
 /**
 * OccupancyGridSLAM runs on a thread and handles mapping.
 * 
@@ -93,11 +95,13 @@ private:
     pose_xyt_t previousPose_;
     pose_xyt_t currentPose_;
     
-    ParticleFilter filter_;
+    ParticleFilter filter_;  // for updateLocalization
     OccupancyGrid map_;
     Mapping mapper_;
     bool uniformDistribution_;
     
+    std::string mapname;
+
     lcm::LCM& lcm_;
     int mapUpdateCount_;  // count so we only send the map occasionally, as it takes lots of bandwidth
     

@@ -87,10 +87,3 @@ lc.publish("MBOT_MOTOR_COMMAND",stop_command.encode())
   
   
   
-  
-  
-  
-  
-  
-  
-  
