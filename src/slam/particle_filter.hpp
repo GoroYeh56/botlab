@@ -75,6 +75,9 @@ public:
     * particles retrieves the posterior set of particles being used by the algorithm.
     */
     particles_t particles(void) const;
+
+
+
     
 private:
     
@@ -86,6 +89,9 @@ private:
     
     int kNumParticles_;         // Number of particles to use for estimating the pose
     
+    double RandomFloat(double a, double b);
+    std::vector<particle_t> LowVarianceResampling(void);
+
     std::vector<particle_t> resamplePosteriorDistribution(void);
     std::vector<particle_t> computeProposalDistribution(const std::vector<particle_t>& prior);
     std::vector<particle_t> computeNormalizedPosterior(const std::vector<particle_t>& proposal,

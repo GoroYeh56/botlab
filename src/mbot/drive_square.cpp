@@ -11,29 +11,29 @@ int main(int argc, char** argv)
 {std::cout << "here" <<std::endl;
     int numTimes = 4;
     // int numTimes = 1;
-
+    
     if(argc > 1)
     {
         numTimes = std::atoi(argv[1]);
     }
 
     std::cout << "Commanding robot to drive around 1m square " << numTimes << " times.\n";
-
-
+    
+   
     robot_path_t path;
     path.path.resize(numTimes * 4); // utime, x, y, theta
-
+    
     pose_xyt_t nextPose;
-
+    
     nextPose.x = 1.0f*SCALAR;
     nextPose.y = 0.0f*SCALAR;
     nextPose.theta = M_PI_2;
-
+    
     for(int n = 0; n < numTimes; ++n)
     {
         path.path[4*n] = nextPose;
     }
-
+    
     nextPose.x = 1.0f*SCALAR;
     nextPose.y = 1.0f*SCALAR;
     nextPose.theta = M_PI;
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     {
         path.path[4*n + 1] = nextPose;
     }
-
+    
     nextPose.x = 0.0f*SCALAR;
     nextPose.y = 1.0f*SCALAR;
     nextPose.theta = -M_PI/2;
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
     {
         path.path[4*n + 2] = nextPose;
     }
-
+    
     nextPose.x = 0.0f*SCALAR;
     nextPose.y = 0.0f*SCALAR;
     nextPose.theta = 0;
@@ -59,12 +59,12 @@ int main(int argc, char** argv)
     }
 
     // Return to original heading after completing all circuits
-
+    
     // nextPose.x = 0.0f*SCALAR;
     // nextPose.y = 0.0f*SCALAR;
-    // nextPose.theta = 0;
+    // nextPose.theta = 0; 
     // path.path.insert(path.path.end(), nextPose);
-
+    
     path.path_length = path.path.size();
 
     lcm::LCM lcmInstance(MULTICAST_URL);

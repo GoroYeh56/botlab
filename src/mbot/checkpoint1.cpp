@@ -14,12 +14,12 @@ using namespace std;
 // Speed mode target FAST, SLOW
 #define FAST
 
-#ifdef SLOW
+#ifdef SLOW 
     vector<vector<float>> targets= {
-        {1.1, 0, 0},          //
+        {1.1, 0, 0},          // 
         {1.1, -1, -M_PI_2},   //    y more
         {2.3, -1, 0},        // x more
-        {2.3, 0.9, M_PI_2},     //
+        {2.3, 0.9, M_PI_2},     // 
         {3.3, 0.9, 0},          // x more This point too short
         {3.3, -1.2, -M_PI_2},  //
         {4.2, -1.2, 0},      //
@@ -29,10 +29,10 @@ using namespace std;
 #else
     #ifdef FAST
         vector<vector<float>> targets= {
-            {1.05, 0, 0},          //
+            {1.05, 0, 0},          // 
             {1.1, -1, -M_PI_2},   //    y more
             {2.21, -1, 0},        // x more
-            {2.21, 0.9, M_PI_2},     //
+            {2.21, 0.9, M_PI_2},     // 
             {3.23, 0.9, 0},          // x more This point too short
             {3.23, -1.2, -M_PI_2},  //
             {4.2, -1.2, 0},      //
@@ -59,15 +59,15 @@ int main(int argc, char** argv)
 {std::cout << "here" <<std::endl;
     // int numTimes = 4;
     int numTimes = 1;
-
+    
     if(argc > 1)
     {
         numTimes = std::atoi(argv[1]);
     }
-
+    
     std::cout << "Commanding robot to drive checkpoint1 " << numTimes << " times.\n";
-
-
+    
+   
     robot_path_t path;
     path.path.resize(targets.size()); // utime, x, y, theta
 
@@ -75,13 +75,13 @@ int main(int argc, char** argv)
         pose_xyt_t nextPose;
         nextPose.x = targets[i][0]*SCALE;
         nextPose.y = targets[i][1]*SCALE;
-        nextPose.theta = targets[i][2];
+        nextPose.theta = targets[i][2];     
         path.path[i] = nextPose;
     }
-
+    
 
     path.path_length = path.path.size();
-
+    
     int index=0;
     for(auto pose : path.path){
         cout<<index++<<": "<<pose.x<<", "<<pose.y<<", "<<pose.theta<<endl;

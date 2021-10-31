@@ -3,6 +3,22 @@
 
 #include <common/point.hpp>
 #include <vector>
+#include <queue>
+
+typedef Point<int> cell_t;
+
+struct DistanceNode{
+    cell_t cell;
+    float distance;
+    bool operator<(const DistanceNode& rhs)const{
+        return rhs.distance < distance;
+    }
+    DistanceNode(cell_t cell, float distance)
+    :cell(cell)
+    ,distance(distance)
+    {}
+};
+
 
 class OccupancyGrid;
 
@@ -58,6 +74,10 @@ public:
     */
     bool isCellInGrid(int x, int y) const;
     
+    
+    void initializedDistances(const OccupancyGrid& map);  
+    void enqueue_obstacle_cells(ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
+    void expand_node(const DistanceNode& nextNode,  ObstacleDistanceGrid& grid, std::priority_queue<DistanceNode>& searchQueue);
     /**
     * operator() provides unchecked access to the cell located at (x,y). If the cell isn't contained in the grid,
     * expect fireworks or a slow, ponderous death.
@@ -87,6 +107,7 @@ private:
     
     // Allow private write-access to cells
     float& distance(int x, int y) { return cells_[cellIndex(x, y)]; }
+
 };
 
 #endif // PLANNING_OBSTACLE_DISTANCE_GRID_HPP

@@ -93,7 +93,7 @@ public:
     Point<float> originInGlobalFrame(void) const { return globalOrigin_; }
     
     void setOrigin(float x, float y);
-
+    
     /**
     * reset resets all cells into the grid to equal odds. All cells will have logOdds == 0.
     */

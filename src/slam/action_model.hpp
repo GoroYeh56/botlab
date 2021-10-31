@@ -43,6 +43,8 @@ public:
     * \return   The pose transform distribution representing the uncertainty of the robot's motion.
     */
     bool updateAction(const pose_xyt_t& odometry);
+    // Calculate std based on how much the robot move
+    // The width of the distribution we sample ~ k1_, k2_
     
     /**
     * applyAction applies the motion to the provided sample and returns a new sample that
@@ -54,8 +56,28 @@ public:
     particle_t applyAction(const particle_t& sample);
     
 private:
+    const float k1_;
+    const float k2_;
+    
+    // previous odometry message
+    pose_xyt_t previousOdometry_;
+    // Keep track of what rotations are
+    double rot1_;
+    double trans_;
+    double rot2_;
+    bool moved_;
+    bool initialized_;
+    int64_t utime_;
+
+    double rot1Std_;
+    double transStd_;
+    double rot2Std_;
+
+    // To generate randomness:
+    std::mt19937 numberGenerateor_;
     
     ////////// TODO: Add private member variables needed for you implementation ///////////////////
 };
 
 #endif // SLAM_ACTION_MODEL_HPP
+;
