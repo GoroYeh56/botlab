@@ -7,26 +7,28 @@
 #include <chrono>
 
 OccupancyGridSLAM::OccupancyGridSLAM(int         numParticles,
-                                     int8_t      hitOddsIncrease,
-                                     int8_t      missOddsDecrease,
-                                     lcm::LCM&   lcmComm,
-                                     bool waitForOptitrack,
-                                     bool mappingOnlyMode,
-                                     bool actionOnlyMode,
-                                     const std::string localizationOnlyMap,
-                                     std::string MapName)
-: mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
-, haveInitializedPoses_(false)
-, waitingForOptitrack_(waitForOptitrack)
-, haveMap_(false)
-, numIgnoredScans_(0)
-, filter_(numParticles)
-, map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
-, mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
-, lcm_(lcmComm)
-, mapUpdateCount_(0)
-, mapname(MapName)
+    int8_t      hitOddsIncrease,
+    int8_t      missOddsDecrease,
+    lcm::LCM& lcmComm,
+    bool waitForOptitrack,
+    bool mappingOnlyMode,
+    bool actionOnlyMode,
+    const std::string localizationOnlyMap,
+    bool uniformDistribution)
+    : mode_(full_slam)  // default is running full SLAM, unless user specifies otherwise on the command line
+    , haveInitializedPoses_(false)
+    , waitingForOptitrack_(waitForOptitrack)
+    , haveMap_(false)
+    , numIgnoredScans_(0)
+    , filter_(numParticles)
+    , map_(10.0f, 10.0f, 0.05f) //30,30,0.1  // create a 10m x 10m grid with 0.05m cells
+    , mapper_(5.0f, hitOddsIncrease, missOddsDecrease)
+    , lcm_(lcmComm)
+    , mapUpdateCount_(0)
+    , uniformDistribution_(uniformDistribution)
+
 {
+    //this->uniformDistribution_ = uniformDistribution;
     // Confirm that the mode is valid -- mapping-only and localization-only are not specified
     assert(!(mappingOnlyMode && localizationOnlyMap.length() > 0));
     
@@ -193,12 +195,14 @@ bool OccupancyGridSLAM::isReadyToUpdate(void)
 
 void OccupancyGridSLAM::runSLAMIteration(void)
 {
+    
     copyDataForSLAMUpdate();
     initializePosesIfNeeded();
     
     // Sanity check the laser data to see if rplidar_driver has lost sync
     if(currentScan_.num_ranges > 100)//250)
     {
+       
         updateLocalization();
         // std::cout<<"runSLAMIteration"<<std::endl;
         updateMap();
@@ -246,8 +250,13 @@ void OccupancyGridSLAM::initializePosesIfNeeded(void)
         currentPose_ = previousPose_;
         currentPose_.utime  = currentScan_.times.back();
         haveInitializedPoses_ = true;
+        if (this->uniformDistribution_) {
+            filter_.initializeFilterUniformly(previousPose_, this->map_);
+        }
+        else {
+            filter_.initializeFilterAtPose(previousPose_);
+        }
         
-        filter_.initializeFilterAtPose(previousPose_);
     }
     
     assert(haveInitializedPoses_);
@@ -267,9 +276,13 @@ void OccupancyGridSLAM::updateLocalization(void)
         }
         
         auto particles = filter_.particles();
+        distance_t distance;
+        distance.distance = filter_.averageParticleDistanceFromMean();
 
         lcm_.publish(SLAM_POSE_CHANNEL, &currentPose_);
         lcm_.publish(SLAM_PARTICLES_CHANNEL, &particles);
+        lcm_.publish(SLAM_DISTANCE_CHANNEL, &distance);
+
 
    }
 }
@@ -280,13 +293,14 @@ void OccupancyGridSLAM::updateMap(void)
     if(mode_ != localization_only && mode_ != action_only)
     {
         // Process the map
+        
         mapper_.updateMap(currentScan_, currentPose_, map_);
         haveMap_ = true;
     }
 
     // Publish the map even in localization-only mode to ensure the visualization is meaningful
     // Send every 5th map -- about 1Hz update rate for map output -- can change if want more or less during operation
-    if(mapUpdateCount_ % MAPPING_UPDATE_PERIOD == 0)
+    if(mapUpdateCount_ % 3 == 0)
     {
         auto mapMessage = map_.toLCM();
         lcm_.publish(SLAM_MAP_CHANNEL, &mapMessage);

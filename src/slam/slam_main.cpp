@@ -14,6 +14,7 @@ int main(int argc, char** argv)
     const char* kMappingOnlyArg = "mapping-only";
         const char* kActionOnlyArg = "action-only";
     const char* kLocalizationOnlyArg = "localization-only";
+    const char* kUniformParticlesArg = "uniform-particles";
     
     // Handle Options
     getopt_t *gopt = getopt_create();
@@ -24,6 +25,7 @@ int main(int argc, char** argv)
     getopt_add_bool(gopt, '\0', kUseOptitrackArg, 0, "Flag indicating if the map reference frame should be set to the Optitrack reference frame.");
     getopt_add_bool(gopt, '\0', kMappingOnlyArg, 0, "Flag indicating if mapping-only mode should be run");
     getopt_add_bool(gopt, '\0', kActionOnlyArg, 0, "Flag indicating if action-only mode should be run");
+    getopt_add_bool(gopt, '\0', kUniformParticlesArg, 0, "Flag indicating if particle filter should be initialized uniformly.");
     getopt_add_string(gopt, '\0', kLocalizationOnlyArg, "", "Localization only mode should be run. Name of map to use is provided.");
     
     if (!getopt_parse(gopt, argc, argv, 1) || getopt_get_bool(gopt, "help")) {
@@ -38,6 +40,7 @@ int main(int argc, char** argv)
     bool useOptitrack = getopt_get_bool(gopt, kUseOptitrackArg);
     bool mappingOnly = getopt_get_bool(gopt, kMappingOnlyArg);
     bool actionOnly = getopt_get_bool(gopt, kActionOnlyArg);
+    bool uniformParticles = getopt_get_bool(gopt, kUniformParticlesArg);
     std::string localizationMap = getopt_get_string(gopt, kLocalizationOnlyArg);
 
     signal(SIGINT, exit);  
@@ -59,7 +62,7 @@ int main(int argc, char** argv)
                            mappingOnly,
                            actionOnly,
                            localizationMap,
-                           MapName);
+                           uniformParticles);
     
     std::thread slamThread([&slam]() {
         slam.runSLAM();

@@ -36,6 +36,9 @@ public:
     * \pre  numParticles > 1
     */
     ParticleFilter(int numParticles);
+
+
+    void initializeFilterUniformly(const pose_xyt_t& pose, const OccupancyGrid& map);
     
     /**
     * initializeFilterAtPose initializes the particle filter with the samples distributed according
@@ -76,8 +79,7 @@ public:
     */
     particles_t particles(void) const;
 
-
-
+    double averageParticleDistanceFromMean(void);
     
 private:
     

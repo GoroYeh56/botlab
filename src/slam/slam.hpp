@@ -4,6 +4,7 @@
 #include <lcmtypes/lidar_t.hpp>
 #include <lcmtypes/odometry_t.hpp>
 #include <lcmtypes/pose_xyt_t.hpp>
+#include <lcmtypes/distance_t.hpp>
 #include <slam/particle_filter.hpp>
 #include <slam/mapping.hpp>
 #include <common/pose_trace.hpp>
@@ -47,7 +48,7 @@ public:
                       bool mappingOnlyMode = false,
                       bool actionOnlyMode = false,
                       const std::string localizationOnlyMap = std::string(""),
-                      std::string MapName = std::string(""));
+                      bool uniformDistribution = false);
     
     /**
     * runSLAM enters an infinite loop where SLAM will keep running as long as data is arriving.
@@ -97,6 +98,7 @@ private:
     ParticleFilter filter_;  // for updateLocalization
     OccupancyGrid map_;
     Mapping mapper_;
+    bool uniformDistribution_;
     
     std::string mapname;
 

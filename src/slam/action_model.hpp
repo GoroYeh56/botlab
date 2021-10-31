@@ -1,4 +1,4 @@
-#ifndef SLAM_ACTION_MODEL_HPP
+ #ifndef SLAM_ACTION_MODEL_HPP
 #define SLAM_ACTION_MODEL_HPP
 
 #include <lcmtypes/pose_xyt_t.hpp>
@@ -43,9 +43,7 @@ public:
     * \return   The pose transform distribution representing the uncertainty of the robot's motion.
     */
     bool updateAction(const pose_xyt_t& odometry);
-    // Calculate std based on how much the robot move
-    // The width of the distribution we sample ~ k1_, k2_
-    
+    bool updateActionOdometry(const pose_xyt_t& odometry);
     /**
     * applyAction applies the motion to the provided sample and returns a new sample that
     * can be part of the proposal distribution for the particle filter.
@@ -77,6 +75,30 @@ private:
     std::mt19937 numberGenerateor_;
     
     ////////// TODO: Add private member variables needed for you implementation ///////////////////
+    const float k1_;
+    const float k2_;
+    //bool initialized_;
+
+    pose_xyt_t previousOdometry_;
+    double rot1_;
+    double trans_;
+    double rot2_;
+    bool moved_;
+    bool initialized_;
+    int64_t utime_;
+
+    double rot1Std_;
+    double transStd_;
+    double rot2Std_;
+
+    std::mt19937 numberGenerator_;
+
+    /*
+    float prob_normal_distribution(float x, float variance);
+    float sample_normal_distribution(float variance);
+    float sample_uniform_distribution(float high, float low);
+    */
+
 };
 
 #endif // SLAM_ACTION_MODEL_HPP

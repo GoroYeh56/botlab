@@ -30,7 +30,9 @@ using namespace std;
  *  - Limit (min max) the speeds that your robot is commanded
  *      to avoid commands to slow for your bots or ones too high
  */
-///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////   
+
+
 
 #define DEBUG_STATE
 
@@ -62,7 +64,34 @@ public:
     StraightManeuverController() = default;
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
-        return {0, 0.1, 0};
+        
+        this->t_now = utime_now();
+        
+        
+
+        this->prevDev = this->dev;
+        this->dev = sqrt(pow((target.x - pose.x), 2) + pow((target.y - pose.y), 2));
+          
+
+        v = Kp * (this->dev); //+Ki*(this->Dt)*this->dev + Kd * (this->xDeviation - this->prevDev) / (this->Dt);
+                
+        float dx = target.x - pose.x;
+        float dy = target.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        float angleDeviation = angle_diff(pose.theta, target_heading);
+        
+        float w = Komega * angleDeviation;
+        
+        this->Dt = (t_now - t_prev);
+        this->t_prev = this->t_now;
+        this->t_next = this->t_now + 1000;
+        
+        if (v > 1.5) v = 1.5;
+        if (v < -1.5) v = -1.5;
+        if (w > 6) w = 6;   
+        if (w < -6) w = -6;
+        
+        return {0, v, w};
     }
 
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
@@ -77,13 +106,25 @@ public:
 
 };
 
+
 class TurnManeuverController : public ManeuverControllerBase
 {
 public:
     TurnManeuverController() = default;
     virtual mbot_motor_command_t get_command(const pose_xyt_t& pose, const pose_xyt_t& target) override
     {
-        return {0, 0, 0.5};
+        float dx = target.x - pose.x;
+        float dy = target.y - pose.y;
+        float target_heading = atan2(dy, dx);
+        float wError = angle_diff(target_heading, pose.theta);
+
+        float w = Kp*wError;// PI / 4;
+        /*if (wError < 0) {
+            w = -2.5;//-PI/4;
+        }*/
+        if (w < 1 && w > 0.02) w = 1;
+        return { 0, 0, w };
+       
     }
     // For 'heading' alignment
     virtual bool target_reached(const pose_xyt_t& pose, const pose_xyt_t& target)  override
@@ -167,6 +208,7 @@ public:
             }
             else if(state_ == DRIVE)
             {
+                std::cout << "\rDRIVING";
                 if(straight_controller.target_reached(pose, target))
                 {
 
@@ -364,6 +406,7 @@ int main(int argc, char** argv)
     MotionController controller(&lcmInstance);
 
     signal(SIGINT, exit);
+    std::cout << "\n";
     
     // if(argc < 2){
     //     printf("Wrong input format. ./motion_controller <speed_mode> (0: Fast, 1: Slow)\n");

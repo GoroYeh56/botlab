@@ -10,8 +10,8 @@ sys.path.append("lcmtypes")
 import lcm
 from lcmtypes import mbot_motor_command_t
 
-LIN_VEL_CMD = 1.5
-ANG_VEL_CMD = 6.28
+LIN_VEL_CMD = 0.2
+ANG_VEL_CMD = 1
 
 Scale = 0.3
 
