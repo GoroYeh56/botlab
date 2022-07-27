@@ -149,6 +149,42 @@ particles_t ParticleFilter::particles(void) const
     return particles;
 }
 
+// sample new particles from posterior_
+
+double ParticleFilter::RandomFloat(double a, double b) {
+    double random = ((double) rand()) / (double) RAND_MAX;
+    double diff = b - a;
+    double r = random * diff;
+    return a + r;
+}
+
+std::vector<particle_t> ParticleFilter::LowVarianceResampling(void)
+{
+    //////////// TODO: Implement your algorithm for resampling from the posterior distribution ///////////////////
+    
+    std::vector<particle_t> prior = posterior_;
+    double r = RandomFloat(0.0, 1/kNumParticles_);
+    double c = posterior_[0].weight;
+    std::cout<<"c[0] "<<c<<std::endl;
+    int i = 0;
+
+    for(int m = 0; m < kNumParticles_; m++){
+        double U = r + (m) * (1.0/(double)kNumParticles_);
+        while( U>c){
+            i += 1;
+            i = std::min(i, kNumParticles_-1);
+            assert(i < kNumParticles_);
+            c += posterior_[i].weight;
+        }
+        prior[m] = posterior_[i];
+        prior[m].parent_pose = posteriorPose_;
+    }
+
+    return prior;    
+}
+
+
+
 double MMA_rand(double high, double low) {
     return low + static_cast <double> (std::rand()) / (static_cast <double> (RAND_MAX / (low - high)));
 }
